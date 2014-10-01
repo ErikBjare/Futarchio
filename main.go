@@ -9,12 +9,21 @@ import (
 	"math/rand"
 	"net/http"
 	//	"strconv"
+	"github.com/golang/oauth2"
+	"os"
 	"time"
 )
 
 type User struct {
-	Id   bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	Name string        `json:"name"`
+	Id      bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	Name    string        `json:"name"`
+	Email   string        `json:"email"`
+	ApiKeys []string      `json:"apikeys"`
+}
+
+func NewUser(name string, email string, apikeys []string) *User {
+	id := bson.NewObjectId()
+	return &User{Id: id, Name: name, Email: email, ApiKeys: apikeys}
 }
 
 type Resource struct {
@@ -23,7 +32,7 @@ type Resource struct {
 }
 
 type UserResource struct {
-	Resource
+	*Resource
 }
 
 func NewSession() *mgo.Session {
@@ -38,81 +47,163 @@ func NewSession() *mgo.Session {
 	return session
 }
 
-func NewResource(collection string, session *mgo.Session) *UserResource {
+func NewResource(collection string, session *mgo.Session) *Resource {
 	c := session.DB("test").C(collection)
-	u := new(UserResource)
+	u := new(Resource)
 	u.collection = c
 	return u
 }
 
+func NewUserResource(session *mgo.Session) *UserResource {
+	ur := &UserResource{NewResource("users", session)}
+	return ur
+}
+
+func NewPollResource(session *mgo.Session) *UserResource {
+	ur := &UserResource{NewResource("users", session)}
+	return ur
+}
+
 func (u UserResource) findUser(request *restful.Request, response *restful.Response) {
-	id := bson.ObjectIdHex(request.PathParameter("user-id"))
+	var q *mgo.Query
+	user_id := request.PathParameter("user-id")
+	email := request.PathParameter("email")
+
+	switch {
+	case user_id != "":
+		id := bson.ObjectIdHex(user_id)
+		q = u.collection.Find(bson.M{"_id": id})
+	case email != "":
+		q = u.collection.Find(bson.M{"email": email})
+	default:
+		q = u.collection.Find(bson.M{})
+	}
+
 	result := []User{}
-	u.collection.Find(bson.M{"_id": id}).All(&result)
-	log.Println(fmt.Sprintf("%d matching entries in database for id: %s", len(result), id))
-	response.WriteAsJson(map[string]interface{}{"length": len(result), "data": result})
+	q.All(&result)
+	log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
+	if len(result) == 0 {
+		response.AddHeader("Content-Type", "text/plain")
+		response.WriteErrorString(http.StatusNotFound, "404: User could not be found.")
+		return
+	}
+	response.WriteEntity(map[string]interface{}{"length": len(result), "data": result})
 }
 
-func paths(ws *restful.WebService) {
+func (u UserResource) Register(container *restful.Container) {
+	ws := new(restful.WebService)
+
 	ws.
-		Path("/users").
-		Consumes(restful.MIME_XML, restful.MIME_JSON).
-		Produces(restful.MIME_JSON, restful.MIME_XML)
+		Path("/api/0/users").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
 	log.Println("Initialized paths")
-}
 
-func routes(ws *restful.WebService) {
-	session := NewSession()
-	u := NewResource("users", session)
-	ws.Route(ws.GET("/{user-id}").To(u.findUser).
-		Doc("get a user").
+	ws.Route(ws.GET("/id/{user-id}").To(u.findUser).
+		Doc("get a user by id").
 		Param(ws.PathParameter("user-id", "identifier of the user").DataType("string")).
 		Writes(User{}))
+	ws.Route(ws.GET("/email/{email}").To(u.findUser).
+		Doc("get a user by email").
+		Param(ws.PathParameter("email", "email of the user").DataType("string")).
+		Writes(User{}))
+	ws.Route(ws.GET("/").To(u.findUser).
+		Doc("get a list of all users").
+		Writes(User{}))
 	log.Println("Initialized routes")
-}
 
-func serve(ws *restful.WebService) {
-	container := restful.NewContainer()
 	container.Add(ws)
-	server := &http.Server{Addr: ":8081", Handler: container}
-	log.Println("Listening...")
-	server.ListenAndServe()
 }
 
-func test_mgo() {
-	session := NewSession()
-	userResource := NewResource("users", session)
-	c := userResource.collection
-	for _, element := range []string{"Erik", "Clara"} {
+func (u UserResource) Init() {
+	c := u.collection
+	for _, elem := range [][]string{{"Erik", "erik@bjareho.lt"}, {"Clara", "idunno@example.com"}} {
+		name, email := elem[0], elem[1]
 		result := []User{}
-		err := c.Find(bson.M{"name": element}).All(&result)
+		err := c.Find(bson.M{"name": name}).All(&result)
 
 		if len(result) == 0 {
-			id := bson.NewObjectId()
-			log.Println("Creating user, did not exist.\n - name: " + element + "\n - id: " + id.Hex())
-			err = c.Insert(&User{id, element})
+			user := NewUser(name, email, []string{})
+			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
+			err = c.Insert(user)
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else if err != nil {
 			log.Println(err)
 		} else {
-			log.Println(fmt.Sprintf("%d matching entries in database for name: %s, had id: %s", len(result), element, result[0].Id))
+			log.Println(fmt.Sprintf("%d matching entries in database for name: %s, had id: %s", len(result), name, result[0].Id))
 		}
-
 	}
+}
+
+func oauth_test() {
+	file, err := os.Open("key.pem")
+	if err != nil {
+		panic(err)
+	}
+	key := []byte{}
+	file.Read(key)
+
+	conf, err := oauth2.NewJWTConfig(&oauth2.JWTOptions{
+		Email: "643992545442-u8dubmhq38dor5bvltjb2o98tv3musqq@developer.gserviceaccount.com",
+		// The contents of your RSA private key or your PEM file
+		// that contains a private key.
+		// If you have a p12 file instead, you
+		// can use `openssl` to export the private key into a pem file.
+		//
+		//    $ openssl pkcs12 -in key.p12 -out key.pem -nodes
+		//
+		// It only supports PEM containers with no passphrase.
+		PrivateKey: key,
+		Scopes:     []string{"profile"},
+	},
+		"https://provider.com/o/oauth2/token")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Initiate an http.Client, the following GET request will be
+	// authorized and authenticated on the behalf of
+	// xxx@developer.gserviceaccount.com.
+	client := http.Client{Transport: conf.NewTransport()}
+	client.Get("...")
+
+	// If you would like to impersonate a user, you can
+	// create a transport with a subject. The following GET
+	// request will be made on the behalf of user@example.com.
+	client = http.Client{Transport: conf.NewTransportWithUser("user@example.com")}
+	client.Get("...")
+}
+
+func serve(wsContainer *restful.Container) {
+	mux := http.NewServeMux()
+	mux.Handle("/api/", wsContainer)
+	mux.Handle("/", http.FileServer(http.Dir("site")))
+	server := &http.Server{Addr: ":8080", Handler: mux}
+
+	log.Println("Frontend is serving on: http://localhost:8080")
+	log.Println("API is serving on: http://localhost:8080/api/")
+	server.ListenAndServe()
 }
 
 func main() {
 	log.Println("Started...")
 	rand.Seed(time.Now().Unix())
-	ws := new(restful.WebService)
 
-	test_mgo()
+	wsContainer := restful.NewContainer()
+	session := NewSession()
+	u := NewUserResource(session)
+	u.Register(wsContainer)
+	u.Init()
 
-	paths(ws)
-	routes(ws)
-	serve(ws)
+	go serve(wsContainer)
+
+	queue := make(chan error)
+	for {
+		err := <-queue
+		log.Println(err)
+	}
 
 	log.Println("Quitting")
 }

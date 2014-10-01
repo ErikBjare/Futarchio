@@ -1,0 +1,74 @@
+<h1>Admin Panel</h1>
+<p>
+  API is located at <code>/api/</code><br>
+  Resources follow the format <code>/api/&lt;version&gt;/&lt;resource&gt;</code>
+</p>
+
+<h2>API</h2>
+<p>
+  <a href="/api/0/users/email/erik@bjareho.lt">Try to find Erik by email</a>
+</p>
+
+<div class="col-md-4 box">
+  <b>Print to console</b><br>
+  <div style="overflow: auto;">
+    <input type=text ng-model="stdin"></input>
+    <button ng-click="log()">
+      Saganize!<br>
+      <img src="/img/sagan.jpg">
+    </button>
+  </div>
+</div>
+
+<div class="col-md-4 box container">
+  <b>Find Entity</b><br>
+
+  <div class=row>
+    <div class="col-md-6">
+      <select class="form-control" ng-model="resource">
+        <option ng-repeat="res in resources">{{res}}</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <select class="col-md-4 form-control" ng-model="lookupKey">
+        <option ng-repeat="key in keys">{{key}}</option>
+      </select>
+    </div>
+
+    <div class="col-md-12">
+      <input class="col-md-4 form-control" type=text ng-model="lookupValue"></input>
+    </div>
+  </div>
+
+    <hr>
+
+    <div class="col-md-offset-5 col-md-2">
+      <button class="btn" ng-click="findUser()">
+        Find
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4 box" ng-controller="PollController">
+  <b>Create Poll</b><br>
+
+  <select ng-model="resource">
+    <option ng-repeat="res in resources">{{res}}</option>
+  </select>
+
+  <input type=text ng-model="lookupValue"></input>
+  <input type=text ng-model="lookupValue"></input>
+
+  <button ng-click="createPoll()">
+    <img src="/img/sagan.jpg">
+  </button>
+</div>
+
+<div class="col-md-12 box console">
+  <b>Console</b><br>
+  <span ng-repeat="logentry in stdout | limitTo: 10">
+    {{logentry.msg}}<br>
+  </span>
+</div>

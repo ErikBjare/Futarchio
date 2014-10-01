@@ -1,0 +1,37 @@
+<div class="col-md-9">
+  <h1>Polls</h1>
+</div>
+
+<div class="col-md-9" ng-controller="PollsController">
+  <div ng-repeat="poll in polls">
+    <h2>{{poll.text}}</h2>
+    <small>By {{poll.user}}</small>
+  </div>
+
+  <div class="col-md-4 box">
+    <b>Create Poll</b><br>
+
+    <select ng-model="resource">
+      <option ng-repeat="res in resources">{{res}}</option>
+    </select>
+
+    <input type=text ng-model="lookupValue"></input>
+    <input type=text ng-model="lookupValue"></input>
+
+    <button ng-click="createPoll()">
+      <img src="/img/sagan.jpg">
+    </button>
+  </div>
+
+  <div class="col-md-12 box console">
+    <b>Console</b><br>
+    <span ng-repeat="logentry in stdout | limitTo: 10">
+      {{logentry.msg}}<br>
+    </span>
+  </div>
+</div>
+
+<div class="col-md-3">
+  Sidebar goes here
+</div>
+

@@ -1,0 +1,16 @@
+body {
+  padding: 15px
+}
+
+.box {
+  border: 1px #AAA solid;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.console {
+  background-color: #000;
+  color: #0F0;
+  padding: 5px;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
