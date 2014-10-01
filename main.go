@@ -1,23 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"github.com/emicklei/go-restful"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
+	//	"strconv"
 	"time"
 )
 
 type User struct {
-	_Id  bson.ObjectId `json:"id"`
+	Id   bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	Name string        `json:"name"`
-}
-
-func (u User) getJson() map[string]string {
-	return map[string]string{"name": u.Name, "id": strconv.Itoa(u.Id)}
 }
 
 type Resource struct {
@@ -49,15 +46,11 @@ func NewResource(collection string, session *mgo.Session) *UserResource {
 }
 
 func (u UserResource) findUser(request *restful.Request, response *restful.Response) {
-	id, err := strconv.Atoi(request.PathParameter("user-id"))
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		result := []User{}
-		err = u.collection.Find(bson.M{"id": id}).All(&result)
-		log.Println(result[0].Name)
-		response.WriteAsJson(result)
-	}
+	id := bson.ObjectIdHex(request.PathParameter("user-id"))
+	result := []User{}
+	u.collection.Find(bson.M{"_id": id}).All(&result)
+	log.Println(fmt.Sprintf("%d matching entries in database for id: %s", len(result), id))
+	response.WriteAsJson(map[string]interface{}{"length": len(result), "data": result})
 }
 
 func paths(ws *restful.WebService) {
@@ -70,7 +63,7 @@ func paths(ws *restful.WebService) {
 
 func routes(ws *restful.WebService) {
 	session := NewSession()
-	u := NewResource("", session)
+	u := NewResource("users", session)
 	ws.Route(ws.GET("/{user-id}").To(u.findUser).
 		Doc("get a user").
 		Param(ws.PathParameter("user-id", "identifier of the user").DataType("string")).
@@ -87,24 +80,16 @@ func serve(ws *restful.WebService) {
 }
 
 func test_mgo() {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	// Optional. Switch the session to a monotonic behavior.
-	session.SetMode(mgo.Monotonic, true)
-
+	session := NewSession()
+	userResource := NewResource("users", session)
+	c := userResource.collection
 	for _, element := range []string{"Erik", "Clara"} {
-		c := session.DB("test").C("users")
+		result := []User{}
+		err := c.Find(bson.M{"name": element}).All(&result)
 
-		result := User{}
-		err = c.Find(bson.M{"name": element}).One(&result)
-
-		if result == *new(User) {
-			id := rand.Int()
-			log.Println("Creating user, did not exist.\n - name: " + element + "\n - id: " + strconv.Itoa(id))
+		if len(result) == 0 {
+			id := bson.NewObjectId()
+			log.Println("Creating user, did not exist.\n - name: " + element + "\n - id: " + id.Hex())
 			err = c.Insert(&User{id, element})
 			if err != nil {
 				log.Fatal(err)
@@ -112,7 +97,7 @@ func test_mgo() {
 		} else if err != nil {
 			log.Println(err)
 		} else {
-			log.Println("In database: " + result.Name)
+			log.Println(fmt.Sprintf("%d matching entries in database for name: %s, had id: %s", len(result), element, result[0].Id))
 		}
 
 	}
