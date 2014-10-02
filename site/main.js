@@ -26,15 +26,13 @@ angular.module('WeArePeopleApp', ["ngResource", "ngRoute"])
 })
 
 .controller('MainController', function($scope, $route, $location) {
-    $scope.pages = [{title: "Polls", url: "polls"},
-                    {title: "Predictions", url: "predictions"},
-                    {title: "Admin", url: "admin"}];
+    $scope.links_left = [{title: "Polls", url: "polls"},
+                    {title: "Predictions", url: "predictions"}];
+    $scope.links_right = [{title: "Admin", url: "admin"}];
     $scope.location = $location;
 })
 
-.controller('PageController', function($scope, $log) {
-    $scope.log = function(obj) {
-    };
+.controller('HomeController', function($scope, $log) {
 })
 
 .controller('AdminController', function($scope, $resource, msgStack, User) {
@@ -54,8 +52,8 @@ angular.module('WeArePeopleApp', ["ngResource", "ngRoute"])
 })
 
 .controller('PollsController', function($scope, $resource, $log) {
-    $scope.polls = [{"user": "Someone", "text": "This is a poll"},
-                    {"user": "Someone else", "text": "This is another poll"}];
+    $scope.polls = [{"creator": "erb", "text": "This is a poll"},
+                    {"creator": "clara", "text": "This is another poll"}];
 })
 
 .controller('PollController', function($scope, $resource, $log) {
@@ -66,19 +64,26 @@ angular.module('WeArePeopleApp', ["ngResource", "ngRoute"])
 
 .controller('ProfileController', function($scope, $routeParams, User) {
     $scope.user = {};
-    User("id", $routeParams.userId).$promise.then(function(payload) {
+    User("username", $routeParams.username).$promise.then(function(payload) {
         console.log(payload);
         $scope.user = payload.data[0];
+    }, function(error) {
+        $scope.loading_error = true;
+
     });
 })
 
 .config(function($routeProvider, $locationProvider) {
   $routeProvider
+   .when('/', {
+    templateUrl: 'home.html',
+    controller: 'HomeController',
+  })
    .when('/polls', {
     templateUrl: 'polls.html',
     controller: 'PollsController',
   })
-   .when('/profile/:userId', {
+   .when('/profile/:username', {
     templateUrl: 'profile.html',
     controller: 'ProfileController',
   })

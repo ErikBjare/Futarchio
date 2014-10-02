@@ -1,4 +1,17 @@
 <div class=row>
-  Name: {{user.name}}<br>
-  Email: {{user.email}}
+  <div class=col-md-12>
+  <p ng-show="!user.username && !loading_error" class=loading>
+    Loading...
+  </p>
+
+  <p ng-show="loading_error" class=loading>
+    There was an error while trying to load this profile
+  </p>
+
+  <div ng-show="user.username" class=profile>
+    Username: {{user.username}}<br>
+    Name: {{user.name}}<br>
+    Email: {{user.email}}
+  </div>
+</div>
 </div>

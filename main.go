@@ -67,16 +67,17 @@ func NewPollResource(session *mgo.Session) *UserResource {
 
 func (u UserResource) findUser(request *restful.Request, response *restful.Response) {
 	var q *mgo.Query
-	user_id := request.PathParameter("user-id")
-	email := request.PathParameter("email")
+	key := request.PathParameter("key")
+	val := request.PathParameter("val")
 
-	switch {
-	case user_id != "":
-		id := bson.ObjectIdHex(user_id)
-		q = u.collection.Find(bson.M{"_id": id})
-	case email != "":
-		q = u.collection.Find(bson.M{"email": email})
-	default:
+	if key != "" && val != "" {
+		if key == "id" {
+			key = "_id"
+			q = u.collection.Find(bson.M{key: bson.ObjectIdHex(val)})
+		} else {
+			q = u.collection.Find(bson.M{key: val})
+		}
+	} else {
 		q = u.collection.Find(bson.M{})
 	}
 
@@ -100,13 +101,10 @@ func (u UserResource) Register(container *restful.Container) {
 		Produces(restful.MIME_JSON)
 	log.Println("Initialized paths")
 
-	ws.Route(ws.GET("/id/{user-id}").To(u.findUser).
-		Doc("get a user by id").
-		Param(ws.PathParameter("user-id", "identifier of the user").DataType("string")).
-		Writes(User{}))
-	ws.Route(ws.GET("/email/{email}").To(u.findUser).
-		Doc("get a user by email").
-		Param(ws.PathParameter("email", "email of the user").DataType("string")).
+	ws.Route(ws.GET("/{key}/{val}").To(u.findUser).
+		Doc("get a user by its properties").
+		Param(ws.PathParameter("key", "property to look up").DataType("string")).
+		Param(ws.PathParameter("val", "value to match").DataType("string")).
 		Writes(User{}))
 	ws.Route(ws.GET("/").To(u.findUser).
 		Doc("get a list of all users").
