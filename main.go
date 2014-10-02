@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//	"fmt"
 	"github.com/emicklei/go-restful"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -15,15 +15,16 @@ import (
 )
 
 type User struct {
-	Id      bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	Name    string        `json:"name"`
-	Email   string        `json:"email"`
-	ApiKeys []string      `json:"apikeys"`
+	Id       bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	Username string        `json:"username"`
+	Name     string        `json:"name"`
+	Email    string        `json:"email"`
+	ApiKeys  []string      `json:"apikeys"`
 }
 
-func NewUser(name string, email string, apikeys []string) *User {
+func NewUser(username string, name string, email string, apikeys []string) *User {
 	id := bson.NewObjectId()
-	return &User{Id: id, Name: name, Email: email, ApiKeys: apikeys}
+	return &User{Id: id, Username: username, Name: name, Email: email, ApiKeys: apikeys}
 }
 
 type Resource struct {
@@ -81,7 +82,7 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 
 	result := []User{}
 	q.All(&result)
-	log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
+	//log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
 	if len(result) == 0 {
 		response.AddHeader("Content-Type", "text/plain")
 		response.WriteErrorString(http.StatusNotFound, "404: User could not be found.")
@@ -117,13 +118,13 @@ func (u UserResource) Register(container *restful.Container) {
 
 func (u UserResource) Init() {
 	c := u.collection
-	for _, elem := range [][]string{{"Erik", "erik@bjareho.lt"}, {"Clara", "idunno@example.com"}} {
-		name, email := elem[0], elem[1]
+	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
+		username, name, email := elem[0], elem[1], elem[2]
 		result := []User{}
 		err := c.Find(bson.M{"name": name}).All(&result)
 
 		if len(result) == 0 {
-			user := NewUser(name, email, []string{})
+			user := NewUser(username, name, email, []string{})
 			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
 			err = c.Insert(user)
 			if err != nil {
@@ -131,9 +132,9 @@ func (u UserResource) Init() {
 			}
 		} else if err != nil {
 			log.Println(err)
-		} else {
+		} /* else {
 			log.Println(fmt.Sprintf("%d matching entries in database for name: %s, had id: %s", len(result), name, result[0].Id))
-		}
+		}*/
 	}
 }
 
@@ -178,7 +179,7 @@ func oauth_test() {
 
 func serve(wsContainer *restful.Container) {
 	mux := http.NewServeMux()
-	mux.Handle("/api/", wsContainer)
+	mux.Handle("/api/0/", wsContainer)
 	mux.Handle("/", http.FileServer(http.Dir("site")))
 	server := &http.Server{Addr: ":8080", Handler: mux}
 

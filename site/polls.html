@@ -3,9 +3,15 @@
 </div>
 
 <div class="col-md-9" ng-controller="PollsController">
-  <div ng-repeat="poll in polls">
-    <h2>{{poll.text}}</h2>
-    <small>By {{poll.user}}</small>
+  <div ng-repeat="poll in polls" class="well poll">
+    <header class="row">
+    <div class="col-md-8">
+        <span class="title">{{poll.text}}</span>
+      </div>
+      <div class="col-md-4">
+        <p class="creator"><b>Created by</b><br>{{poll.user}}</p>
+      </div>
+    </header>
   </div>
 
   <div class="col-md-4 box">
