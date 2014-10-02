@@ -89,7 +89,20 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 		response.WriteErrorString(http.StatusNotFound, "404: User could not be found.")
 		return
 	}
+
 	response.WriteEntity(map[string]interface{}{"length": len(result), "data": result})
+}
+
+func basicAuthenticate(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	encoded := req.Request.Header.Get("Authorization")
+	// usr/pwd = admin/admin
+	// real code does some decoding
+	if len(encoded) == 0 || "Basic YWRtaW46YWRtaW4=" != encoded {
+		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
+		resp.WriteErrorString(401, "401: Not Authorized")
+		return
+	}
+	chain.ProcessFilter(req, resp)
 }
 
 func (u UserResource) Register(container *restful.Container) {
@@ -107,6 +120,7 @@ func (u UserResource) Register(container *restful.Container) {
 		Param(ws.PathParameter("val", "value to match").DataType("string")).
 		Writes(User{}))
 	ws.Route(ws.GET("/").To(u.findUser).
+		Filter(basicAuthenticate).
 		Doc("get a list of all users").
 		Writes(User{}))
 	log.Println("Initialized routes")
@@ -137,7 +151,7 @@ func (u UserResource) Init() {
 }
 
 func oauth_test() {
-	file, err := os.Open("key.pem")
+	file, err := os.Open("secrets/key.pem")
 	if err != nil {
 		panic(err)
 	}
