@@ -18,10 +18,6 @@ body {
 }
 
 .poll {
-  .well {
-    padding: 8px;
-  }
-
   header {
     height: 2em;
 
@@ -30,12 +26,12 @@ body {
       padding: 0px;
       margin: 0px;
     }
-  .creator {
-    font-size: 12px;
-    text-align: right;
-  }
-  }
 
+    .creator {
+      font-size: 12px;
+      text-align: right;
+    }
+  }
 }
 
 .loading {
