@@ -1,0 +1,83 @@
+@import 'mixins';
+@import 'login';
+
+$footer_height: 140px;
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+
+.footer {
+  position: absolute;
+  padding-top: 20px;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: $footer_height;
+  color: #FFF;
+  background-color: #444;
+  border: 0 #AAA solid;
+  border-top-width: 4px;
+  box-shadow: 0 10px 15px 2px #333 inset;
+}
+
+body {
+  margin-top: 70px;
+  margin-bottom: $footer_height+20;
+}
+
+
+.profile-thumbnail {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  margin-bottom: -8px;
+  margin-right: 5px;
+  border: 1px #888 solid;
+  border-radius: 3px;
+  background-size: cover;
+  background-image: url('/img/sagan.jpg');
+}
+
+
+
+
+
+.box {
+  border: 1px #AAA solid;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.console {
+  background-color: #000;
+  color: #0F0;
+  padding: 5px;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+.poll {
+    .panel-heading {
+      padding: 8px;
+    }
+
+    .title {
+      font-size: 18px;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    .metadata {
+      font-size: 12px;
+      text-align: right;
+    }
+}
+
+.loading {
+  @include fadein(1s);
+  text-align: center;
+  font-size: 3em;
+  color: #777;
+}

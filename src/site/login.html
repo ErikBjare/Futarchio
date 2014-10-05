@@ -1,0 +1,14 @@
+<form class="form-signin" role="form">
+  <h2 class="form-signin-heading text-center">Please sign in</h2>
+
+  <div ng-if="error" class="alert alert-danger">
+    <b>Error!</b> {{error|capitalize}}
+  </div>
+
+  <input type="text" class="form-control" placeholder="Username/Email" required="" autofocus="" ng-model="username">
+  <input type="password" class="form-control" placeholder="Password" required="" ng-model="password">
+  <label class="checkbox" for="remember">
+    <input type="checkbox" value="remember-me" id="remember" ng-model="remember"> Remember me
+  </label>
+  <button class="btn btn-lg btn-primary btn-block" ng-class="{'disabled': logging_in}" type="submit" ng-click="login()">Sign in</button>
+</form>

@@ -1,65 +1,39 @@
 package main
 
 import (
-	//	"fmt"
+	"./db"
+	"code.google.com/p/go.crypto/bcrypt"
+	"encoding/base64"
 	"github.com/emicklei/go-restful"
+	"github.com/golang/oauth2"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"math/rand"
 	"net/http"
-	"strings"
-	//	"strconv"
-	"code.google.com/p/go.crypto/bcrypt"
-	"github.com/golang/oauth2"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
-type User struct {
-	Id       bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	Username string        `json:"username"`
-	Password []byte        `json:"password"`
-	Name     string        `json:"name"`
-	Email    string        `json:"email"`
-	Created  time.Time     `json:"created"`
-	ApiKeys  []string      `json:"apikeys"`
-}
-
-func NewUser(username string, password string, name string, email string, apikeys []string) *User {
-	id := bson.NewObjectId()
-	hashed_pass, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &User{
-		Id:       id,
-		Username: username,
-		Password: hashed_pass,
-		Name:     name,
-		Email:    email,
-		Created:  time.Now(),
-		ApiKeys:  apikeys,
-	}
-}
-
-func (u User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
-	if err != nil {
-		log.Println(err)
-	}
-	return !(err != nil)
-}
-
-type Resource struct {
+type MongoResource struct {
 	session    *mgo.Session
 	collection *mgo.Collection
 }
 
 type UserResource struct {
-	*Resource
+	*MongoResource
 }
+
+type AuthResource struct {
+	auths map[string]bson.ObjectId
+}
+
+var (
+	userresource *UserResource
+	authresource *AuthResource
+)
 
 func NewSession() *mgo.Session {
 	session, err := mgo.Dial("localhost")
@@ -73,20 +47,20 @@ func NewSession() *mgo.Session {
 	return session
 }
 
-func NewResource(collection string, session *mgo.Session) *Resource {
+func NewMongoResource(collection string, session *mgo.Session) *MongoResource {
 	c := session.DB("test").C(collection)
-	u := new(Resource)
+	u := new(MongoResource)
 	u.collection = c
 	return u
 }
 
 func NewUserResource(session *mgo.Session) *UserResource {
-	ur := &UserResource{NewResource("users", session)}
+	ur := &UserResource{NewMongoResource("users", session)}
 	return ur
 }
 
 func NewPollResource(session *mgo.Session) *UserResource {
-	ur := &UserResource{NewResource("users", session)}
+	ur := &UserResource{NewMongoResource("users", session)}
 	return ur
 }
 
@@ -106,7 +80,7 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 		q = u.collection.Find(bson.M{})
 	}
 
-	result := []User{}
+	result := []db.User{}
 	q.All(&result)
 	//log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
 	if len(result) == 0 {
@@ -128,7 +102,6 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 	}
 	username := data["username"]
 	password := data["password"]
-	log.Println(data)
 
 	if strings.Contains(username, "@") {
 		// Is an Email
@@ -137,12 +110,32 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 		q = ur.collection.Find(bson.M{"username": username})
 	}
 
-	user := User{}
+	user := db.User{}
 	q.One(&user)
 
-	if user.CheckPassword(string(password)) {
+	if user.CheckPassword(password) {
 		// If user successfully authorized
-		response.WriteEntity(map[string]interface{}{"data": user})
+
+		// Check if auth key already exists
+		auth := ""
+		for k, v := range authresource.auths {
+			if v == user.Id {
+				auth = k
+				break
+			}
+		}
+
+		if auth == "" {
+			auth_bytes, err := bcrypt.GenerateFromPassword([]byte(username+password+strconv.Itoa(rand.Int())), 8)
+			if err != nil {
+				log.Println(err)
+			}
+			auth = base64.StdEncoding.EncodeToString(auth_bytes)
+			authresource.auths[auth] = user.Id
+			response.WriteEntity(map[string]interface{}{"auth": auth})
+		} else {
+			response.WriteEntity(map[string]interface{}{"auth": auth})
+		}
 	} else {
 		response.WriteEntity(map[string]interface{}{"error": "wrong username/password"})
 	}
@@ -153,7 +146,16 @@ func basicAuthenticate(req *restful.Request, resp *restful.Response, chain *rest
 	encoded := req.Request.Header.Get("Authorization")
 	// usr/pwd = admin/admin
 	// real code does some decoding
-	if len(encoded) == 0 || "Basic YWRtaW46YWRtaW4=" != encoded {
+	uid, ok := authresource.auths[encoded]
+	if len(encoded) == 0 {
+		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
+		resp.WriteErrorString(401, "401: Not Authorized")
+		return
+	} else if "Basic YWRtaW46YWRtaW4=" == encoded {
+		log.Print("Successfully logged in with admin,admin")
+	} else if ok {
+		log.Println("Successfully logged in with UID:", uid.Hex())
+	} else {
 		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
 		resp.WriteErrorString(401, "401: Not Authorized")
 		return
@@ -172,11 +174,11 @@ func (u UserResource) Register(container *restful.Container) {
 		Doc("get a user by its properties").
 		Param(ws.PathParameter("key", "property to look up").DataType("string")).
 		Param(ws.PathParameter("val", "value to match").DataType("string")).
-		Writes(User{}))
+		Writes(db.User{}))
 	ws.Route(ws.GET("/").To(u.findUser).
 		Filter(basicAuthenticate).
 		Doc("get a list of all users").
-		Writes(User{}))
+		Writes(db.User{}))
 	container.Add(ws)
 
 	ws = new(restful.WebService)
@@ -198,11 +200,11 @@ func (u UserResource) Init() {
 	c := u.collection
 	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
 		username, name, email := elem[0], elem[1], elem[2]
-		result := []User{}
+		result := []db.User{}
 		err := c.Find(bson.M{"name": name}).All(&result)
 
 		if len(result) == 0 {
-			user := NewUser(username, "password", name, email, []string{})
+			user := db.NewUser(username, "password", name, email, []string{})
 			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
 			err = c.Insert(user)
 			if err != nil {
@@ -266,15 +268,25 @@ func serve(wsContainer *restful.Container) {
 	server.ListenAndServe()
 }
 
+func FindUserById(id bson.ObjectId) db.User {
+	ur := userresource
+	q := ur.collection.Find(bson.M{"_id": id})
+	user := db.User{}
+	q.One(&user)
+	return user
+}
+
 func main() {
 	log.Println("Started...")
 	rand.Seed(time.Now().Unix())
 
-	wsContainer := restful.NewContainer()
 	session := NewSession()
-	u := NewUserResource(session)
-	u.Register(wsContainer)
-	u.Init()
+	wsContainer := restful.NewContainer()
+
+	authresource = &AuthResource{map[string]bson.ObjectId{}}
+	userresource = NewUserResource(session)
+	userresource.Register(wsContainer)
+	userresource.Init()
 
 	go serve(wsContainer)
 
