@@ -260,7 +260,7 @@ func oauth_test() {
 func serve(wsContainer *restful.Container) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/0/", wsContainer)
-	mux.Handle("/", http.FileServer(http.Dir("site")))
+	mux.Handle("/", http.FileServer(http.Dir("site/dist")))
 	server := &http.Server{Addr: ":8080", Handler: mux}
 
 	log.Println("Frontend is serving on: http://localhost:8080")
