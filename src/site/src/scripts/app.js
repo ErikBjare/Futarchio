@@ -1,4 +1,4 @@
-app = angular.module('WeArePeopleApp', ["ngResource", "ngRoute"]);
+app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies"]);
 
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider
@@ -10,13 +10,25 @@ app.config(function($routeProvider, $locationProvider) {
     templateUrl: 'polls.html',
     controller: 'PollsController',
   })
+   .when('/predictions', {
+    templateUrl: 'predictions.html',
+    controller: 'PredictionsController',
+  })
    .when('/profile/:username', {
+    templateUrl: 'profile.html',
+    controller: 'ProfileController',
+  })
+   .when('/profile', {
     templateUrl: 'profile.html',
     controller: 'ProfileController',
   })
    .when('/admin', {
     templateUrl: 'admin.html',
     controller: 'AdminController',
+  })
+   .when('/logout', {
+    templateUrl: 'logout.html',
+    controller: 'LogoutController',
   })
    .when('/login', {
     templateUrl: 'login.html',

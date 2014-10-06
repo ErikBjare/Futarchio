@@ -13,11 +13,11 @@ import (
 type User struct {
 	Id       bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	Username string        `json:"username"`
-	Password []byte        `json:"password"`
+	Password []byte        `json:"-"`
 	Name     string        `json:"name"`
 	Email    string        `json:"email"`
 	Created  time.Time     `json:"created"`
-	ApiKeys  []string      `json:"apikeys"`
+	ApiKeys  []string      `json:"-"`
 }
 
 func NewUser(username string, password string, name string, email string, apikeys []string) *User {

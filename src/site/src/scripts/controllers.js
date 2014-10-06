@@ -29,6 +29,9 @@ app.controller('PollsController', function($scope, $resource, $log) {
     $scope.time = new Date().toISOString();
 });
 
+app.controller('PredictionsController', function($scope, $resource, $log) {
+});
+
 app.controller('PollController', function($scope, $resource, $log) {
     $scope.voted = true;
     $scope.votes = 0;
@@ -42,9 +45,24 @@ app.controller('PollController', function($scope, $resource, $log) {
         console.log($scope.rating);
         $scope.voted = true;
     };
-})
+});
 
-app.controller('ProfileController', function($scope, $routeParams, User) {
+app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, User) {
+        console.log("Missing username routeParam");
+    if(!$routeParams.username) {
+        console.log("Missing username routeParam");
+        me = $cookieStore.get("me");
+        console.log(me);
+        if(me !== undefined) {
+            console.log("Redirecting to profile");
+            $location.path("/profile/"+me.username);
+        } else {
+            console.log("Redirecting to login");
+            $location.path("/login");
+        }
+        return;
+    }
+
     $scope.user = {};
     User("username", $routeParams.username).$promise.then(function(payload) {
         console.log(payload);
@@ -55,8 +73,17 @@ app.controller('ProfileController', function($scope, $routeParams, User) {
     });
 });
 
-app.controller('LoginController', function($scope, $routeParams, $location, $http) {
+app.controller('LoginController', function($scope, $routeParams, $location, $cookieStore, $http) {
+    //TODO: Set 30 day cookie expiry upon "Remember me"
     $scope.logging_in = false;
+
+    var auth = $cookieStore.get("auth");
+    if(auth) {
+        console.log(auth);
+        $location.path("/profile/"+$cookieStore.get("me").username);
+    } else {
+        $scope.logged_in = false;
+    }
 
     $scope.login = function() {
         $scope.logging_in = true;
@@ -68,8 +95,9 @@ app.controller('LoginController', function($scope, $routeParams, $location, $htt
                 $scope.error = data.error;
             } else {
                 $scope.error = "";
+                $cookieStore.put("auth", data.auth);
+                $cookieStore.put("me", {"username": $scope.username});
                 $location.path("/profile/"+$scope.username);
-                alert("Success!");
             }
             $scope.logging_in = false;
         }).error(function(data, status, headers, config) {
@@ -77,5 +105,14 @@ app.controller('LoginController', function($scope, $routeParams, $location, $htt
             $scope.logging_in = false;
         });
     };
+});
+
+app.controller('LogoutController', function($scope, $window, $route, $routeParams, $location, $cookieStore, $http) {
+    $cookieStore.remove("auth");
+    $cookieStore.remove("me");
+    $location.path("/");
+
+    // TODO: Use $window.location.reload() instead?
+    $location.reload();
 });
 

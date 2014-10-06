@@ -1,6 +1,6 @@
-<html ng-app="WeArePeopleApp">
+<html ng-app="FutarchioApp">
   <head>
-    <title>We Are People</title>
+    <title>Futarchio</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/style.css"></script>
@@ -12,6 +12,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-cookies.js"></script>
     <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
     <script src="/all.min.js"></script>
   </head>
@@ -26,7 +27,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/#/" ng-class="{'active': location.path() == '/'+page.url}">We Are People</a>
+          <a class="navbar-brand" href="/#/" ng-class="{'active': location.path() == '/'+page.url}">Futarchio</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -65,20 +66,19 @@
 
 
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <a href="" class="dropdown-toggle" data-toggle="dropdown">
                 <div class="profile-thumbnail">
                 </div>
                 My Account <span class="caret"></span>
               </a>
               <ul class="dropdown-menu" role="menu">
                 <li><a href="/#/profile">Profile</a></li>
-                <li><a href="/#/">Profile</a></li>
-                <li><a href="/#/">Stats</a></li>
-                <li><a href="/#/">Messages</a></li>
+                <li><a href="/#/stats">Stats</a></li>
+                <li><a href="/#/messages">Messages</a></li>
                 <li><a href="/#/settings">Settings</a></li>
                 <li><a href="/#/admin">Admin</a></li>
                 <li class="divider"></li>
-                <li><a href="#">Log out</a></li>
+                <li><a href="/#/logout">Log out</a></li>
               </ul>
             </li>
           </ul>

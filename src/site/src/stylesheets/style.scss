@@ -74,6 +74,15 @@ body {
     }
 }
 
+.profile {
+  .image {
+    border: 1px solid #777;
+    border-radius: 10px;
+    width: 100%;
+    min-height: 200px;
+  }
+}
+
 .loading {
   @include fadein(1s);
   text-align: center;

@@ -2,7 +2,7 @@ package main
 
 import (
 	"./db"
-	"code.google.com/p/go.crypto/bcrypt"
+	"crypto/sha256"
 	"encoding/base64"
 	"github.com/emicklei/go-restful"
 	"github.com/golang/oauth2"
@@ -126,11 +126,8 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 		}
 
 		if auth == "" {
-			auth_bytes, err := bcrypt.GenerateFromPassword([]byte(username+password+strconv.Itoa(rand.Int())), 8)
-			if err != nil {
-				log.Println(err)
-			}
-			auth = base64.StdEncoding.EncodeToString(auth_bytes)
+			auth_bytes := sha256.Sum256([]byte(username + password + strconv.Itoa(rand.Int())))
+			auth = base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
 			authresource.auths[auth] = user.Id
 			response.WriteEntity(map[string]interface{}{"auth": auth})
 		} else {
