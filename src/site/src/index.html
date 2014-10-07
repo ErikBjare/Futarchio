@@ -2,19 +2,24 @@
   <head>
     <title>Futarchio</title>
 
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/style.css"></script>
 
-
+    <!-- Basic stuff, jQuery+Bootstrap+lodash/underscore -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+    <!-- Angular stuff -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-cookies.js"></script>
     <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+
+    <!-- Custom stuff, concatenated and minified by gulp -->
     <script src="/all.min.js"></script>
+
   </head>
   <body ng-controller="MainController">
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -51,10 +56,7 @@
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
           </form>
-          <ul class="nav navbar-nav navbar-right">
-            <li ng-repeat="link in links_right" ng-class="{'active': location.path() == '/'+link.url}">
-              <a href="/#/{{link.url}}">{{link.title}}</a>
-            </li>
+          <ul class="nav navbar-nav navbar-right" ng-if="user.is_logged_in()">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notifications <span class="badge">0</span></a>
               <ul class="dropdown-menu" role="menu">
@@ -62,8 +64,6 @@
                 <li><a href="#">Mark all as read</a></li>
               </ul>
             </li>
-
-
 
             <li class="dropdown">
               <a href="" class="dropdown-toggle" data-toggle="dropdown">
@@ -81,6 +81,9 @@
                 <li><a href="/#/logout">Log out</a></li>
               </ul>
             </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right" ng-if="!user.is_logged_in()">
+            <li><a href="/#/login">Login</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->

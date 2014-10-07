@@ -1,4 +1,4 @@
-WeArePeople
-===========
+Furarchio
+=========
 
-Predicting a better world.
+Predicting a better world, for most of mankind.

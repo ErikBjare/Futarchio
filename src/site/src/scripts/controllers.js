@@ -1,7 +1,8 @@
-app.controller('MainController', function($scope, $route, $location) {
+app.controller('MainController', function($scope, $route, $location, user) {
     $scope.links_left = [{title: "Polls", url: "polls", beta: true},
                     {title: "Predictions", url: "predictions", alpha: true}];
     $scope.location = $location;
+    $scope.user = user;
 });
 
 app.controller('HomeController', function($scope, $log) {
@@ -73,46 +74,30 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
     });
 });
 
-app.controller('LoginController', function($scope, $routeParams, $location, $cookieStore, $http) {
+app.controller('LoginController', function($scope, $routeParams, $location, user, $http) {
     //TODO: Set 30 day cookie expiry upon "Remember me"
     $scope.logging_in = false;
 
-    var auth = $cookieStore.get("auth");
-    if(auth) {
-        console.log(auth);
-        $location.path("/profile/"+$cookieStore.get("me").username);
+    if(user.is_logged_in()) {
+        $location.path("/profile/"+user.username());
     } else {
         $scope.logged_in = false;
     }
 
     $scope.login = function() {
         $scope.logging_in = true;
-        console.log("Hello");
-        $http.post('/api/0/auth', {username: $scope.username, password: $scope.password})
-        .success(function(data, status, headers, config) {
-            console.log(data);
-            if(!data.auth) {
-                $scope.error = data.error;
-            } else {
-                $scope.error = "";
-                $cookieStore.put("auth", data.auth);
-                $cookieStore.put("me", {"username": $scope.username});
-                $location.path("/profile/"+$scope.username);
-            }
+        user.login($scope.username, $scope.password).then(function(data) {
+            $scope.error = "";
+            $location.path("/profile/"+$scope.username);
             $scope.logging_in = false;
-        }).error(function(data, status, headers, config) {
-            $scope.error = "Something went wrong, we dearly apologize";
+        }, function(error) {
+            $scope.error = error;
             $scope.logging_in = false;
         });
     };
 });
 
-app.controller('LogoutController', function($scope, $window, $route, $routeParams, $location, $cookieStore, $http) {
-    $cookieStore.remove("auth");
-    $cookieStore.remove("me");
-    $location.path("/");
-
-    // TODO: Use $window.location.reload() instead?
-    $location.reload();
+app.controller('LogoutController', function(user) {
+    user.logout();
 });
 
