@@ -5,4 +5,4 @@ Futarchio
 
 
 ## About
-For more info and reading material, check out the wiki.
+For info, the Vision, ToDos and inspirational reading material, check out the wiki.
