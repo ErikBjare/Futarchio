@@ -1,7 +1,7 @@
 
 <div class=row>
   <div class=col-md-12>
-    <p ng-show="!user.username && !loading_error" class=loading>
+    <p ng-show="!profile.username && !loading_error" class=loading>
       Loading...
     </p>
 
@@ -9,17 +9,17 @@
       There was an error while trying to load this profile
     </p>
 
-    <div ng-show="user.username" class=profile>
+    <div ng-show="profile.username" class=profile>
       <div class="col-md-3">
         <div>
-          <img class=image width="100%" src="http://www.gravatar.com/avatar/{{email_hash}}?s=300"></img>
+          <img class=image width="100%" src="http://www.gravatar.com/avatar/{{profile.gravatar_hash}}?s=300"></img>
         </div>
-        <h2>{{user.name}}</h2>
-        <h4>@{{user.username}}</h4>
+        <h2>{{profile.name}}</h2>
+        <h4>@{{profile.username}}</h4>
 
-        Username: {{user.username}}<br>
-        Name: {{user.name}}<br>
-        Email: {{user.email}}
+        Username: {{profile.username}}<br>
+        Name: {{profile.name}}<br>
+        Email: {{profile.email}}
       </div>
       <div class="col-md-9">
         Public activity will go here!

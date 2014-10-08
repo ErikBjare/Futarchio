@@ -48,8 +48,8 @@ app.controller('PollController', function($scope, $resource, $log) {
     };
 });
 
-app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, User) {
-        console.log("Missing username routeParam");
+app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, User) {
+    console.log("Missing username routeParam");
     if(!$routeParams.username) {
         console.log("Missing username routeParam");
         me = $cookieStore.get("me");
@@ -67,8 +67,8 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
     $scope.user = {};
     User("username", $routeParams.username).$promise.then(function(payload) {
         console.log(payload);
-        $scope.user = payload.data[0];
-        $scope.email_hash = CryptoJS.MD5($scope.user.email).toString();
+        $scope.profile = payload.data[0];
+        $scope.profile.gravatar_hash = gravatar.hash($scope.profile.email);
     }, function(error) {
         $scope.loading_error = true;
     });

@@ -2,13 +2,24 @@ package db
 
 import (
 	//	"fmt"
+	"code.google.com/p/go.crypto/bcrypt"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	// "strings"
-	//	"strconv"
-	"code.google.com/p/go.crypto/bcrypt"
 	"time"
 )
+
+func NewSession() *mgo.Session {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+	//defer session.Close()
+
+	// Optional. Switch the session to a monotonic behavior.
+	session.SetMode(mgo.Monotonic, true)
+	return session
+}
 
 type User struct {
 	Id       bson.ObjectId `json:"_id" bson:"_id,omitempty"`

@@ -23,7 +23,17 @@ app.factory('User', function($log, $resource) {
     };
 });
 
-app.factory('user', function($q, $log, $http, $cookieStore, $location) {
+app.factory('gravatar', function($log, $resource) {
+    var gravatar = {};
+    gravatar.hash = function(email) {
+        var hash = CryptoJS.MD5(email).toString();
+        return hash;
+    };
+
+    return gravatar;
+});
+
+app.factory('user', function($q, $log, $http, $cookieStore, $location, gravatar) {
     var user = {};
     user.is_logged_in = function() {
         val = $cookieStore.get("me") && $cookieStore.get("auth");
@@ -40,7 +50,8 @@ app.factory('user', function($q, $log, $http, $cookieStore, $location) {
                 deferred.reject(data.error);
             } else {
                 $cookieStore.put("auth", data.auth);
-                $cookieStore.put("me", {"username": username});
+                $http.get('/api/0/me');
+                $cookieStore.put("me", {"username": username, "email": data.email});
                 deferred.resolve(data);
             }
         }).error(function(data, status, headers, config) {
@@ -62,6 +73,14 @@ app.factory('user', function($q, $log, $http, $cookieStore, $location) {
 
     user.username = function() {
         return $cookieStore.get("me").username;
+    };
+
+    user.email = function() {
+        return $cookieStore.get("me").email;
+    };
+
+    user.gravatar_hash = function() {
+        gravatar.hash(user.email());
     };
 
     return user;
