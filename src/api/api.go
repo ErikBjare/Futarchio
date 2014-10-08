@@ -33,10 +33,6 @@ type MongoResource struct {
 	collection *mgo.Collection
 }
 
-func (mgr MongoResource) FindOne(bson bson.M) {
-	mgr.collection.Find(bson)
-}
-
 func NewSession() *mgo.Session {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
@@ -69,11 +65,20 @@ func NewUserResource(session *mgo.Session) *UserResource {
 	return ur
 }
 
-func (ur UserResource) findById(id bson.ObjectId) db.User {
-	q := ur.collection.Find(bson.M{"_id": id})
+func (ur UserResource) FindOne(bson bson.M) *db.User {
+	q := ur.collection.Find(bson)
 	user := db.User{}
 	q.One(&user)
-	return user
+	return &user
+}
+
+func (ur UserResource) Insert(user *db.User) error {
+	err := ur.collection.Insert(user)
+	return err
+}
+
+func (ur UserResource) findById(id bson.ObjectId) *db.User {
+	return ur.FindOne(bson.M{"_id": id})
 }
 
 func (u UserResource) findByAuth(authkey string) *db.User {
@@ -87,13 +92,13 @@ func (u UserResource) findByAuth(authkey string) *db.User {
 		log.Println("User could not be found")
 		return nil
 	}
-	return &user
+	return user
 }
 
 func (u UserResource) getByAuth(request *restful.Request, response *restful.Response) {
 	authkey := request.Request.Header.Get("Authorization")
 	user := u.findByAuth(authkey)
-	respond(response, user)
+	respond(response, []db.User{*user})
 }
 
 func (u UserResource) getByKeyVal(request *restful.Request, response *restful.Response) {
@@ -135,11 +140,9 @@ func NewAuthResource(session *mgo.Session) *AuthResource {
 	return ur
 }
 
-func (ar AuthResource) Insert(auth db.Auth) {
+func (ar AuthResource) Insert(auth *db.Auth) error {
 	err := ar.collection.Insert(auth)
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 func (ar AuthResource) findByUserId(uid bson.ObjectId) *db.Auth {
@@ -248,13 +251,23 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 
 		// Check if auth key already exists
 		auth := Auths.findByUserId(user.Id)
+		log.Println("Found existing auth")
+		log.Println(auth)
 
 		if auth.User == user.Id {
-			auth_bytes := sha256.Sum256([]byte(username + password + strconv.Itoa(rand.Int())))
-			authkey := base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
-			Auths.Insert(db.Auth{Id: user.Id, Key: authkey})
+			// If user already has a authkey
 			response.WriteEntity(map[string]interface{}{"auth": auth})
 		} else {
+			// If user doesn't have an authkey
+			auth_bytes := sha256.Sum256([]byte(username + password + strconv.Itoa(rand.Int())))
+			authkey := base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
+			auth := db.Auth{User: user.Id, Key: authkey}
+			log.Println("Created new auth")
+			log.Println(auth)
+			err := Auths.Insert(&auth)
+			if err != nil {
+				panic(err)
+			}
 			response.WriteEntity(map[string]interface{}{"auth": auth})
 		}
 	} else {

@@ -52,8 +52,9 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, g
             if(!data.auth) {
                 deferred.reject(data.error);
             } else {
-                $cookieStore.put("auth", data.auth);
-                $http.get('/api/0/users/me', {"headers": {"Authorization": data.auth}})
+                authkey = data.auth.key;
+                $cookieStore.put("auth", authkey);
+                $http.get('/api/0/users/me', {"headers": {"Authorization": authkey}})
                 .success(function(data) {
                     console.log(data);
                     $cookieStore.put("me", {"username": username, "email": data.data[0].email});
