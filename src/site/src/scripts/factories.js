@@ -26,6 +26,9 @@ app.factory('User', function($log, $resource) {
 app.factory('gravatar', function($log, $resource) {
     var gravatar = {};
     gravatar.hash = function(email) {
+        if(!_.contains(email, "@") {
+            console.error("Error: got empty email");
+        }
         var hash = CryptoJS.MD5(email).toString();
         return hash;
     };
@@ -33,7 +36,7 @@ app.factory('gravatar', function($log, $resource) {
     return gravatar;
 });
 
-app.factory('user', function($q, $log, $http, $cookieStore, $location, gravatar) {
+app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, gravatar) {
     var user = {};
     user.is_logged_in = function() {
         val = $cookieStore.get("me") && $cookieStore.get("auth");
@@ -50,9 +53,12 @@ app.factory('user', function($q, $log, $http, $cookieStore, $location, gravatar)
                 deferred.reject(data.error);
             } else {
                 $cookieStore.put("auth", data.auth);
-                $http.get('/api/0/me');
-                $cookieStore.put("me", {"username": username, "email": data.email});
-                deferred.resolve(data);
+                $http.get('/api/0/users/me', {"headers": {"Authorization": data.auth}})
+                .success(function(data) {
+                    console.log(data);
+                    $cookieStore.put("me", {"username": username, "email": data.data[0].email});
+                    deferred.resolve(data);
+                });
             }
         }).error(function(data, status, headers, config) {
             error = "Something went wrong while trying to make request";
@@ -80,7 +86,7 @@ app.factory('user', function($q, $log, $http, $cookieStore, $location, gravatar)
     };
 
     user.gravatar_hash = function() {
-        gravatar.hash(user.email());
+        return gravatar.hash(user.email());
     };
 
     return user;
