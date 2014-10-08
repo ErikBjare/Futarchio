@@ -4,7 +4,9 @@ go:
     - 1.2
 
 install:
-    - go get -d -v ./src && go build -v ./src
+    - cd src
+    - go get -d -v ./... && go build -v ./...
+    - cd ..
 
 services:
     - mongodb
