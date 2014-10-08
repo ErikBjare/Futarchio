@@ -1,0 +1,145 @@
+@keyframes fadein {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto; }
+
+.form-signin .form-signin-heading, .form-signin .checkbox {
+  margin-bottom: 10px; }
+
+.form-signin .checkbox {
+  font-weight: normal; }
+
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px; }
+
+.form-signin .form-control:focus {
+  z-index: 2; }
+
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0; }
+
+.checkbox {
+  margin-left: 1.5em; }
+
+html {
+  position: relative;
+  min-height: 100%; }
+
+.footer {
+  position: absolute;
+  padding-top: 20px;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 140px;
+  color: #FFF;
+  background-color: #444;
+  border: 0 #AAA solid;
+  border-top-width: 4px;
+  box-shadow: 0 10px 15px 2px #333 inset; }
+
+body {
+  margin-top: 70px;
+  margin-bottom: 160px; }
+
+.profile-thumbnail {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  margin-bottom: -8px;
+  margin-right: 5px;
+  border: 1px #888 solid;
+  border-radius: 3px;
+  background-size: cover; }
+
+.box {
+  border: 1px #AAA solid;
+  border-radius: 5px;
+  padding: 10px; }
+
+.console {
+  background-color: #000;
+  color: #0F0;
+  padding: 5px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace; }
+
+.poll .panel-heading {
+  padding: 8px; }
+.poll .title {
+  font-size: 18px;
+  padding: 0px;
+  margin: 0px; }
+.poll .metadata {
+  font-size: 12px;
+  text-align: right; }
+
+.profile .image {
+  border: 1px solid #777;
+  border-radius: 10px;
+  width: 100%; }
+
+.loading {
+  -webkit-animation: fadein 1s;
+  /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 1s;
+  /* Firefox < 16 */
+  -ms-animation: fadein 1s;
+  /* Internet Explorer */
+  -o-animation: fadein 1s;
+  /* Opera < 12.1 */
+  animation: fadein 1s;
+  text-align: center;
+  font-size: 3em;
+  color: #777; }
