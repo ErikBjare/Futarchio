@@ -8,8 +8,7 @@ go:
     - tip
 
 install:
-    - cd src
-    - go get -d -v ./... && go build -v ./...
+    - go get -d -v ./src/main.go && go build -v ./src/main.go
 
 services:
     - mongodb
