@@ -31,6 +31,12 @@ type User struct {
 	ApiKeys  []string      `json:"-"`
 }
 
+type Auth struct {
+	Id   bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	Key  string        `json:"key"`
+	User bson.ObjectId `json:"user"`
+}
+
 func NewUser(username string, password string, name string, email string, apikeys []string) *User {
 	id := bson.NewObjectId()
 	hashed_pass, err := bcrypt.GenerateFromPassword([]byte(password), 12)

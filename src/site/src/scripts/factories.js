@@ -26,7 +26,7 @@ app.factory('User', function($log, $resource) {
 app.factory('gravatar', function($log, $resource) {
     var gravatar = {};
     gravatar.hash = function(email) {
-        if(!_.contains(email, "@") {
+        if(!_.contains(email, "@")) {
             console.error("Error: got empty email");
         }
         var hash = CryptoJS.MD5(email).toString();

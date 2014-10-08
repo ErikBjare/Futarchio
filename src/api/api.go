@@ -18,12 +18,14 @@ import (
 var (
 	Users *UserResource
 	Auths *AuthResource
+	Polls *PollResource
 )
 
 func init() {
 	session := NewSession()
-	Auths = &AuthResource{map[string]bson.ObjectId{}}
 	Users = NewUserResource(session)
+	Auths = NewAuthResource(session)
+	Polls = NewPollResource(session)
 }
 
 type MongoResource struct {
@@ -31,12 +33,8 @@ type MongoResource struct {
 	collection *mgo.Collection
 }
 
-type UserResource struct {
-	*MongoResource
-}
-
-type AuthResource struct {
-	auths map[string]bson.ObjectId
+func (mgr MongoResource) FindOne(bson bson.M) {
+	mgr.collection.Find(bson)
 }
 
 func NewSession() *mgo.Session {
@@ -58,43 +56,47 @@ func NewMongoResource(collection string, session *mgo.Session) *MongoResource {
 	return u
 }
 
+/*
+  UserResource
+*/
+
+type UserResource struct {
+	*MongoResource
+}
+
 func NewUserResource(session *mgo.Session) *UserResource {
 	ur := &UserResource{NewMongoResource("users", session)}
 	return ur
 }
 
-func NewPollResource(session *mgo.Session) *UserResource {
-	ur := &UserResource{NewMongoResource("users", session)}
-	return ur
-}
-
-func (ur UserResource) FindUserById(id bson.ObjectId) db.User {
+func (ur UserResource) findById(id bson.ObjectId) db.User {
 	q := ur.collection.Find(bson.M{"_id": id})
 	user := db.User{}
 	q.One(&user)
 	return user
 }
 
-func (u UserResource) byAuth(request *restful.Request, response *restful.Response) {
-	var q *mgo.Query
-	auth := request.Request.Header.Get("Authorization")
-	uid, ok := Auths.auths[auth]
-	if ok {
-		q = u.collection.Find(bson.M{"_id": uid})
-		result := []db.User{}
-		q.All(&result)
-		if len(result) == 0 {
-			respondError(response, "User could not be found.")
-			return
-		}
-		//log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
-		respond(response, result)
-	} else {
-		respondError(response, "Not authorized")
+func (u UserResource) findByAuth(authkey string) *db.User {
+	auth := Auths.findByKey(authkey)
+	if auth.Key != authkey {
+		log.Println("Could not find matching authkey")
+		return nil
 	}
+	user := u.findById(auth.User)
+	if user.Name == "" {
+		log.Println("User could not be found")
+		return nil
+	}
+	return &user
 }
 
-func (u UserResource) byKeyVal(request *restful.Request, response *restful.Response) {
+func (u UserResource) getByAuth(request *restful.Request, response *restful.Response) {
+	authkey := request.Request.Header.Get("Authorization")
+	user := u.findByAuth(authkey)
+	respond(response, user)
+}
+
+func (u UserResource) getByKeyVal(request *restful.Request, response *restful.Response) {
 	var q *mgo.Query
 	key := request.PathParameter("key")
 	val := request.PathParameter("val")
@@ -120,6 +122,57 @@ func (u UserResource) byKeyVal(request *restful.Request, response *restful.Respo
 	respond(response, result)
 }
 
+/*
+   AuthResource
+*/
+
+type AuthResource struct {
+	*MongoResource
+}
+
+func NewAuthResource(session *mgo.Session) *AuthResource {
+	ur := &AuthResource{NewMongoResource("auths", session)}
+	return ur
+}
+
+func (ar AuthResource) Insert(auth db.Auth) {
+	err := ar.collection.Insert(auth)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (ar AuthResource) findByUserId(uid bson.ObjectId) *db.Auth {
+	q := ar.collection.Find(bson.M{"user": uid})
+	auth := db.Auth{}
+	q.One(&auth)
+	return &auth
+}
+
+func (ar AuthResource) findByKey(key string) *db.Auth {
+	q := ar.collection.Find(bson.M{"key": key})
+	auth := db.Auth{}
+	q.One(&auth)
+	return &auth
+}
+
+/*
+   PollResource
+*/
+
+type PollResource struct {
+	*MongoResource
+}
+
+func NewPollResource(session *mgo.Session) *PollResource {
+	ur := &PollResource{NewMongoResource("polls", session)}
+	return ur
+}
+
+/*
+   Repspond Functions
+*/
+
 func respond(r *restful.Response, result interface{}) {
 	r.WriteEntity(map[string]interface{}{"data": result})
 }
@@ -129,6 +182,10 @@ func respondError(r *restful.Response, error string) {
 	r.WriteEntity(map[string]interface{}{"error": error})
 }
 
+/*
+   Register functions
+*/
+
 func (u UserResource) Register(container *restful.Container) {
 	ws := new(restful.WebService)
 
@@ -136,16 +193,16 @@ func (u UserResource) Register(container *restful.Container) {
 		Path("/api/0/users").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("/me").To(u.byAuth).
+	ws.Route(ws.GET("/me").To(u.getByAuth).
 		Filter(basicAuthenticate).
 		Doc("get the authorized user").
 		Writes(db.User{}))
-	ws.Route(ws.GET("/{key}/{val}").To(u.byKeyVal).
+	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
 		Doc("get a user by its properties").
 		Param(ws.PathParameter("key", "property to look up").DataType("string")).
 		Param(ws.PathParameter("val", "value to match").DataType("string")).
 		Writes(db.User{}))
-	ws.Route(ws.GET("/").To(u.byKeyVal).
+	ws.Route(ws.GET("/").To(u.getByKeyVal).
 		Filter(basicAuthenticate).
 		Doc("get a list of all users").
 		Writes(db.User{}))
@@ -163,15 +220,6 @@ func (u UserResource) Register(container *restful.Container) {
 
 	log.Println("Initialized routes")
 	log.Println("Initialized paths")
-}
-
-func authFromUserId(uid bson.ObjectId) string {
-	for k, v := range Auths.auths {
-		if v == uid {
-			return k
-		}
-	}
-	return ""
 }
 
 func (ur UserResource) authorizeUser(request *restful.Request, response *restful.Response) {
@@ -199,12 +247,12 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 		// If user successfully authorized
 
 		// Check if auth key already exists
-		auth := authFromUserId(user.Id)
+		auth := Auths.findByUserId(user.Id)
 
-		if auth == "" {
+		if auth.User == user.Id {
 			auth_bytes := sha256.Sum256([]byte(username + password + strconv.Itoa(rand.Int())))
-			auth = base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
-			Auths.auths[auth] = user.Id
+			authkey := base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
+			Auths.Insert(db.Auth{Id: user.Id, Key: authkey})
 			response.WriteEntity(map[string]interface{}{"auth": auth})
 		} else {
 			response.WriteEntity(map[string]interface{}{"auth": auth})
@@ -216,44 +264,21 @@ func (ur UserResource) authorizeUser(request *restful.Request, response *restful
 }
 
 func basicAuthenticate(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
-	encoded := req.Request.Header.Get("Authorization")
-	// usr/pwd = admin/admin
-	// real code does some decoding
-	uid, ok := Auths.auths[encoded]
-	if len(encoded) == 0 {
+	authkey := req.Request.Header.Get("Authorization")
+	if len(authkey) == 0 {
 		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
 		resp.WriteErrorString(401, "401: Not Authorized")
 		return
-	} else if "Basic YWRtaW46YWRtaW4=" == encoded {
-		log.Print("Successfully logged in with admin,admin")
-	} else if ok {
-		log.Println("Successfully logged in with UID:", uid.Hex())
+	}
+	// usr/pwd = admin/admin
+	// real code does some decoding
+	auth := Auths.findByKey(authkey)
+	if auth.Key == authkey {
+		log.Println("Successfully logged in with UID:", auth.Id.Hex())
 	} else {
 		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
 		resp.WriteErrorString(401, "401: Not Authorized")
 		return
 	}
 	chain.ProcessFilter(req, resp)
-}
-
-func (u UserResource) Init() {
-	c := u.collection
-	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
-		username, name, email := elem[0], elem[1], elem[2]
-		result := []db.User{}
-		err := c.Find(bson.M{"name": name}).All(&result)
-
-		if len(result) == 0 {
-			user := db.NewUser(username, "password", name, email, []string{})
-			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
-			err = c.Insert(user)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else if err != nil {
-			log.Println(err)
-		} /* else {
-			log.Println(fmt.Sprintf("%d matching entries in database for name: %s, had id: %s", len(result), name, result[0].Id))
-		}*/
-	}
 }

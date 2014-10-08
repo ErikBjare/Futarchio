@@ -68,7 +68,6 @@ func main() {
 	wsContainer := restful.NewContainer()
 
 	api.Users.Register(wsContainer)
-	api.Users.Init()
 
 	go serve(wsContainer)
 

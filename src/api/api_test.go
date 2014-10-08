@@ -8,10 +8,12 @@ import (
 	"testing"
 )
 
+func init() {
+	initUsers()
+}
+
 func TestUsers(t *testing.T) {
-	u := NewUserResource(NewSession())
-	u.Init()
-	c := u.collection
+	c := Users.collection
 	result := []db.User{}
 	c.Find(bson.M{"email": "erik@bjareho.lt"}).All(&result)
 	if len(result) == 0 {
@@ -22,8 +24,7 @@ func TestUsers(t *testing.T) {
 }
 
 func BenchmarkUserExistanceCycle(b *testing.B) {
-	u := NewUserResource(NewSession())
-	c := u.collection
+	c := Users.collection
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		user := db.NewUser("tester", "password", "Tester", "test@example.com", []string{})
@@ -38,4 +39,24 @@ func BenchmarkUserExistanceCycle(b *testing.B) {
 
 func TestNotDone(t *testing.T) {
 	t.Skip("Not implemented")
+}
+
+func initUsers() {
+	c := Users.collection
+	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
+		username, name, email := elem[0], elem[1], elem[2]
+		result := []db.User{}
+		err := c.Find(bson.M{"name": name}).All(&result)
+
+		if len(result) == 0 {
+			user := db.NewUser(username, "password", name, email, []string{})
+			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
+			err = c.Insert(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if err != nil {
+			log.Println(err)
+		}
+	}
 }
