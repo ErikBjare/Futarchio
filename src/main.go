@@ -2,14 +2,36 @@ package main
 
 import (
 	"github.com/ErikBjare/Futarchio/src/api"
+	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"github.com/golang/oauth2"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"time"
 )
+
+func init() {
+	initUsers()
+}
+
+func initUsers() {
+	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
+		username, name, email := elem[0], elem[1], elem[2]
+		user := api.Users.FindOne(bson.M{"name": name})
+
+		if user.Name != name {
+			user := db.NewUser(username, "password", name, email, []string{})
+			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
+			err := api.Users.Insert(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+}
 
 func oauth_test() {
 	file, err := os.Open("secrets/key.pem")

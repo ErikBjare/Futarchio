@@ -1,5 +1,7 @@
 package main
 
+// TODO: Move relevant tests to API package
+
 import (
 	//	"gopkg.in/mgo.v2"
 	"bytes"
@@ -24,7 +26,8 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	msg := map[string]string{}
+	msg := map[string]map[string]string{}
+	fmt.Println(string(body))
 	json.Unmarshal(body, &msg)
 
 	urls := []string{"http://localhost:8080/api/0/users", "http://localhost:8080/api/0/users/me"}
@@ -33,7 +36,7 @@ func TestAuth(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req.Header.Add("Authorization", msg["auth"])
+		req.Header.Add("Authorization", msg["auth"]["key"])
 		resp, err = client.Do(req)
 		if err != nil {
 			t.Error("Is the server running?")
