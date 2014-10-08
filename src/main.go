@@ -76,10 +76,10 @@ func serve(wsContainer *restful.Container) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/0/", wsContainer)
 	mux.Handle("/", http.FileServer(http.Dir("site/dist")))
-	server := &http.Server{Addr: ":8080", Handler: mux}
+	server := &http.Server{Addr: ":80", Handler: mux}
 
-	log.Println("Frontend is serving on: http://localhost:8080")
-	log.Println("API is serving on: http://localhost:8080/api/")
+	log.Println("Frontend is serving on: http://futarch.io/")
+	log.Println("API is serving on: http://futarch.io/api/")
 	server.ListenAndServe()
 }
 
