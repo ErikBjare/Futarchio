@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./db"
 	"crypto/sha256"
 	"encoding/base64"
+	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"github.com/golang/oauth2"
 	"gopkg.in/mgo.v2"
