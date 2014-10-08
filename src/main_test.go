@@ -27,32 +27,35 @@ func TestAuth(t *testing.T) {
 	msg := map[string]string{}
 	json.Unmarshal(body, &msg)
 
-	req, err := http.NewRequest("GET", "http://localhost:8080/api/0/users", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Add("Authorization", msg["auth"])
-	resp, err = client.Do(req)
-	if err != nil {
-		t.Error("Is the server running?")
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		t.Fatal(fmt.Sprintf("Status code was not 200, was %d with message: %s", resp.StatusCode, resp.Status))
-	}
+	urls := []string{"http://localhost:8080/api/0/users", "http://localhost:8080/api/0/users/me"}
+	for _, url := range urls {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.Header.Add("Authorization", msg["auth"])
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error("Is the server running?")
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			t.Fatal(fmt.Sprintf("Status code was not 200, was %d with message: %s", resp.StatusCode, resp.Status))
+		}
 
-	body, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Error(err)
-	}
-	data := map[string]interface{}{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		t.Error(err)
-	}
-	if data["length"] == float64(0) {
-		t.Fatal(fmt.Sprintf("Got zero results: %f", data["length"]))
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		data := map[string]interface{}{}
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			t.Error(err)
+		}
+		if data["length"] == float64(0) {
+			t.Fatal(fmt.Sprintf("Got zero results: %f", data["length"]))
+		}
 	}
 }
 

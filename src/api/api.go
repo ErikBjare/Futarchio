@@ -81,17 +81,17 @@ func (u UserResource) byAuth(request *restful.Request, response *restful.Respons
 	uid, ok := Auths.auths[auth]
 	if ok {
 		q = u.collection.Find(bson.M{"_id": uid})
+		result := []db.User{}
+		q.All(&result)
+		if len(result) == 0 {
+			respondError(response, "User could not be found.")
+			return
+		}
+		//log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
+		respond(response, result)
+	} else {
+		respondError(response, "Not authorized")
 	}
-	result := []db.User{}
-	q.All(&result)
-	//log.Println(fmt.Sprintf("%d matching entries in database for request: %s", len(result), request.PathParameters()))
-	if len(result) == 0 {
-		response.AddHeader("Content-Type", "text/plain")
-		response.WriteErrorString(http.StatusNotFound, "404: User could not be found.")
-		return
-	}
-
-	respond(response, result)
 }
 
 func (u UserResource) byKeyVal(request *restful.Request, response *restful.Response) {
@@ -122,6 +122,11 @@ func (u UserResource) byKeyVal(request *restful.Request, response *restful.Respo
 
 func respond(r *restful.Response, result interface{}) {
 	r.WriteEntity(map[string]interface{}{"data": result})
+}
+
+func respondError(r *restful.Response, error string) {
+	r.WriteHeader(http.StatusNotFound)
+	r.WriteEntity(map[string]interface{}{"error": error})
 }
 
 func (u UserResource) Register(container *restful.Container) {
