@@ -2,29 +2,13 @@ package main
 
 import (
 	//	"gopkg.in/mgo.v2"
-	"./db"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"testing"
 )
-
-func TestUsers(t *testing.T) {
-	u := NewUserResource(NewSession())
-	u.Init()
-	c := u.collection
-	result := []db.User{}
-	c.Find(bson.M{"email": "erik@bjareho.lt"}).All(&result)
-	if len(result) == 0 {
-		t.Error("Couldn't find Erik in database")
-	} else if len(result) > 1 {
-		t.Error("More than one user with email erik@bjareho.lt in database")
-	}
-}
 
 func TestAuth(t *testing.T) {
 	client := &http.Client{}
@@ -70,25 +54,6 @@ func TestAuth(t *testing.T) {
 	if data["length"] == float64(0) {
 		t.Fatal(fmt.Sprintf("Got zero results: %f", data["length"]))
 	}
-}
-
-func BenchmarkUserExistanceCycle(b *testing.B) {
-	u := NewUserResource(NewSession())
-	c := u.collection
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		user := db.NewUser("tester", "password", "Tester", "test@example.com", []string{})
-		err := c.Insert(user)
-		if err != nil {
-			b.Error("Error when creating user")
-			log.Println("I'm here")
-		}
-		c.Remove(user)
-	}
-}
-
-func TestNotDone(t *testing.T) {
-	t.Skip("Not implemented")
 }
 
 func BenchmarkAPICall(b *testing.B) {
