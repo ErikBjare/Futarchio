@@ -7,6 +7,8 @@ go:
     - 1.3
     - tip
 
+install:
+    - go get -d -v ./src/... && go build -v ./src/...
 
 services:
     - mongodb
@@ -15,4 +17,5 @@ before_script:
     - go run ./src/main.go
     - sleep 5 # give some time to start
 
-script: go test -v ./src/...
+script:
+    - go test -v ./src/...
