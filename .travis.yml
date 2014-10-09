@@ -14,7 +14,9 @@ services:
     - mongodb
 
 before_script:
-    - go run ./src/main.go &
+    - cd src
+    - go run ./main.go &
+    - cd ..
     - sleep 5 # give some time to start
 
 script:
