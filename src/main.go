@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code.google.com/p/gcfg"
 	"github.com/ErikBjare/Futarchio/src/api"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
@@ -13,7 +14,23 @@ import (
 	"time"
 )
 
+type config struct {
+	Main struct {
+		Hostname string
+		Port     string
+	}
+}
+
+var (
+	Config config
+)
+
 func init() {
+	err := gcfg.ReadFileInto(&Config, "config.ini")
+	if err != nil {
+		panic(err)
+	}
+
 	initUsers()
 }
 
@@ -76,10 +93,10 @@ func serve(wsContainer *restful.Container) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/0/", wsContainer)
 	mux.Handle("/", http.FileServer(http.Dir("site/dist")))
-	server := &http.Server{Addr: ":8080", Handler: mux}
+	server := &http.Server{Addr: ":" + Config.Main.Port, Handler: mux}
 
-	log.Println("Frontend is serving on: http://localhost:8080")
-	log.Println("API is serving on: http://localhost:8080/api/")
+	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
+	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
 	server.ListenAndServe()
 }
 
