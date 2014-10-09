@@ -1,12 +1,14 @@
 package main
 
 import (
+	"appengine"
+	"appengine/datastore"
 	"code.google.com/p/gcfg"
+	"fmt"
 	"github.com/ErikBjare/Futarchio/src/api"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"github.com/golang/oauth2"
-	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
 	"os"
@@ -29,8 +31,6 @@ func init() {
 		panic(err)
 	}
 
-	initUsers()
-
 	serve()
 }
 
@@ -38,23 +38,32 @@ func serve() {
 	wsContainer := restful.NewContainer()
 	api.Users.Register(wsContainer)
 	http.Handle("/api/0/", wsContainer)
+	http.HandleFunc("/api/init", initDB)
 
 	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
 	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
 }
 
-func initUsers() {
+func initDB(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
 		username, name, email := elem[0], elem[1], elem[2]
-		user := api.Users.FindOne(bson.M{"name": name})
+		q := datastore.NewQuery("User").
+			Filter("email =", email).
+			Limit(1)
 
-		if user.Name != name {
+		var users []db.User
+		q.GetAll(c, &users)
+
+		if len(users) == 0 {
 			user := db.NewUser(username, "password", name, email, []string{})
-			log.Println("Creating user, did not exist.\n - name: " + name + "\n - id: " + user.Id.Hex())
-			err := api.Users.Insert(user)
+			log.Println("Creating user, did not exist.\n - name: " + name)
+			key, err := datastore.Put(c, datastore.NewIncompleteKey(c, "User", nil), user)
 			if err != nil {
 				log.Fatal(err)
 			}
+			fmt.Fprintf(w, "created %q\n", key)
 		}
 	}
 }
