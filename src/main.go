@@ -8,10 +8,8 @@ import (
 	"github.com/golang/oauth2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
-	"time"
 )
 
 type config struct {
@@ -32,6 +30,17 @@ func init() {
 	}
 
 	initUsers()
+
+	serve()
+}
+
+func serve() {
+	wsContainer := restful.NewContainer()
+	api.Users.Register(wsContainer)
+	http.Handle("/api/0/", wsContainer)
+
+	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
+	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
 }
 
 func initUsers() {
@@ -87,34 +96,4 @@ func oauth_test() {
 	// request will be made on the behalf of user@example.com.
 	client = http.Client{Transport: conf.NewTransportWithUser("user@example.com")}
 	client.Get("...")
-}
-
-func serve(wsContainer *restful.Container) {
-	mux := http.NewServeMux()
-	mux.Handle("/api/0/", wsContainer)
-	mux.Handle("/", http.FileServer(http.Dir("site/dist")))
-	server := &http.Server{Addr: ":" + Config.Main.Port, Handler: mux}
-
-	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
-	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
-	server.ListenAndServe()
-}
-
-func main() {
-	log.Println("Started...")
-	rand.Seed(time.Now().Unix())
-
-	wsContainer := restful.NewContainer()
-
-	api.Users.Register(wsContainer)
-
-	go serve(wsContainer)
-
-	queue := make(chan error)
-	for {
-		err := <-queue
-		log.Println(err)
-	}
-
-	log.Println("Quitting")
 }
