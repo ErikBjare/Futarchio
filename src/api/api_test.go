@@ -2,9 +2,9 @@ package api
 
 import (
 	//	"gopkg.in/mgo.v2"
-	"appengine"
 	"appengine/aetest"
 	"appengine/datastore"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/ErikBjare/Futarchio/src/db"
@@ -15,39 +15,17 @@ import (
 )
 
 func init() {
-	http.Get("http://localhost:8080/api/0/init")
+	_, err := http.Get("http://localhost:8080/api/0/ident")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestAuth(t *testing.T) {
-	inst, err := aetest.NewInstance(nil)
-	if err != nil {
-		t.Fatalf("Failed to create instance: %v", err)
-	}
-	defer inst.Close()
-
-	c, err := aetest.NewContext(nil)
-	hostname := appengine.DefaultVersionHostname(c)
-	defer c.Close()
-
-	log.Println(hostname)
-
 	client := &http.Client{}
-	req1, err := inst.NewRequest("GET", "http://"+hostname+"/api/0/init", nil)
-	if err != nil {
-		t.Fatalf("Failed to create req1: %v", err)
-	}
-	_, err = client.Do(req1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	req2, err := inst.NewRequest("POST", "/api/0/auth", nil)
-	req2.Header.Add("Content-Type", "application/json")
-	req2.Body.Read([]byte("{\"username\": \"erb\", \"password\": \"password\"}"))
-	if err != nil {
-		t.Fatalf("Failed to create req1: %v", err)
-	}
-	resp, err := client.Do(req2)
+	bodybuf := &bytes.Buffer{}
+	bodybuf.Write([]byte("{\"username\": \"erb\", \"password\": \"password\"}"))
+	resp, err := client.Post("http://localhost:8080/api/0/auth", "application/json", bodybuf)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +36,7 @@ func TestAuth(t *testing.T) {
 	}
 
 	msg := map[string]map[string]string{}
-	log.Println(string(body))
+	fmt.Println(string(body))
 	json.Unmarshal(body, &msg)
 
 	urls := []string{"http://localhost:8080/api/0/users", "http://localhost:8080/api/0/users/me"}
