@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -36,6 +35,7 @@ func auth(c appengine.Context, authkey string) *db.User {
 	var auths []db.Auth
 	keys, err := q.GetAll(c, &auths)
 	if err != nil {
+		c.Errorf(err.Error())
 		panic(err)
 	}
 
@@ -45,8 +45,10 @@ func auth(c appengine.Context, authkey string) *db.User {
 		if err != nil {
 			panic(err)
 		}
-		log.Println("Successfully logged in with email: " + user.Email)
+		c.Infof("User successfully authorized in with email: " + user.Email)
 		return &user
+	} else {
+		c.Warningf("Could not find Auth for authkey")
 	}
 	return nil
 }
@@ -162,7 +164,8 @@ func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
 	data := map[string]string{}
 	err := r.ReadEntity(&data)
 	if err != nil {
-		log.Fatal(err)
+		c.Criticalf(err.Error())
+		panic(err)
 	}
 	username := data["username"]
 	password := data["password"]
@@ -197,8 +200,7 @@ func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			auth_bytes := sha256.Sum256([]byte(username + password + strconv.Itoa(rand.Int())))
 			authkey := base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
 			auth := db.Auth{Key: authkey}
-			log.Println("Created new auth")
-			log.Println(auth)
+			c.Infof("Created new auth %s", auth)
 			_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Auth", userkey[0]), &auth)
 			if err != nil {
 				panic(err)
@@ -214,13 +216,7 @@ func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
 func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.FilterChain) {
 	c := appengine.NewContext(r.Request)
 	authkey := r.Request.Header.Get("Authorization")
-	if len(authkey) == 0 {
-		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
-		w.WriteErrorString(401, "401: Not Authorized")
-		return
-	}
-	// usr/pwd = admin/admin
-	// real code does some decoding
+
 	user := auth(c, authkey)
 	if user == nil {
 		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")

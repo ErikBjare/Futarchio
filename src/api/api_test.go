@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func init() {
@@ -36,8 +37,15 @@ func TestAuth(t *testing.T) {
 	}
 
 	msg := map[string]map[string]string{}
-	fmt.Println(string(body))
-	json.Unmarshal(body, &msg)
+	//fmt.Println(string(body))
+	err = json.Unmarshal(body, &msg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Apparently required to allow the datastore time to be able to store Auth
+	// Should probably be removed once Memcache is implemented
+	time.Sleep(1 * time.Second)
 
 	urls := []string{"http://localhost:8080/api/0/users", "http://localhost:8080/api/0/users/me"}
 	for _, url := range urls {
