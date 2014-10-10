@@ -39,9 +39,6 @@ func serve() {
 	api.Users.Register(wsContainer)
 	http.Handle("/api/0/", wsContainer)
 	http.HandleFunc("/api/0/init", initDB)
-
-	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
-	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
 }
 
 func initDB(w http.ResponseWriter, r *http.Request) {
