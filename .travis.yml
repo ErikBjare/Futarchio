@@ -15,7 +15,7 @@ install:
 
 before_script:
     - cd src/frontend
-    - ../go_appengine/goapp serve &
+    - ../../go_appengine/goapp serve &
     - cd ../..
     - sleep 5 # give some time to start
 
