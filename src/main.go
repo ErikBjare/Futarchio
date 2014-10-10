@@ -38,7 +38,7 @@ func serve() {
 	wsContainer := restful.NewContainer()
 	api.Users.Register(wsContainer)
 	http.Handle("/api/0/", wsContainer)
-	http.HandleFunc("/api/init", initDB)
+	http.HandleFunc("/api/0/init", initDB)
 
 	log.Println("Frontend is serving on: http://localhost:" + Config.Main.Port)
 	log.Println("API is serving on: http://localhost:" + Config.Main.Port + "/api/")
@@ -50,7 +50,7 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
 		username, name, email := elem[0], elem[1], elem[2]
 		q := datastore.NewQuery("User").
-			Filter("email =", email).
+			Filter("Email =", email).
 			Limit(1)
 
 		var users []db.User

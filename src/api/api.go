@@ -31,11 +31,8 @@ func init() {
 	Polls = &PollApi{Path: "/polls"}
 }
 
-func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
-	c := appengine.NewContext(r.Request)
-	authkey := r.Request.Header.Get("Authorization")
-
-	q := datastore.NewQuery("Auth").Filter("key =", authkey).Limit(1)
+func auth(c appengine.Context, authkey string) *db.User {
+	q := datastore.NewQuery("Auth").Filter("Key =", authkey).Limit(1)
 	var auths []db.Auth
 	keys, err := q.GetAll(c, &auths)
 	if err != nil {
@@ -49,11 +46,21 @@ func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 			panic(err)
 		}
 		log.Println("Successfully logged in with email: " + user.Email)
-		respond(w, []db.User{user})
+		return &user
+	}
+	return nil
+}
+
+func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+	authkey := r.Request.Header.Get("Authorization")
+
+	user := auth(c, authkey)
+	if user != nil {
+		respond(w, user)
 	} else {
 		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
 		w.WriteErrorString(401, "401: Not Authorized")
-		return
 	}
 }
 
@@ -64,7 +71,7 @@ func (u UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
 
 	q := datastore.NewQuery("User")
 	if key != "" && val != "" {
-		q = q.Filter(key+" =", val)
+		q = q.Filter(strings.Replace(key, key[0:1], strings.ToUpper(key[0:1]), 1)+" =", val)
 	} else {
 		// TODO: Get all
 	}
@@ -147,9 +154,6 @@ func (u UserApi) Register(container *restful.Container) {
 		Doc("authorize a user").
 		Reads(map[string]string{}))
 	container.Add(ws)
-
-	log.Println("Initialized routes")
-	log.Println("Initialized paths")
 }
 
 func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
@@ -166,9 +170,9 @@ func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
 	q := datastore.NewQuery("User").Limit(1)
 	if strings.Contains(username, "@") {
 		// Is an Email
-		q = q.Filter("email =", username)
+		q = q.Filter("Email =", username)
 	} else {
-		q = q.Filter("username =", username)
+		q = q.Filter("Username =", username)
 	}
 
 	var user []db.User
@@ -180,15 +184,13 @@ func (ur UserApi) authorizeUser(r *restful.Request, w *restful.Response) {
 		// Check if auth key already exists
 		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1)
 		var auths []db.Auth
-		_, err := q.GetAll(c, &auths)
-		if err != nil {
+		k, err := q.GetAll(c, &auths)
+		if len(k) != 0 && err != nil {
 			panic(err)
 		}
 
 		if len(auths) != 0 {
 			// If user already has a authkey
-			log.Println("Found existing auth")
-			log.Println(auths[0])
 			w.WriteEntity(map[string]interface{}{"auth": auths[0]})
 		} else {
 			// If user doesn't have an authkey
@@ -219,23 +221,10 @@ func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.F
 	}
 	// usr/pwd = admin/admin
 	// real code does some decoding
-	q := datastore.NewQuery("Auth").Filter("key =", authkey).Limit(1)
-	var auths []db.Auth
-	keys, err := q.GetAll(c, &auths)
-	if err != nil {
-		panic(err)
-	}
-
-	if len(auths) != 0 && auths[0].Key == authkey {
-		var user db.User
-		err := datastore.Get(c, keys[0].Parent(), &user)
-		if err != nil {
-			panic(err)
-		}
-		log.Println("Successfully logged in with email: " + user.Email)
-	} else {
+	user := auth(c, authkey)
+	if user == nil {
 		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
-		w.WriteErrorString(401, "401: Not Authorized")
+		w.WriteErrorString(401, "401: Invalid auth")
 		return
 	}
 	chain.ProcessFilter(r, w)
