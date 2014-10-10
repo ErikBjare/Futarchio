@@ -1,9 +1,8 @@
-package main
+package frontend
 
 import (
 	"appengine"
 	"appengine/datastore"
-	"code.google.com/p/gcfg"
 	"fmt"
 	"github.com/ErikBjare/Futarchio/src/api"
 	"github.com/ErikBjare/Futarchio/src/db"
@@ -14,31 +13,16 @@ import (
 	"os"
 )
 
-type config struct {
-	Main struct {
-		Hostname string
-		Port     string
-	}
-}
-
 func main() {
 	log.Println("Invalid use, start with `goapp serve` (Google App Engine)")
 }
 
-var (
-	Config config
-)
-
 func init() {
-	err := gcfg.ReadFileInto(&Config, "config.ini")
-	if err != nil {
-		panic(err)
-	}
-
 	serve()
 }
 
 func serve() {
+	log.Println("Instance starting...")
 	wsContainer := restful.NewContainer()
 	api.Users.Register(wsContainer)
 	http.Handle("/api/0/", wsContainer)
