@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	_, err := http.Get("http://localhost:8080/api/0/ident")
+	_, err := http.Get("http://localhost:8080/api/0/init")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,13 +60,17 @@ func TestAuth(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		data := map[string]interface{}{}
+
+		// The following comment line can be useful for debugging by printing body
+		//log.Println(string(body))
+
+		data := map[string][]interface{}{}
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			t.Error(err)
 		}
-		if data["length"] == float64(0) {
-			t.Fatal(fmt.Sprintf("Got zero results: %f", data["length"]))
+		if len(data["data"]) == 0 {
+			t.Fatal(fmt.Sprintf("Got zero results or non-array"))
 		}
 	}
 }

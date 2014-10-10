@@ -57,7 +57,7 @@ func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 
 	user := auth(c, authkey)
 	if user != nil {
-		respond(w, user)
+		respond(w, []db.User{*user})
 	} else {
 		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
 		w.WriteErrorString(401, "401: Not Authorized")
