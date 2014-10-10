@@ -8,3 +8,4 @@ unzip -q go_appengine.zip
 
 IFS=':' read -ra GOPKGS <<< "$GOPATH"
 ln -s "$(pwd)/go_appengine/goroot/src/pkg/appengine" "${GOPKGS[0]}/src/appengine"
+ln -s "$(pwd)/go_appengine/goroot/src/pkg/appengine_internal" "${GOPKGS[0]}/src/appengine_internal"

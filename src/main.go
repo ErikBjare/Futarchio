@@ -21,6 +21,10 @@ type config struct {
 	}
 }
 
+func main() {
+	log.Println("Invalid use, start with `goapp serve` (Google App Engine)")
+}
+
 var (
 	Config config
 )
