@@ -119,7 +119,7 @@ func BenchmarkAPICall(b *testing.B) {
 func TestUsers(t *testing.T) {
 	c, err := aetest.NewContext(nil)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	defer c.Close()
 
