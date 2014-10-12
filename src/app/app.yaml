@@ -6,13 +6,13 @@ api_version: go1
 handlers:
 - url: /api/.*
   script: _go_app
-  secure: always
+#  secure: always
 
 - url: /
   static_files: site/dist/index.html
   upload: site/dist/index.html
-  secure: always
+#  secure: always
 
 - url: /
   static_dir: site/dist
-  secure: always
+#  secure: always
