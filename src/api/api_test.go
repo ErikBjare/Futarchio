@@ -36,8 +36,8 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	msg := map[string]map[string]string{}
-	//fmt.Println(string(body))
+	msg := map[string]db.Auth{}
+	fmt.Println(string(body))
 	err = json.Unmarshal(body, &msg)
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +53,7 @@ func TestAuth(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req.Header.Add("Authorization", msg["auth"]["key"])
+		req.Header.Add("Authorization", msg["auth"].Key)
 		resp, err = client.Do(req)
 		if err != nil {
 			t.Error("Is the server running?")
@@ -79,39 +79,6 @@ func TestAuth(t *testing.T) {
 		}
 		if len(data["data"]) == 0 {
 			t.Fatal(fmt.Sprintf("Got zero results or non-array"))
-		}
-	}
-}
-
-func BenchmarkAPICall(b *testing.B) {
-	client := &http.Client{}
-	for i := 0; i < b.N; i++ {
-		req, err := http.NewRequest("GET", "http://localhost:8080/api/0/users", nil)
-		if err != nil {
-			b.Fatal(err)
-		}
-		req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-		resp, err := client.Do(req)
-		if err != nil {
-			b.Error("Is the server running?")
-			b.Fatal(err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			b.Fatal(fmt.Sprintf("Status code was not 200, was %d with message: %s", resp.StatusCode, resp.Status))
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			b.Error(err)
-		}
-		data := map[string]interface{}{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
-			b.Error(err)
-		}
-		if data["length"] == float64(0) {
-			b.Fatal(fmt.Sprintf("Got zero results: %f", data["length"]))
 		}
 	}
 }
@@ -148,22 +115,3 @@ func TestUsers(t *testing.T) {
 		t.Error("More than one user with email erik@bjareho.lt in database")
 	}
 }
-
-/*
-func BenchmarkUserExistanceCycle(b *testing.B) {
-	c, err := aetest.NewContext(nil)
-	if err != nil {
-		panic(err)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		user := db.NewUser("tester", "password", "Tester", "test@example.com", []string{})
-		userkey, err := datastore.Put(c, datastore.NewIncompleteKey(c, "User", nil), user)
-		if err != nil {
-			b.Error("Error when creating user")
-			log.Println("I'm here")
-		}
-		datastore.Delete(c, userkey)
-	}
-}
-*/
