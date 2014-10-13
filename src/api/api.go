@@ -7,7 +7,6 @@ import (
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
-	"net/http"
 )
 
 var (
@@ -40,8 +39,8 @@ func respondMany(w *restful.Response, entities interface{}) {
 	w.WriteEntity(entities)
 }
 
-func respondError(w *restful.Response, error string) {
-	w.WriteHeader(http.StatusNotFound)
+func respondError(w *restful.Response, httperr int, error string) {
+	w.WriteHeader(httperr)
 	w.WriteEntity(map[string]interface{}{"error": error})
 }
 
@@ -55,8 +54,7 @@ func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.F
 
 	user := auth(c, authkey)
 	if user == nil {
-		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
-		w.WriteErrorString(401, "401: Invalid auth")
+		respondError(w, 401, "invalid or missing Authorization header")
 		return
 	}
 	c.Infof("Authenticated %s", user.Username)

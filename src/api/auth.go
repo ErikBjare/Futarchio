@@ -22,7 +22,7 @@ func (a AuthApi) Register() {
 		Path("/api/0/auth").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
-	ws.Route(ws.POST("").To(a.authorizeUser).
+	ws.Route(ws.POST("/").To(a.authorizeUser).
 		Doc("authorize a user").
 		Operation("authorizeUser").
 		Reads(AuthReq{}))
@@ -94,7 +94,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			respondOne(w, auth)
 		}
 	} else {
-		respondError(w, "wrong username/password")
+		respondError(w, 401, "wrong username/password")
 	}
 
 }
