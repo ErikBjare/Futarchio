@@ -124,7 +124,7 @@ func TestUsers(t *testing.T) {
 	defer c.Close()
 
 	key := datastore.NewKey(c, "User", "", 1, nil)
-	_, err = datastore.Put(c, key, db.NewUser("erb", "secretpassword", "Erik", "erik@bjareho.lt", []string{}))
+	_, err = datastore.Put(c, key, db.NewUser("erb", "secretpassword", "Erik", "erik@bjareho.lt"))
 	if err != nil {
 		t.Fatal(err)
 	}
