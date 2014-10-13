@@ -14,6 +14,7 @@ var paths = {
   scripts: src_path+'/scripts/**/*.js',
   images: src_path+'/img/**/*',
   html: src_path+'/**/*.html',
+  robots: src_path+'/robots.txt',
   stylesheets: src_path+'/stylesheets/style.scss'
 };
 
@@ -51,10 +52,14 @@ gulp.task('stylesheets', [], function() {
     .pipe(gulp.dest(dist_path));
 });
 
-// TODO: Minify HTML
 gulp.task('html', [], function() {
   return gulp.src(paths.html)
     .pipe(htmlmin({collapseWhitespace:true}))
+    .pipe(gulp.dest(dist_path));
+});
+
+gulp.task('robots', [], function() {
+  return gulp.src(paths.robots)
     .pipe(gulp.dest(dist_path));
 });
 
@@ -67,4 +72,4 @@ gulp.task('watch', function() {
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'scripts', 'images', 'stylesheets', 'html']);
+gulp.task('default', ['watch', 'scripts', 'images', 'stylesheets', 'html', 'robots']);
