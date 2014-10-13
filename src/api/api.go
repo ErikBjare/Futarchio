@@ -91,6 +91,10 @@ func auth(c appengine.Context, authkey string) *db.User {
 		c.Errorf(err.Error())
 		panic(err)
 	}
+	if len(keys) == 0 {
+		c.Infof("Failed to find authkey")
+		return nil
+	}
 	key := keys[0]
 
 	auth := db.Auth{}

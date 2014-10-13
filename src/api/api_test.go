@@ -53,7 +53,7 @@ func TestAuth(t *testing.T) {
 	}
 	// Apparently required to allow the datastore time to be able to store Auth
 	// Should probably be removed once Memcache is implemented
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	body, err := getBody("http://localhost:8080/api/0/users", authkey)
 	if err != nil {

@@ -17,7 +17,7 @@ before_script:
     - cd src/app
     - ../../go_appengine/goapp serve &
     - cd ../..
-    - sleep 5 # give some time to start
+    - sleep 10 # give some time to start
 
 script:
     - ./go_appengine/goapp test -v -cover ./src/...
