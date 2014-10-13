@@ -4,13 +4,12 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"fmt"
-	"github.com/ErikBjare/Futarchio/src/api"
+	_ "github.com/ErikBjare/Futarchio/src/api"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
-	"github.com/golang/oauth2"
+	"github.com/emicklei/go-restful/swagger"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
@@ -21,12 +20,34 @@ func init() {
 	serve()
 }
 
+func getGaeURL() string {
+	if appengine.IsDevAppServer() {
+		return "http://localhost:8080"
+	} else {
+		/**
+		 * Include your URL on App Engine here.
+		 * I found no way to get AppID without appengine.Context and this always
+		 * based on a http.Request.
+		 */
+		return "http://futarchio.appspot.com"
+	}
+}
+
 func serve() {
 	log.Println("Instance starting...")
-	wsContainer := restful.NewContainer()
-	api.Users.Register(wsContainer)
-	http.Handle("/api/0/", wsContainer)
 	http.HandleFunc("/api/0/init", initDB)
+
+	config := swagger.Config{
+		WebServices:    restful.RegisteredWebServices(), // you control what services are visible
+		WebServicesUrl: getGaeURL(),
+		ApiPath:        "/apidocs.json",
+
+		// Optionally, specifiy where the UI is located
+		SwaggerPath: "/apidocs/",
+		// GAE support static content which is configured in your app.yaml.
+		// This example expect the swagger-ui in static/swagger so you should place it there :)
+		SwaggerFilePath: "site/swagger/dist"}
+	swagger.InstallSwaggerService(config)
 }
 
 func initDB(w http.ResponseWriter, r *http.Request) {
@@ -35,14 +56,14 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
 		username, name, email := elem[0], elem[1], elem[2]
 		q := datastore.NewQuery("User").
-			Filter("Email =", email).
+			Filter("email =", email).
 			Limit(1)
 
 		var users []db.User
 		q.GetAll(c, &users)
 
 		if len(users) == 0 {
-			user := db.NewUser(username, "password", name, email, []string{})
+			user := db.NewUser(username, "password", name, email)
 			log.Println("Creating user, did not exist.\n - name: " + name)
 			key, err := datastore.Put(c, datastore.NewIncompleteKey(c, "User", nil), user)
 			if err != nil {
@@ -51,43 +72,4 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "created %q\n", key)
 		}
 	}
-}
-
-func oauth_test() {
-	file, err := os.Open("secrets/key.pem")
-	if err != nil {
-		panic(err)
-	}
-	key := []byte{}
-	file.Read(key)
-
-	conf, err := oauth2.NewJWTConfig(&oauth2.JWTOptions{
-		Email: "643992545442-u8dubmhq38dor5bvltjb2o98tv3musqq@developer.gserviceaccount.com",
-		// The contents of your RSA private key or your PEM file
-		// that contains a private key.
-		// If you have a p12 file instead, you
-		// can use `openssl` to export the private key into a pem file.
-		//
-		//    $ openssl pkcs12 -in key.p12 -out key.pem -nodes
-		//
-		// It only supports PEM containers with no passphrase.
-		PrivateKey: key,
-		Scopes:     []string{"profile"},
-	},
-		"https://provider.com/o/oauth2/token")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Initiate an http.Client, the following GET request will be
-	// authorized and authenticated on the behalf of
-	// xxx@developer.gserviceaccount.com.
-	client := http.Client{Transport: conf.NewTransport()}
-	client.Get("...")
-
-	// If you would like to impersonate a user, you can
-	// create a transport with a subject. The following GET
-	// request will be made on the behalf of user@example.com.
-	client = http.Client{Transport: conf.NewTransportWithUser("user@example.com")}
-	client.Get("...")
 }

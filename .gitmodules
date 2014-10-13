@@ -1,3 +1,6 @@
 [submodule "wiki"]
 	path = wiki
 	url = git@github.com:ErikBjare/Futarchio.wiki.git
+[submodule "src/site/swagger"]
+	path = src/site/swagger
+	url = git://github.com/ErikBjare/swagger-ui.git

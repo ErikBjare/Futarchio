@@ -8,6 +8,10 @@ handlers:
   script: _go_app
 #  secure: always
 
+- url: /apidocs.*
+  script: _go_app
+#  secure: always
+
 - url: /
   static_files: site/dist/index.html
   upload: site/dist/index.html
