@@ -33,27 +33,25 @@ func (a AuthApi) Register() {
 func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 	// Username can be User.Username or User.Email
-	data := map[string]string{}
-	err := r.ReadEntity(&data)
+	var ar AuthReq
+	err := r.ReadEntity(&ar)
 	if err != nil {
 		c.Criticalf(err.Error())
 		panic(err)
 	}
-	username := data["username"]
-	password := data["password"]
 
 	q := datastore.NewQuery("User").Limit(1)
-	if strings.Contains(username, "@") {
+	if strings.Contains(ar.Username, "@") {
 		// Is an Email
-		q = q.Filter("Email =", username)
+		q = q.Filter("Email =", ar.Username)
 	} else {
-		q = q.Filter("Username =", username)
+		q = q.Filter("Username =", ar.Username)
 	}
 
 	var user []db.User
 	userkey, err := q.GetAll(c, &user)
 
-	if len(user) != 0 && user[0].CheckPassword(password) {
+	if len(user) != 0 && user[0].CheckPassword(ar.Password) {
 		// If user successfully authorized
 
 		// Check if auth key already exists
@@ -66,7 +64,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 
 		if len(auths) != 0 {
 			// If user already has a authkey
-			w.WriteEntity(map[string]interface{}{"auth": auths[0]})
+			respondOne(w, auths[0])
 		} else {
 			// If user doesn't have an authkey
 			auth := db.NewAuth()
@@ -93,10 +91,10 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			}
 			c.Infof("Created new auth %s", auth)
 
-			w.WriteEntity(map[string]interface{}{"auth": auth})
+			respondOne(w, auth)
 		}
 	} else {
-		w.WriteEntity(map[string]interface{}{"error": "wrong username/password"})
+		respondError(w, "wrong username/password")
 	}
 
 }

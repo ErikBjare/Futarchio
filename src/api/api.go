@@ -32,13 +32,17 @@ type Api swagger.Api
    Respond Functions
 */
 
-func respond(r *restful.Response, result interface{}) {
-	r.WriteEntity(map[string]interface{}{"data": result})
+func respondOne(w *restful.Response, entity interface{}) {
+	w.WriteEntity(entity)
 }
 
-func respondError(r *restful.Response, error string) {
-	r.WriteHeader(http.StatusNotFound)
-	r.WriteEntity(map[string]interface{}{"error": error})
+func respondMany(w *restful.Response, entities interface{}) {
+	w.WriteEntity(entities)
+}
+
+func respondError(w *restful.Response, error string) {
+	w.WriteHeader(http.StatusNotFound)
+	w.WriteEntity(map[string]interface{}{"error": error})
 }
 
 /*

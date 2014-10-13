@@ -21,7 +21,7 @@ func (p PollApi) Register() {
 		Filter(basicAuthenticate).
 		Doc("get the latest polls").
 		Operation("getTop").
-		Writes(db.Poll{}))
+		Writes([]db.Poll{}))
 
 	restful.Add(ws)
 }
@@ -32,5 +32,5 @@ func (p PollApi) getTop(r *restful.Request, w *restful.Response) {
 
 	var polls []db.Poll
 	q.GetAll(c, &polls)
-	respond(w, polls)
+	respondMany(w, polls)
 }
