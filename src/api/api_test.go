@@ -22,6 +22,9 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: Should probably be removed once Memcache is implemented
+	time.Sleep(time.Second)
 }
 
 func getAuthkey() (string, error) {
@@ -51,9 +54,10 @@ func TestAuth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	// Apparently required to allow the datastore time to be able to store Auth
-	// Should probably be removed once Memcache is implemented
-	time.Sleep(2 * time.Second)
+	// TODO: Should probably be removed once Memcache is implemented
+	time.Sleep(time.Second)
 
 	body, err := getBody("http://localhost:8080/api/0/users", authkey)
 	if err != nil {
