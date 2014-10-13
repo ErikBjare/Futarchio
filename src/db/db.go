@@ -122,3 +122,13 @@ func NewYesNoVote(yes bool) Vote {
 		return NewVote(map[string]float32{"no": 1})
 	}
 }
+
+func SumVotes(vs []Vote) map[string]float32 {
+	weights := map[string]float32{"yes": 0, "no": 0}
+	for _, v := range vs {
+		for k, f := range v.Weights {
+			weights[k] += f
+		}
+	}
+	return weights
+}

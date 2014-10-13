@@ -54,6 +54,7 @@ func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.F
 
 	user := auth(c, authkey)
 	if user == nil {
+		c.Infof("Invalid or expired Authorization header: %s", authkey)
 		respondError(w, 401, "invalid or missing Authorization header")
 		return
 	}
