@@ -8,14 +8,13 @@ app.factory('msgStack', function() {
 });
 
 app.factory('User', function($log, $resource) {
-    var User = $resource('/api/0/:resource/:key/:val', {});
+    var User = $resource('/api/0/users/:key/:val', {});
     return function(key, val) {
-        var user = User.get(
-           {"resource": "users",
-            "key": key,
+        var user = User.query(
+           {"key": key,
             "val": val},
             function(u) {
-                $log.info(u.data[0]);
+                $log.info("Successfully fetched user");
             }, function(u) {
                 $log.error("Error");
             });
@@ -43,24 +42,28 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, g
         return val;
     };
 
+    user.getAuthkey = function() {
+        authkey = $cookieStore.get("auth");
+        return authkey;
+    };
+
     user.login = function(username, password) {
         var deferred = $q.defer();
 
         $http.post('/api/0/auth', {username: username, password: password})
         .success(function(data, status, headers, config) {
             console.log(data);
-            if(!data.auth) {
-                deferred.reject(data.error);
-            } else {
-                authkey = data.auth.key;
-                $cookieStore.put("auth", authkey);
-                $http.get('/api/0/users/me', {"headers": {"Authorization": authkey}})
-                .success(function(data) {
-                    console.log(data);
-                    $cookieStore.put("me", {"username": username, "email": data.data[0].email});
-                    deferred.resolve(data);
-                });
-            }
+            authkey = data.key;
+            $cookieStore.put("auth", authkey);
+            console.log("Cookie put");
+            $http.get('/api/0/users/me', {"headers": {"Authorization": authkey}})
+            .success(function(data) {
+                console.log(data);
+                $cookieStore.put("me", {"username": username, "email": data.email});
+                deferred.resolve(data);
+            }).error(function(data) {
+                console.log("Error");
+            });
         }).error(function(data, status, headers, config) {
             error = "Something went wrong while trying to make request";
             deferred.reject(error);

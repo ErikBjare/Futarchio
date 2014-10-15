@@ -14,9 +14,8 @@ type UserApi Api
 
 func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
-	authkey := r.Request.Header.Get("Authorization")
 
-	user := auth(c, authkey)
+	user, _ := auth(c, r)
 	if user != nil {
 		respondOne(w, user)
 	} else {

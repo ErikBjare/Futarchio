@@ -19,15 +19,33 @@ app.controller('AdminController', function($scope, $resource, msgStack, User) {
     };
 
     $scope.findUser = function() {
-        var user = User($scope.lookupKey, $scope.lookupValie);
+        var user = User($scope.lookupKey, $scope.lookupValue);
         console.log(user);
     };
 });
 
-app.controller('PollsController', function($scope, $resource, $log) {
-    $scope.polls = [{"creator": "erb", "text": "This is a poll"},
-                    {"creator": "clara", "text": "This is another poll"}];
-    $scope.time = new Date().toISOString();
+app.controller('PollsController', function($scope, $resource, $log, Poll) {
+    Poll.query(function(data) {
+           $scope.polls = data;
+    });
+});
+
+app.factory('Poll', function($resource, user) {
+    var Poll = $resource("/api/0/polls", {api_key: user.getAuthkey()},
+        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.getAuthkey()}}});
+    console.log(new Poll());
+    return Poll;
+});
+
+app.controller('NewPollController', function($scope, $resource, $log, Poll) {
+    $scope.createPoll = function() {
+        var poll = new Poll(
+            {"title": $scope.title,
+             "description": $scope.description || "",
+             "type": "YesNoPoll"});
+        console.log(poll);
+        poll.$save();
+    };
 });
 
 app.controller('PredictionsController', function($scope, $resource, $log) {
@@ -49,7 +67,6 @@ app.controller('PollController', function($scope, $resource, $log) {
 });
 
 app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, User) {
-    console.log("Missing username routeParam");
     if(!$routeParams.username) {
         console.log("Missing username routeParam");
         me = $cookieStore.get("me");
@@ -67,7 +84,7 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
     $scope.user = {};
     User("username", $routeParams.username).$promise.then(function(payload) {
         console.log(payload);
-        $scope.profile = payload.data[0];
+        $scope.profile = payload[0];
         $scope.profile.gravatar_hash = gravatar.hash($scope.profile.email);
     }, function(error) {
         $scope.loading_error = true;

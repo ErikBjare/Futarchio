@@ -29,7 +29,7 @@ func getGaeURL() string {
 		 * I found no way to get AppID without appengine.Context and this always
 		 * based on a http.Request.
 		 */
-		return "http://futarchio.appspot.com"
+		return "http://www.futarch.io"
 	}
 }
 

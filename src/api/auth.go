@@ -20,6 +20,7 @@ func (a AuthApi) Register() {
 	ws := new(restful.WebService)
 	ws.
 		Path("/api/0/auth").
+		Doc("Authentication Tokens").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 	ws.Route(ws.POST("/").To(a.authorizeUser).

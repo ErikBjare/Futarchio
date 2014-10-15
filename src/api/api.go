@@ -50,12 +50,10 @@ func respondError(w *restful.Response, httperr int, error string) {
 
 func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.FilterChain) {
 	c := appengine.NewContext(r.Request)
-	authkey := r.Request.Header.Get("Authorization")
 
-	user := auth(c, authkey)
+	user, _ := auth(c, r)
 	if user == nil {
-		c.Infof("Invalid or expired Authorization header: %s", authkey)
-		respondError(w, 401, "invalid or missing Authorization header")
+		respondError(w, 401, "")
 		return
 	}
 	c.Infof("Authenticated %s", user.Username)
@@ -63,7 +61,16 @@ func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.F
 	chain.ProcessFilter(r, w)
 }
 
-func auth(c appengine.Context, authkey string) *db.User {
+func auth(c appengine.Context, r *restful.Request) (*db.User, *datastore.Key) {
+	authkey := r.Request.Header.Get("Authorization")
+	if authkey == "" {
+		authkey = r.QueryParameter("api_key")
+	}
+
+	if authkey == "" {
+		c.Errorf("Got blank authkey")
+	}
+
 	q := datastore.NewQuery("Auth").Filter("Key =", authkey).Limit(1)
 	var auths []db.Auth
 
@@ -92,7 +99,7 @@ func auth(c appengine.Context, authkey string) *db.User {
 	}
 	if len(keys) == 0 {
 		c.Infof("Failed to find authkey")
-		return nil
+		return nil, nil
 	}
 	key := keys[0]
 
@@ -110,9 +117,10 @@ func auth(c appengine.Context, authkey string) *db.User {
 			panic(err)
 		}
 		c.Infof("User successfully authorized in with email: " + user.Email)
-		return &user
+		return &user, key
 	} else {
 		c.Warningf("Could not find Auth for authkey")
 	}
-	return nil
+	c.Infof("Invalid or expired Authorization header: %s", authkey)
+	return nil, nil
 }

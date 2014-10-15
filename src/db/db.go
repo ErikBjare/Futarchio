@@ -68,12 +68,12 @@ func (u User) CheckPassword(password string) bool {
 
 type Poll struct {
 	// Represents a base poll, needs to be filled by poll-type initializers
-	Title       string
-	Description string
-	Creator     *datastore.Key
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Creator     *datastore.Key `json:"creator"`
 	// Type can be one of "YesNoPoll", "CredencePoll", "MultipleChoicePoll", "AllocationPoll"
-	Type    string
-	Choices []string
+	Type    string   `json:"type"`
+	Choices []string `json:"choices"`
 }
 
 func NewPoll(title, desc string, creator *datastore.Key) Poll {
