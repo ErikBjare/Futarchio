@@ -65,7 +65,7 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 		if len(users) == 0 {
 			user := db.NewUser(username, "password", name, email)
 			log.Println("Creating user, did not exist.\n - name: " + name)
-			key, err := datastore.Put(c, datastore.NewIncompleteKey(c, "User", nil), &user)
+			key, err := datastore.Put(c, datastore.NewKey(c, "User", username, 0, nil), &user)
 			if err != nil {
 				log.Fatal(err)
 			}

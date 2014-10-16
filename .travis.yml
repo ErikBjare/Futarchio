@@ -2,8 +2,8 @@ language: go
 
 go:
     - 1.2
-    - 1.3
-    - tip
+   #- 1.3
+   #- tip
 
 before_install:
     - bash ./scripts/setup_gae.sh
@@ -17,7 +17,7 @@ before_script:
     - cd src/app
     - ../../go_appengine/goapp serve &
     - cd ../..
-    - sleep 10 # give some time to start
+    - sleep 5 # give some time to start
 
 script:
     - ./go_appengine/goapp test -v -cover ./src/...
