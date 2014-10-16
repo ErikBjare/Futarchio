@@ -8,7 +8,7 @@ app.controller('MainController', function($scope, $route, $location, user) {
 app.controller('HomeController', function($scope, $log) {
 });
 
-app.controller('AdminController', function($scope, $resource, msgStack, User) {
+app.controller('AdminController', function($scope, $resource, msgStack) {
     $scope.resources = ["users", "idklol"];
     $scope.keys = ["email", "id"];
     $scope.stdin = "";
@@ -16,11 +16,6 @@ app.controller('AdminController', function($scope, $resource, msgStack, User) {
     $scope.log = function(obj) {
         $scope.stdout = msgStack($scope, obj);
         $scope.stdin = "";
-    };
-
-    $scope.findUser = function() {
-        var user = User($scope.lookupKey, $scope.lookupValue);
-        console.log(user);
     };
 });
 
@@ -31,7 +26,7 @@ app.controller('PollsController', function($scope, $resource, $log, Poll) {
 });
 
 app.factory('Poll', function($resource, user) {
-    var Poll = $resource("/api/0/polls", {api_key: user.getAuthkey()},
+    var Poll = $resource("/api/0/polls", {},
         {"save": {method: "POST", isArray: false, headers: {"Authorization": user.getAuthkey()}}});
     console.log(new Poll());
     return Poll;
@@ -66,7 +61,7 @@ app.controller('PollController', function($scope, $resource, $log) {
     };
 });
 
-app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, User) {
+app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, UserKeyVal) {
     if(!$routeParams.username) {
         console.log("Missing username routeParam");
         me = $cookieStore.get("me");
@@ -81,8 +76,7 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
         return;
     }
 
-    $scope.user = {};
-    User("username", $routeParams.username).$promise.then(function(payload) {
+    UserKeyVal("username", $routeParams.username).$promise.then(function(payload) {
         console.log(payload);
         $scope.profile = payload[0];
         $scope.profile.gravatar_hash = gravatar.hash($scope.profile.email);
@@ -109,6 +103,27 @@ app.controller('LoginController', function($scope, $routeParams, $location, user
             $scope.logging_in = false;
         }, function(error) {
             $scope.error = error;
+            $scope.logging_in = false;
+        });
+    };
+});
+
+app.controller('SignupController', function($scope, $routeParams, $location, User, user) {
+    if(user.is_logged_in()) {
+        $location.path("/profile/"+user.username());
+    } else {
+        $scope.logged_in = false;
+    }
+
+    $scope.signup = function() {
+        var user = new User({username: $scope.username, password: $scope.password, email: $scope.email});
+        user.$save().then(function(data) {
+            $scope.error = "";
+            $location.path("/profile/"+$scope.username);
+            $scope.logging_in = false;
+        }, function(data) {
+            console.log(data.data);
+            $scope.error = data.data.error;
             $scope.logging_in = false;
         });
     };

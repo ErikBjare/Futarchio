@@ -33,5 +33,9 @@ app.config(function($routeProvider, $locationProvider) {
    .when('/login', {
     templateUrl: 'login.html',
     controller: 'LoginController',
+  })
+   .when('/signup', {
+    templateUrl: 'signup.html',
+    controller: 'SignupController',
   });
 });

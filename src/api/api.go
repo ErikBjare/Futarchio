@@ -35,6 +35,11 @@ func respondOne(w *restful.Response, entity interface{}) {
 	w.WriteEntity(entity)
 }
 
+func respondSuccess(w *restful.Response, msg string) {
+	w.WriteHeader(200)
+	w.WriteEntity(map[string]interface{}{"success": msg})
+}
+
 func respondMany(w *restful.Response, entities interface{}) {
 	w.WriteEntity(entities)
 }
@@ -69,6 +74,7 @@ func auth(c appengine.Context, r *restful.Request) (*db.User, *datastore.Key) {
 
 	if authkey == "" {
 		c.Errorf("Got blank authkey")
+		return nil, nil
 	}
 
 	q := datastore.NewQuery("Auth").Filter("Key =", authkey).Limit(1)

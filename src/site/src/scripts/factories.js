@@ -7,7 +7,9 @@ app.factory('msgStack', function() {
     };
 });
 
-app.factory('User', function($log, $resource) {
+app.factory('UserKeyVal', function($log, $resource) {
+    // DEPRECATED
+    // TODO: Remove refs
     var User = $resource('/api/0/users/:key/:val', {});
     return function(key, val) {
         var user = User.query(
@@ -20,6 +22,10 @@ app.factory('User', function($log, $resource) {
             });
         return user;
     };
+});
+
+app.factory('User', function($log, $resource) {
+    return $resource('/api/0/users', {}, {});
 });
 
 app.factory('gravatar', function($log, $resource) {

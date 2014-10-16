@@ -30,13 +30,13 @@ type Auth struct {
 	Expires time.Time `json:"expires"`
 }
 
-func NewUser(username string, password string, name string, email string) *User {
+func NewUser(username string, password string, name string, email string) User {
 	hashed_pass, err := bcrypt.GenerateFromPassword([]byte(password), 11)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &User{
+	return User{
 		Username: username,
 		Password: hashed_pass,
 		Name:     name,
