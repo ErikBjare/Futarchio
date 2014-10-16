@@ -56,7 +56,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 		// If user successfully authorized
 
 		// Check if auth key already exists
-		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1)
+		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1).EventualConsistency()
 		var auths []db.Auth
 		k, err := q.GetAll(c, &auths)
 		if len(k) != 0 && err != nil {

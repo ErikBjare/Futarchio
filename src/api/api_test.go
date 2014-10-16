@@ -21,10 +21,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// TODO: Should probably be removed once Memcache is implemented
-	// Or? Seems to need the same sleep interval as the goapp serve.
-	time.Sleep(5 * time.Second)
 }
 
 func getAuthkey() (string, error) {
