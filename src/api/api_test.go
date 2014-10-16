@@ -2,7 +2,6 @@ package api
 
 import (
 	//	"gopkg.in/mgo.v2"
-	"appengine"
 	"appengine/aetest"
 	"appengine/datastore"
 	"bytes"
@@ -46,6 +45,7 @@ func getAuthkey() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return msg.Key, nil
 }
 
@@ -117,16 +117,15 @@ func TestUsers(t *testing.T) {
 	}
 	defer c.Close()
 
-	log.Println(appengine.DefaultVersionHostname(c))
-
-	key := datastore.NewKey(c, "User", "", 1, nil)
-	_, err = datastore.Put(c, key, db.NewUser("erb", "secretpassword", "Erik", "erik@bjareho.lt"))
+	key := datastore.NewKey(c, "User", "erb", 0, nil)
+	user1 := db.NewUser("erb", "secretpassword", "Erik", "erik@bjareho.lt")
+	_, err = datastore.Put(c, key, &user1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var user db.User
-	err = datastore.Get(c, key, &user)
+	var user2 db.User
+	err = datastore.Get(c, key, &user2)
 	if err != nil {
 		t.Error(err)
 	}
