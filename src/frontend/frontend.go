@@ -56,7 +56,7 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 	for _, elem := range [][]string{{"erb", "Erik", "erik@bjareho.lt"}, {"clara", "Clara", "idunno@example.com"}} {
 		username, name, email := elem[0], elem[1], elem[2]
 		q := datastore.NewQuery("User").
-			Filter("email =", email).
+			Filter("Email =", email).
 			Limit(1)
 
 		var users []db.User
@@ -69,7 +69,9 @@ func initDB(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Fprintf(w, "created %q\n", key)
+			fmt.Fprintf(w, "Created: %s (%q)\n", email, key)
+		} else {
+			fmt.Fprintf(w, "Already existed, didn't create: %s\n", email)
 		}
 	}
 }
