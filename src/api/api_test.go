@@ -21,6 +21,9 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: Should probably be removed once Memcache is implemented
+	time.Sleep(time.Second)
 }
 
 func getAuthkey() (string, error) {
