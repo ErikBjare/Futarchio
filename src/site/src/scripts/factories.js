@@ -41,7 +41,7 @@ app.factory('gravatar', function($log, $resource) {
     return gravatar;
 });
 
-app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, gravatar) {
+app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $window, gravatar) {
     var user = {};
     user.is_logged_in = function() {
         val = $cookieStore.get("me") && $cookieStore.get("auth");
@@ -64,15 +64,13 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, g
             console.log("Cookie put");
             $http.get('/api/0/users/me', {"headers": {"Authorization": authkey}})
             .success(function(data) {
-                console.log(data);
-                $cookieStore.put("me", {"username": username, "email": data.email});
+                $cookieStore.put("me", {"username": data.username, "email": data.email});
                 deferred.resolve(data);
             }).error(function(data) {
-                console.log("Error");
+                deferred.reject("error while fetching profile");
             });
         }).error(function(data, status, headers, config) {
-            error = "Something went wrong while trying to make request";
-            deferred.reject(error);
+            deferred.reject(data.error)
         });
 
         return deferred.promise;

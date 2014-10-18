@@ -85,7 +85,7 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
     });
 });
 
-app.controller('LoginController', function($scope, $routeParams, $location, user, $http) {
+app.controller('LoginController', function($scope, $routeParams, $location, $window, user, $http) {
     //TODO: Set 30 day cookie expiry upon "Remember me"
     $scope.logging_in = false;
 
@@ -99,7 +99,9 @@ app.controller('LoginController', function($scope, $routeParams, $location, user
         $scope.logging_in = true;
         user.login($scope.username, $scope.password).then(function(data) {
             $scope.error = "";
-            $location.path("/profile/"+$scope.username);
+            // Needed in order to ask for remembering username & password
+            $window.location.href = "#/profile/"+data.username;
+            $window.location.reload();
             $scope.logging_in = false;
         }, function(error) {
             $scope.error = error;
