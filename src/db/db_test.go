@@ -22,7 +22,10 @@ func TestAuth(t *testing.T) {
 }
 
 func TestPoll(t *testing.T) {
-	votes := []Vote{NewYesNoVote(true), NewYesNoVote(false)}
+	user := NewUser("test", "test", "test", "test")
+	vote1, _ := NewYesNoVote(true, user, true)
+	vote2, _ := NewYesNoVote(false, user, true)
+	votes := []Vote{vote1, vote2}
 
 	sumvotes := SumVotes(votes)
 	shouldbe := map[string]float32{"yes": 1.0, "no": 1.0}
