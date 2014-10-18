@@ -4,6 +4,7 @@ import (
 	//	"fmt"
 	"appengine"
 	"appengine/datastore"
+	"appengine/memcache"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"strings"
@@ -70,20 +71,17 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			// If user doesn't have an authkey
 			auth := db.NewAuth()
 
-			// TODO: Complete the following memcache use
-			/*
-				item := &memcache.Item{
-					Key:   auth.Key,
-					Value: []byte(userkey[0].String()),
-				}
+			// Add it to the memcache
+			item := &memcache.Item{
+				Key:   auth.Key,
+				Value: []byte(userkey[0].Encode()),
+			}
 
-				// Add the item to the memcache, if the key does not already exist
-				if err := memcache.Add(c, item); err == memcache.ErrNotStored {
-					c.Infof("item with key %q already exists", item.Key)
-				} else if err != nil {
-					c.Errorf("error adding item: %v", err)
-				}
-			*/
+			if err := memcache.Add(c, item); err == memcache.ErrNotStored {
+				c.Infof("item with key %q already exists", item.Key)
+			} else if err != nil {
+				c.Errorf("error adding item: %v", err)
+			}
 
 			// Put the item into the datastore
 			_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Auth", userkey[0]), &auth)
