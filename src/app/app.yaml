@@ -12,6 +12,10 @@ handlers:
   script: _go_app
 #  secure: always
 
+- url: /favicon.png
+  static_files: site/dist/img/favicon.png
+  upload: site/dist/img/favicon.png
+
 - url: /static
   static_dir: site/dist
 #  secure: always
