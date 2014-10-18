@@ -12,11 +12,11 @@ handlers:
   script: _go_app
 #  secure: always
 
-- url: /
-  static_files: site/dist/index.html
-  upload: site/dist/index.html
+- url: /static
+  static_dir: site/dist
 #  secure: always
 
-- url: /
-  static_dir: site/dist
+- url: /.*
+  static_files: site/dist/index.html
+  upload: site/dist/index.html
 #  secure: always

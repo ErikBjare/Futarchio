@@ -107,7 +107,7 @@ app.controller('LoginController', function($scope, $routeParams, $location, $win
         user.login($scope.username, $scope.password).then(function(data) {
             $scope.error = "";
             // Needed in order to ask for remembering username & password
-            $window.location.href = "#/profile/"+data.username;
+            $window.location.href = "/profile/"+data.username;
             $window.location.reload();
             $scope.logging_in = false;
         }, function(error) {

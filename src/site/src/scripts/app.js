@@ -3,39 +3,41 @@ app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies"]);
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider
    .when('/', {
-    templateUrl: 'home.html',
+    templateUrl: '/static/home.html',
     controller: 'HomeController',
   })
    .when('/polls', {
-    templateUrl: 'polls.html',
+    templateUrl: '/static/polls.html',
     controller: 'PollsController',
   })
    .when('/predictions', {
-    templateUrl: 'predictions.html',
+    templateUrl: '/static/predictions.html',
     controller: 'PredictionsController',
   })
    .when('/profile/:username', {
-    templateUrl: 'profile.html',
+    templateUrl: '/static/profile.html',
     controller: 'ProfileController',
   })
    .when('/profile', {
-    templateUrl: 'profile.html',
+    templateUrl: '/static/profile.html',
     controller: 'ProfileController',
   })
    .when('/admin', {
-    templateUrl: 'admin.html',
+    templateUrl: '/static/admin.html',
     controller: 'AdminController',
   })
    .when('/logout', {
-    templateUrl: 'logout.html',
+    templateUrl: '/static/logout.html',
     controller: 'LogoutController',
   })
    .when('/login', {
-    templateUrl: 'login.html',
+    templateUrl: '/static/login.html',
     controller: 'LoginController',
   })
    .when('/signup', {
-    templateUrl: 'signup.html',
+    templateUrl: '/static/signup.html',
     controller: 'SignupController',
   });
+
+  $locationProvider.html5Mode(true);
 });
