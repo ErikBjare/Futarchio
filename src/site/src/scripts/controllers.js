@@ -1,4 +1,8 @@
 app.controller('MainController', function($scope, $route, $location, user) {
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window.ga('send', 'pageview', { page: $location.path() });
+    });
+
     $scope.links_left = [{title: "Polls", url: "polls", beta: true},
                     {title: "Predictions", url: "predictions", alpha: true}];
     $scope.location = $location;
@@ -32,14 +36,17 @@ app.factory('Poll', function($resource, user) {
     return Poll;
 });
 
-app.controller('NewPollController', function($scope, $resource, $log, Poll) {
+app.controller('NewPollController', function($scope, $resource, $log, $window, Poll) {
     $scope.createPoll = function() {
         var poll = new Poll(
             {"title": $scope.title,
              "description": $scope.description || "",
              "type": "YesNoPoll"});
         console.log(poll);
-        poll.$save();
+        poll.$save().then(function() {
+            // Dirty way of reloading polls
+            $window.location.reload();
+        });
     };
 });
 

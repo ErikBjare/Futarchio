@@ -18,9 +18,9 @@ func (p PollApi) Register() {
 		Doc("Polls").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("/").To(p.getTop).
+	ws.Route(ws.GET("/").To(p.getLatest).
 		Doc("get the latest polls").
-		Operation("getTop").
+		Operation("getLatest").
 		Writes([]db.Poll{}))
 	ws.Route(ws.POST("/").To(p.createPoll).
 		Filter(basicAuthenticate).
@@ -31,9 +31,9 @@ func (p PollApi) Register() {
 	restful.Add(ws)
 }
 
-func (p PollApi) getTop(r *restful.Request, w *restful.Response) {
+func (p PollApi) getLatest(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
-	q := datastore.NewQuery("Poll").Limit(20)
+	q := datastore.NewQuery("Poll").Limit(20).Order("-Created")
 
 	var polls []db.Poll
 	keys, err := q.GetAll(c, &polls)
@@ -46,14 +46,14 @@ func (p PollApi) getTop(r *restful.Request, w *restful.Response) {
 		return
 	}
 
-	c.Infof("%s", polls)
+	c.Debugf("%s", polls)
 	respondMany(w, polls)
 }
 
 func (p PollApi) createPoll(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 
-	_, key := auth(c, r)
+	user, _ := auth(c, r)
 
 	var poll db.Poll
 	err := r.ReadEntity(&poll)
@@ -61,9 +61,9 @@ func (p PollApi) createPoll(r *restful.Request, w *restful.Response) {
 		c.Errorf("Error")
 	}
 
-	c.Infof("%s", poll)
+	c.Debugf("Created poll: %s", poll)
 	if poll.Type == "YesNoPoll" {
-		poll := db.NewYesNoPoll(poll.Title, poll.Description, key)
+		poll := db.NewYesNoPoll(poll.Title, poll.Description, user.Username)
 		datastore.Put(c, datastore.NewIncompleteKey(c, "Poll", nil), &poll)
 		c.Infof("Saved poll!")
 	}

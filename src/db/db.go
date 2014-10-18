@@ -2,7 +2,6 @@ package db
 
 import (
 	//	"fmt"
-	"appengine/datastore"
 	"code.google.com/p/go.crypto/bcrypt"
 	"crypto/sha256"
 	"encoding/base64"
@@ -68,19 +67,21 @@ func (u User) CheckPassword(password string) bool {
 
 type Poll struct {
 	// Represents a base poll, needs to be filled by poll-type initializers
-	Title       string         `json:"title"`
-	Description string         `json:"description"`
-	Creator     *datastore.Key `json:"creator"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Creator     string    `json:"creator"`
+	Created     time.Time `json:"created"`
 	// Type can be one of "YesNoPoll", "CredencePoll", "MultipleChoicePoll", "AllocationPoll"
 	Type    string   `json:"type"`
 	Choices []string `json:"choices"`
 }
 
-func NewPoll(title, desc string, creator *datastore.Key) Poll {
+func NewPoll(title, desc string, creator string) Poll {
 	return Poll{
 		Title:       title,
 		Description: desc,
 		Creator:     creator,
+		Created:     time.Now(),
 	}
 }
 
@@ -88,14 +89,14 @@ func (p Poll) AddChoice(name string) {
 	p.Choices = append(p.Choices, name)
 }
 
-func NewYesNoPoll(title, desc string, creator *datastore.Key) Poll {
+func NewYesNoPoll(title, desc string, creator string) Poll {
 	p := NewPoll(title, desc, creator)
 	p.Type = "YesNoPoll"
 	p.Choices = []string{"yes", "no"}
 	return p
 }
 
-func MultichoicePoll(title, desc string, creator *datastore.Key, choices []string) Poll {
+func MultichoicePoll(title, desc string, creator string, choices []string) Poll {
 	p := NewPoll(title, desc, creator)
 	p.Type = "MultichoicePoll"
 	p.Choices = choices
@@ -106,7 +107,7 @@ type Vote struct {
 	// Should always have a Poll as parent
 	Weights map[string]float32 `json:"weights" datastore:"weights"`
 	Key     string             // Optional, never both Creator and Key
-	Creator *datastore.Key     // Optional, never both Creator and Key
+	Creator string             // Optional, never both Creator and Key
 }
 
 func NewVote(choice map[string]float32) Vote {
