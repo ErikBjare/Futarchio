@@ -1,5 +1,5 @@
-app.controller('MainController', function($scope, $route, $location, $window, user) {
-    $scope.$on('$viewContentLoaded', function(event) {
+app.controller('MainController', function($scope, $route, $rootScope, $location, $window, user) {
+    $rootScope.$on('$routeChangeSuccess', function(event) {
         $window.ga('send', 'pageview', { page: $location.path() });
     });
 
