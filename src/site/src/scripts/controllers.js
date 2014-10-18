@@ -1,4 +1,4 @@
-app.controller('MainController', function($scope, $route, $location, user) {
+app.controller('MainController', function($scope, $route, $location, $window, user) {
     $scope.$on('$viewContentLoaded', function(event) {
         $window.ga('send', 'pageview', { page: $location.path() });
     });
