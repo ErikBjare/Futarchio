@@ -28,6 +28,7 @@ func TestPoll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer c.Close()
 
 	user := NewUser("user", "pass", "name", "email")
 	_ = NewYesNoPoll("title", "desc", "erb")
