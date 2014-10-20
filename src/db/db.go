@@ -129,18 +129,18 @@ type Vote struct {
 	Key string `json:"key"`
 }
 
-func (v Vote) Weights() map[string]float32 {
-	var buffer bytes.Buffer
-	dec := gob.NewDecoder(&buffer)
+func (v *Vote) Weights() map[string]float32 {
+	reader := bytes.NewReader(v.EncodedWeights)
+	dec := gob.NewDecoder(reader)
 	var weights map[string]float32
 	err := dec.Decode(&weights)
-	if err != nil {
+	if err != nil /*&& err.Error() != "EOF"*/ {
 		panic(err)
 	}
 	return weights
 }
 
-func (v Vote) SetWeights(w map[string]float32) error {
+func (v *Vote) SetWeights(w map[string]float32) error {
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
 	err := enc.Encode(w)
@@ -181,6 +181,9 @@ func newVote(pollkey *datastore.Key, user User, choice map[string]float32, priva
 		Key:  base64.StdEncoding.EncodeToString([]byte(hash[:])),
 	}
 	vote.SetWeights(choice)
+	if len(vote.EncodedWeights) == 0 {
+		log.Println("len of encoded weights was 0")
+	}
 
 	votereceipt := VoteReceipt{
 		Poll: pollkey,

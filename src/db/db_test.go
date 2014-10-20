@@ -1,6 +1,8 @@
 package db
 
 import (
+	"appengine/aetest"
+	"appengine/datastore"
 	"testing"
 )
 
@@ -22,11 +24,25 @@ func TestAuth(t *testing.T) {
 }
 
 func TestPoll(t *testing.T) {
-	user := NewUser("test", "test", "test", "test")
-	vote1, _ := NewYesNoVote(true, user, true)
-	vote2, _ := NewYesNoVote(false, user, true)
-	votes := []Vote{vote1, vote2}
+	c, err := aetest.NewContext(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	user := NewUser("user", "pass", "name", "email")
+	_ = NewYesNoPoll("title", "desc", "erb")
+	pollkey := datastore.NewIncompleteKey(c, "Poll", nil)
+	vote1, _, _ := NewYesNoVote(pollkey, user, true, 0)
+	vote2, _, _ := NewYesNoVote(pollkey, user, false, 0)
+
+	// TODO: Verify that polls are actually made by their creator
+	// TODO: Test different levels of privacy
+
+	if vote1.Weights()["yes"] != vote2.Weights()["no"] {
+		t.Fatal("")
+	}
+
+	votes := []Vote{vote1, vote2}
 	sumvotes := SumVotes(votes)
 	shouldbe := map[string]float32{"yes": 1.0, "no": 1.0}
 	for k := range sumvotes {
