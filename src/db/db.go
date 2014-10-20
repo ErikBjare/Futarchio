@@ -2,9 +2,11 @@ package db
 
 import (
 	"appengine/datastore"
+	"bytes"
 	"code.google.com/p/go.crypto/bcrypt"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/gob"
 	"log"
 	"math/rand"
 	"strconv"
@@ -108,13 +110,13 @@ func MultichoicePoll(title, desc string, creator string, choices []string) Poll 
 }
 
 // A vote
-//
-// Should always have a Poll as parent
 type Vote struct {
-	// The weights of the vote
+	Poll *datastore.Key `json:"pollid"`
+
+	// The weights of the vote, a map[string]float32
 	//
 	// Keys are options, values are how much of the vote is put on each choice
-	Weights map[string]float32 `json:"weights" datastore:"weights"`
+	EncodedWeights []byte `json:"-"`
 
 	// The username of the voter
 	//
@@ -127,52 +129,98 @@ type Vote struct {
 	Key string `json:"key"`
 }
 
+func (v Vote) Weights() map[string]float32 {
+	var buffer bytes.Buffer
+	dec := gob.NewDecoder(&buffer)
+	var weights map[string]float32
+	err := dec.Decode(&weights)
+	if err != nil {
+		panic(err)
+	}
+	return weights
+}
+
+func (v Vote) SetWeights(w map[string]float32) error {
+	var buffer bytes.Buffer
+	enc := gob.NewEncoder(&buffer)
+	err := enc.Encode(w)
+	if err != nil {
+		return err
+	}
+	v.EncodedWeights = buffer.Bytes()
+	return nil
+}
+
 // A receipt that the user has voted
 //
 // Only useful if voter voted anonymously
-type VoterReceipt struct {
+type VoteReceipt struct {
 	Poll *datastore.Key
-	User *datastore.Key
+	User string
+	// If vote is private, store key here
+	Key string
 }
+
+const (
+	Public    = 0
+	Private   = 5
+	Anonymous = 10
+)
 
 // Creates a new vote
 //
 // Is user == nil, then vote anonymously and return the private key
-func newVote(choice map[string]float32, user User, anon bool) (Vote, string) {
-	var private_key string
+// Privacy is either Public (0), Private (5) or Anonymous (10)
+// TODO: Add entropy to private key, use bcrypt?
+func newVote(pollkey *datastore.Key, user User, choice map[string]float32, privacy int) (Vote, VoteReceipt, string) {
+	private_key := user.Username + "#" + strconv.Itoa(rand.Int())
+
+	hash := sha256.Sum256([]byte(private_key))
 	vote := Vote{
-		Weights: choice,
+		Poll: pollkey,
+		Key:  base64.StdEncoding.EncodeToString([]byte(hash[:])),
 	}
-	if anon {
+	vote.SetWeights(choice)
+
+	votereceipt := VoteReceipt{
+		Poll: pollkey,
+		User: user.Username,
+	}
+
+	// Store user in vote if public
+	if privacy == Public {
 		vote.Creator = user.Username
-	} else {
-		private_key = user.Username + "#" + strconv.Itoa(rand.Int())
-		hash := sha256.Sum256([]byte(private_key))
-		vote.Key = base64.StdEncoding.EncodeToString([]byte(hash[:]))
 	}
-	return vote, private_key
+
+	// If vote is private or public, store private key in receipt
+	if privacy <= Private {
+		votereceipt.Key = private_key
+	}
+
+	return vote, votereceipt, private_key
 }
 
 // Creates new Vote for a Yes or No poll.
 //
 // If user == nil, then vote anonymously
-func NewYesNoVote(yes bool, user User, anon bool) (Vote, string) {
+func NewYesNoVote(pollkey *datastore.Key, user User, yes bool, privacy int) (Vote, VoteReceipt, string) {
 	var choice map[string]float32
 	if yes {
 		choice = map[string]float32{"yes": 1}
 	} else {
 		choice = map[string]float32{"no": 1}
 	}
-	return newVote(choice, user, anon)
+	return newVote(pollkey, user, choice, privacy)
 }
 
 // Sums a collection of votes
 //
 // TODO: Vote normalization
+// TODO: Make it work not exclusively for yes and no
 func SumVotes(vs []Vote) map[string]float32 {
 	weights := map[string]float32{"yes": 0, "no": 0}
 	for _, v := range vs {
-		for k, f := range v.Weights {
+		for k, f := range v.Weights() {
 			weights[k] += f
 		}
 	}

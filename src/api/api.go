@@ -47,7 +47,7 @@ func respondMany(w *restful.Response, entities interface{}) {
 
 func respondError(w *restful.Response, httperr int, error string) {
 	w.WriteHeader(httperr)
-	w.WriteEntity(map[string]interface{}{"error": error})
+	w.WriteEntity(map[string]string{"error": error})
 }
 
 /*
