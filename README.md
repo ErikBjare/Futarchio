@@ -10,4 +10,4 @@ Futarchio
 For info, the Vision, ToDos and inspirational reading material, check out the wiki.
 
 ## Developing
-For how to set up the development enviroment, check out the [Development page on the wiki](./wiki/Development).
+For how to set up the development enviroment, check out the [Development page on the wiki](https://github.com/ErikBjare/Futarchio/wiki/Development).
