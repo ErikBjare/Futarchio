@@ -108,6 +108,15 @@ func (u UserApi) Register() {
 		Doc("Users").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
+	ws.Route(ws.GET("").To(u.getByKeyVal).
+		Doc("get a list of all users").
+		Operation("placeholderOp").
+		Filter(basicAuthenticate).
+		Writes([]db.User{}))
+	ws.Route(ws.POST("").To(u.create).
+		Doc("create a user").
+		Operation("createUser").
+		Reads(UserRegistration{}))
 	ws.Route(ws.GET("/me").To(u.getByAuth).
 		Doc("get the authorized user").
 		Operation("getByAuth").
@@ -119,15 +128,6 @@ func (u UserApi) Register() {
 		Param(ws.PathParameter("key", "property to look up").DataType("string")).
 		Param(ws.PathParameter("val", "value to match").DataType("string")).
 		Writes([]db.User{}))
-	ws.Route(ws.GET("/").To(u.getByKeyVal).
-		Doc("get a list of all users").
-		Operation("placeholderOp").
-		Filter(basicAuthenticate).
-		Writes([]db.User{}))
-	ws.Route(ws.POST("/").To(u.create).
-		Doc("create a user").
-		Operation("createUser").
-		Reads(UserRegistration{}))
 
 	restful.Add(ws)
 }

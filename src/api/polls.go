@@ -29,10 +29,15 @@ func (p PollApi) Register() {
 		Doc("Polls").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("/").To(p.getLatest).
+	ws.Route(ws.GET("").To(p.getLatest).
 		Doc("get the latest polls").
 		Operation("getLatest").
 		Writes([]PollResponse{}))
+	ws.Route(ws.POST("").To(p.createPoll).
+		Filter(basicAuthenticate).
+		Doc("create a poll").
+		Operation("createPoll").
+		Reads(db.Poll{}))
 	ws.Route(ws.POST("/{pollid}/vote").To(p.vote).
 		Doc("vote on a poll").
 		Operation("vote").
@@ -40,11 +45,6 @@ func (p PollApi) Register() {
 		Param(ws.PathParameter("pollid", "Id of poll to vote on").DataType("string")).
 		Reads(VoteRequest{}).
 		Writes(db.VoteReceipt{}))
-	ws.Route(ws.POST("/").To(p.createPoll).
-		Filter(basicAuthenticate).
-		Doc("create a poll").
-		Operation("createPoll").
-		Reads(db.Poll{}))
 
 	restful.Add(ws)
 }

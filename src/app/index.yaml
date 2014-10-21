@@ -10,7 +10,3 @@ indexes:
   ancestor: yes
   properties:
   - name: key
-
-- kind: Poll
-  properties:
-  - name: created
