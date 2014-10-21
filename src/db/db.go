@@ -1,6 +1,7 @@
 package db
 
 import (
+	"appengine"
 	"appengine/datastore"
 	"bytes"
 	"code.google.com/p/go.crypto/bcrypt"
@@ -89,8 +90,20 @@ func newPoll(title, desc string, creator string) Poll {
 }
 
 // Adds a choice to a poll
-func (p Poll) AddChoice(name string) {
+func (p *Poll) AddChoice(name string) {
 	p.Choices = append(p.Choices, name)
+}
+
+// Returns the current standings of the poll
+func (p *Poll) Weights(c appengine.Context, pollkey *datastore.Key) map[string]float32 {
+	var votes []Vote
+	q := datastore.NewQuery("Vote").Filter("Poll =", pollkey)
+	_, err := q.GetAll(c, &votes)
+	if err != nil {
+		// TODO: Better error handling
+		panic(err)
+	}
+	return SumVotes(votes)
 }
 
 // Creates a yes/no poll
@@ -134,7 +147,7 @@ func (v *Vote) Weights() map[string]float32 {
 	dec := gob.NewDecoder(reader)
 	var weights map[string]float32
 	err := dec.Decode(&weights)
-	if err != nil /*&& err.Error() != "EOF"*/ {
+	if err != nil {
 		panic(err)
 	}
 	return weights
@@ -155,10 +168,10 @@ func (v *Vote) SetWeights(w map[string]float32) error {
 //
 // Only useful if voter voted anonymously
 type VoteReceipt struct {
-	Poll *datastore.Key
-	User string
+	Poll *datastore.Key `json:"pollid"`
+	User string         `json:"user"`
 	// If vote is private, store key here
-	Key string
+	Key string `json:"key"`
 }
 
 const (
@@ -222,10 +235,18 @@ func NewYesNoVote(pollkey *datastore.Key, user User, yes bool, privacy int) (Vot
 // TODO: Make it work not exclusively for yes and no
 func SumVotes(vs []Vote) map[string]float32 {
 	weights := map[string]float32{"yes": 0, "no": 0}
+
+	// Stores the total size of the vote weights for normalization
+	var votesum float32 = 0.0
 	for _, v := range vs {
-		for k, f := range v.Weights() {
-			weights[k] += f
+		w := v.Weights()
+		for _, f := range w {
+			votesum += f
 		}
+		for k, f := range w {
+			weights[k] += f / votesum
+		}
+		votesum = 0.0
 	}
 	return weights
 }

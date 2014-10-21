@@ -1,0 +1,16 @@
+indexes:
+
+- kind: User
+  ancestor: yes
+  properties:
+  - name: username
+  - name: email
+
+- kind: Auth
+  ancestor: yes
+  properties:
+  - name: key
+
+- kind: Poll
+  properties:
+  - name: created

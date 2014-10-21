@@ -10,10 +10,11 @@ import (
 
 type PollApi Api
 
-type PollWithId struct {
+type PollResponse struct {
 	// Id should be an encoded datastore.Key
 	Id string `json:"id"`
 	db.Poll
+	Weights map[string]float32 `json:"weights"`
 }
 
 type VoteRequest struct {
@@ -31,7 +32,7 @@ func (p PollApi) Register() {
 	ws.Route(ws.GET("/").To(p.getLatest).
 		Doc("get the latest polls").
 		Operation("getLatest").
-		Writes([]PollWithId{}))
+		Writes([]PollResponse{}))
 	ws.Route(ws.POST("/{pollid}/vote").To(p.vote).
 		Doc("vote on a poll").
 		Operation("vote").
@@ -124,14 +125,15 @@ func (p PollApi) getLatest(r *restful.Request, w *restful.Response) {
 		return
 	}
 
-	pollswithkey := make([]PollWithId, len(polls))
+	polls_response := make([]PollResponse, len(polls))
 	for i, _ := range polls {
-		pollswithkey[i].Poll = polls[i]
-		pollswithkey[i].Id = keys[i].Encode()
+		polls_response[i].Poll = polls[i]
+		polls_response[i].Id = keys[i].Encode()
+		polls_response[i].Weights = polls[i].Weights(c, keys[i])
 	}
 
-	c.Debugf("%s", pollswithkey)
-	respondMany(w, pollswithkey)
+	c.Debugf("%s", polls_response)
+	respondMany(w, polls_response)
 }
 
 func (p PollApi) createPoll(r *restful.Request, w *restful.Response) {

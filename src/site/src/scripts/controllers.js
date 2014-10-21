@@ -53,17 +53,23 @@ app.controller('NewPollController', function($scope, $resource, $log, $window, P
 app.controller('PredictionsController', function($scope, $resource, $log) {
 });
 
-app.controller('PollController', function($scope, $resource, $log) {
-    $scope.voted = true;
-    $scope.votes = 0;
-    $scope.rating = 0;
+app.controller('PollController', function($scope, $resource, $log, Vote) {
+    $scope.voted = false;
+    $scope.votes = $scope.poll.weights.yes + $scope.poll.weights.no;
+    $scope.rating = $scope.poll.weights.yes - $scope.poll.weights.no;
+
+    console.log($scope.poll)
 
     $scope.vote = function(option) {
+        weights = option ? {"yes": 1} : {"no": 1}
+        vote = new Vote({weights: weights});
+        vote.$save({pollid: $scope.poll.id}).then(function (data) {
+            console.log(data)
+        })
         $scope.votes += 1;
         $scope.rating = option ? $scope.rating+1 : $scope.rating-1;
         $scope.trues = Math.round(1000*(1+($scope.rating/$scope.votes))/2)/10;
         $scope.falses = Math.round(1000*(1-($scope.rating/$scope.votes))/2)/10;
-        console.log($scope.rating);
         $scope.voted = true;
     };
 });

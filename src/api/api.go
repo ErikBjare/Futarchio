@@ -10,20 +10,10 @@ import (
 	"github.com/emicklei/go-restful/swagger"
 )
 
-var (
-	Users *UserApi
-	Auths *AuthApi
-	Polls *PollApi
-)
-
 func init() {
-	Users = &UserApi{}
-	Auths = &AuthApi{}
-	Polls = &PollApi{}
-
-	Users.Register()
-	Auths.Register()
-	Polls.Register()
+	UserApi{}.Register()
+	AuthApi{}.Register()
+	PollApi{}.Register()
 }
 
 type Api swagger.Api

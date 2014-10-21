@@ -28,6 +28,10 @@ app.factory('User', function($log, $resource) {
     return $resource('/api/0/users', {}, {});
 });
 
+app.factory('Vote', function($log, $resource, user) {
+    return $resource('/api/0/polls/:pollid/vote?api_key='+user.getAuthkey());
+});
+
 app.factory('gravatar', function($log, $resource) {
     var gravatar = {};
     gravatar.hash = function(email) {
