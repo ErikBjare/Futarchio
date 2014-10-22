@@ -49,7 +49,7 @@ func basicAuthenticate(r *restful.Request, w *restful.Response, chain *restful.F
 
 	user, _ := auth(c, r)
 	if user == nil {
-		respondError(w, 401, "")
+		respondError(w, 401, "invalid or missing auth")
 		return
 	}
 	c.Infof("Authenticated %s", user.Username)

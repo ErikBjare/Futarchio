@@ -29,7 +29,7 @@ app.factory('User', function($log, $resource) {
 });
 
 app.factory('Vote', function($log, $resource, user) {
-    return $resource('/api/0/polls/:pollid/vote?api_key='+user.getAuthkey());
+    return $resource('/api/0/polls/:pollid/vote?api_key='+user.authkey());
 });
 
 app.factory('gravatar', function($log, $resource) {
@@ -48,12 +48,17 @@ app.factory('gravatar', function($log, $resource) {
 app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $window, gravatar) {
     var user = {};
     user.is_logged_in = function() {
-        val = $cookieStore.get("me") && $cookieStore.get("auth");
-        return val;
+        val = $cookieStore.get("me") && user.authkey();
+        return val ? true : false;
     };
 
-    user.getAuthkey = function() {
-        authkey = $cookieStore.get("auth");
+    user.authkey = function(authkey) {
+        if(authkey !== undefined) {
+            $cookieStore.put("auth", authkey);
+            console.log("authkey cookie put");
+        } else {
+            authkey = $cookieStore.get("auth");
+        }
         return authkey;
     };
 
@@ -63,10 +68,8 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
         $http.post('/api/0/auth', {username: username, password: password})
         .success(function(data, status, headers, config) {
             console.log(data);
-            authkey = data.key;
-            $cookieStore.put("auth", authkey);
-            console.log("Cookie put");
-            $http.get('/api/0/users/me', {"headers": {"Authorization": authkey}})
+            user.authkey(data.key);
+            $http.get('/api/0/users/me', {"headers": {"Authorization": user.authkey()}})
             .success(function(data) {
                 $cookieStore.put("me", {"username": data.username, "email": data.email});
                 deferred.resolve(data);
@@ -74,7 +77,7 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
                 deferred.reject("error while fetching profile");
             });
         }).error(function(data, status, headers, config) {
-            deferred.reject(data.error)
+            deferred.reject(data.error);
         });
 
         return deferred.promise;
@@ -99,6 +102,32 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
 
     user.gravatar_hash = function() {
         return gravatar.hash(user.email());
+    };
+
+    user.votereceipts = undefined;
+    user.get_votereceipts = function() {
+        $http.get('/api/0/polls/myvotereceipts', {'headers': {'Authorization': user.authkey()}})
+            .success(function(data) {
+                user.votereceipts = data;
+                console.log(data);
+            }).error(function(data) {
+                console.log(data);
+            });
+    };
+    user.get_votereceipts();
+
+
+    user.has_voted_on = function(pollid) {
+        if(user.votereceipts === undefined) {
+            console.log("Votereceipts not received");
+            return false;
+        }
+        for(var i = 0; i < user.votereceipts.length; i++) {
+            if(user.votereceipts[i].pollid == pollid) {
+                return true;
+            }
+        }
+        return false;
     };
 
     return user;

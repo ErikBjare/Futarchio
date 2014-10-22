@@ -134,12 +134,15 @@ type Vote struct {
 	// The username of the voter
 	//
 	// Optional, never both Creator and Key
-	Creator string `json:"creator"`
+	Creator *datastore.Key `json:"creatorid"`
 
 	// Represents a public key when a vote is made anonymously
 	//
 	// Optional, never both Creator and Key
 	Key string `json:"key"`
+
+	// The time and date of creation
+	Created time.Time `json:"created"`
 }
 
 func (v *Vote) Weights() map[string]float32 {
@@ -169,7 +172,7 @@ func (v *Vote) SetWeights(w map[string]float32) error {
 // Only useful if voter voted anonymously
 type VoteReceipt struct {
 	Poll *datastore.Key `json:"pollid"`
-	User string         `json:"user"`
+	User *datastore.Key `json:"userid"`
 	// If vote is private, store key here
 	Key string `json:"key"`
 }
@@ -185,13 +188,14 @@ const (
 // Is user == nil, then vote anonymously and return the private key
 // Privacy is either Public (0), Private (5) or Anonymous (10)
 // TODO: Add entropy to private key, use bcrypt?
-func newVote(pollkey *datastore.Key, user User, choice map[string]float32, privacy int) (Vote, VoteReceipt, string) {
-	private_key := user.Username + "#" + strconv.Itoa(rand.Int())
+func newVote(pollkey *datastore.Key, userkey *datastore.Key, choice map[string]float32, privacy int) (Vote, VoteReceipt, string) {
+	private_key := userkey.Encode() + "#" + strconv.Itoa(rand.Int())
 
 	hash := sha256.Sum256([]byte(private_key))
 	vote := Vote{
-		Poll: pollkey,
-		Key:  base64.StdEncoding.EncodeToString([]byte(hash[:])),
+		Poll:    pollkey,
+		Key:     base64.StdEncoding.EncodeToString([]byte(hash[:])),
+		Created: time.Now(),
 	}
 	vote.SetWeights(choice)
 	if len(vote.EncodedWeights) == 0 {
@@ -200,12 +204,12 @@ func newVote(pollkey *datastore.Key, user User, choice map[string]float32, priva
 
 	votereceipt := VoteReceipt{
 		Poll: pollkey,
-		User: user.Username,
+		User: userkey,
 	}
 
 	// Store user in vote if public
 	if privacy == Public {
-		vote.Creator = user.Username
+		vote.Creator = userkey
 	}
 
 	// If vote is private or public, store private key in receipt
@@ -219,14 +223,14 @@ func newVote(pollkey *datastore.Key, user User, choice map[string]float32, priva
 // Creates new Vote for a Yes or No poll.
 //
 // If user == nil, then vote anonymously
-func NewYesNoVote(pollkey *datastore.Key, user User, yes bool, privacy int) (Vote, VoteReceipt, string) {
+func NewYesNoVote(pollkey *datastore.Key, userkey *datastore.Key, yes bool, privacy int) (Vote, VoteReceipt, string) {
 	var choice map[string]float32
 	if yes {
 		choice = map[string]float32{"yes": 1}
 	} else {
 		choice = map[string]float32{"no": 1}
 	}
-	return newVote(pollkey, user, choice, privacy)
+	return newVote(pollkey, userkey, choice, privacy)
 }
 
 // Sums a collection of votes

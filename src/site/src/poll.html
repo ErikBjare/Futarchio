@@ -1,0 +1,67 @@
+<div ng-controller="PollController" class="poll panel panel-default">
+  <div class="panel-heading" ng-click="poll.show = !poll.show" style="cursor: pointer">
+    <div class=row>
+      <div class="col-md-8">
+        <span class="title">{{poll.title}}</span>
+      </div>
+
+      <div class="col-md-4">
+        <div class="metadata">
+          <b>Created by</b> <a ng-href="/profile/{{poll.creator}}">{{poll.creator}}</a>
+          <br>
+          <time>{{poll.created}}</time>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row panel-body" ng-show="poll.show">
+    <p class="description col-md-12" ng-if="poll.description">{{poll.description}}</p>
+    <p ng-if="!poll.description"><i>No description available</i></p>
+
+    <div ng-hide="voted">
+      <hr>
+      <div ng-if="error" class="alert alert-danger">
+        <b>Error: </b> {{error|capitalize}}
+      </div>
+      <div ng-if="!user.is_logged_in()" class="col-md-offset-3 col-md-6 alert alert-warning text-center">
+        Only logged in users can vote
+      </div>
+      <div class="col-md-offset-4 col-md-4">
+        <div class="col-md-6">
+          <button class="btn btn-success btn-block" ng-disabled="!user.is_logged_in()" ng-click="vote(true)">Yes</button>
+        </div>
+        <div class=col-md-6>
+          <button class="btn btn-danger btn-block" ng-disabled="!user.is_logged_in()" ng-click="vote(false)">No</button>
+        </div>
+      </div>
+      <div class="col-md-offset-4 col-md-4" style="margin-top:20px;">
+        <button class="btn btn-xs center-block" ng-click="show_results = !show_results">
+          <span ng-show="!show_results">Show</span>
+          <span ng-show="show_results">Hide</span>
+          results
+        </button>
+      </div>
+    </div>
+
+    <!-- TODO: Show results before voting (on demand) -->
+    <!-- TODO: Show percentage on hover -->
+    <div ng-show="voted || show_results" class=col-md-12>
+      <hr>
+      <div ng-show="voted" class="alert alert-success alert-small">You have voted on this poll</div>
+
+      <div class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
+          <b>Yes</b> ({{trues}}%)
+        </div>
+        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
+          <b>No</b> ({{falses}}%)
+        </div>
+      </div>
+      <div>
+        Votes: {{votes}}<br>
+        Rating: {{rating}}
+      </div>
+    </div>
+  </div>
+</div>

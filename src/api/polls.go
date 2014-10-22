@@ -21,6 +21,11 @@ type VoteRequest struct {
 	Weights map[string]float32 `json:"weights"`
 }
 
+type VoteResponse struct {
+	db.Vote
+	Weights map[string]float32 `json:"weights"`
+}
+
 func (p PollApi) Register() {
 	ws := new(restful.WebService)
 
@@ -46,12 +51,147 @@ func (p PollApi) Register() {
 		Reads(VoteRequest{}).
 		Writes(db.VoteReceipt{}))
 
+	// The following two routes use the same method
+	ws.Route(ws.GET("/votes").To(p.getVotes).
+		Doc("get the latest votes for all polls").
+		Operation("getVotes").
+		Writes([]VoteResponse{}))
+	ws.Route(ws.GET("/{pollid}/votes").To(p.getVotes).
+		Doc("get the votes for given pollid").
+		Operation("getPollVotes").
+		Param(ws.PathParameter("pollid", "id of poll to get votes for").DataType("string")).
+		Writes([]VoteResponse{}))
+
+	// TODO: Move these two to User endpoint?
+	ws.Route(ws.GET("/myvotereceipts").To(p.getMyVotereceipts).
+		Filter(basicAuthenticate).
+		Doc("get the current users votereceipts").
+		Operation("getMyVotereceipts").
+		Writes([]db.VoteReceipt{}))
+	/*
+		ws.Route(ws.GET("/myvotes").To(p.getMyVotes).
+			Filter(basicAuthenticate).
+			Doc("get my votes").
+			Operation("getMyVotes").
+			Reads([]string{}).
+			Writes([]db.Vote{}))
+	*/
+
 	restful.Add(ws)
+}
+
+func fetchVotes(c appengine.Context, user *datastore.Key) (*[]db.Vote, error) {
+	// TODO: Fetch all of the users votereceipts, use the keys to find private votes
+
+	// Fetch all votes which are public
+	var votes []db.Vote
+	q := datastore.NewQuery("Vote")
+	if user != nil {
+		q = q.Filter("Creator =", user)
+	}
+	_, err := q.GetAll(c, &votes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &votes, nil
+}
+
+func (p PollApi) getMyVotereceipts(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+	_, userkey := auth(c, r)
+
+	var votereceipts []db.VoteReceipt
+	q := datastore.NewQuery("VoteReceipt").Filter("User =", userkey)
+	_, err := q.GetAll(c, &votereceipts)
+	if err != nil {
+		c.Errorf(err.Error())
+		respondError(w, 500, "")
+		return
+	}
+
+	respondMany(w, votereceipts)
+}
+
+func (p PollApi) getVotes(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+	pollid := r.PathParameter("pollid")
+	c.Infof(pollid)
+
+	var votes []VoteResponse
+	q := datastore.NewQuery("Vote")
+	if pollid != "" {
+		pollkey, err := datastore.DecodeKey(pollid)
+		if err != nil {
+			c.Errorf("%v", err)
+		} else {
+			q = q.Filter("Poll =", pollkey)
+		}
+	}
+	_, err := q.GetAll(c, &votes)
+	if err != nil {
+		c.Errorf(err.Error())
+		respondError(w, 500, "")
+		return
+	}
+
+	for i := range votes {
+		votes[i].Weights = votes[i].Vote.Weights()
+	}
+
+	respondMany(w, votes)
+}
+
+func (p PollApi) unused_getMyVotereceipts(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+	_, userkey := auth(c, r)
+
+	// Read pollkeys
+	var pollkeystr []string
+	err := r.ReadEntity(&pollkeystr)
+	if err != nil {
+		c.Errorf(err.Error())
+		respondError(w, 500, "")
+		return
+	}
+
+	// Decode keys
+	pollkeys := make([]*datastore.Key, len(pollkeystr))
+	for i, k := range pollkeystr {
+		pollkeys[i], err = datastore.DecodeKey(k)
+		if err != nil {
+			c.Errorf(err.Error())
+		}
+	}
+
+	c.Infof("%v", pollkeys)
+
+	// TODO: This is horribly slow, speed up (this is due to the IN filter apparently not being supported in Go)
+	votereceipts := make([]db.VoteReceipt, len(pollkeys))
+	for i, pollkey := range pollkeys {
+		var vresult []db.VoteReceipt
+		q := datastore.NewQuery("VoteReceipt").Filter("User =", userkey).Filter("Poll =", pollkey)
+		_, err = q.GetAll(c, &votereceipts)
+		if err != nil {
+			c.Errorf(err.Error())
+			respondError(w, 500, "")
+			return
+		}
+		if len(vresult) == 0 {
+			continue
+		}
+		if len(vresult) > 1 {
+			c.Errorf("got more than one votereceipt as result")
+		}
+		votereceipts[i] = vresult[0]
+	}
+
+	respondMany(w, votereceipts)
 }
 
 func (p PollApi) vote(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
-	user, _ := auth(c, r)
+	_, userkey := auth(c, r)
 
 	pollkey, err := datastore.DecodeKey(r.PathParameter("pollid"))
 	if err != nil {
@@ -64,7 +204,20 @@ func (p PollApi) vote(r *restful.Request, w *restful.Response) {
 		c.Errorf("%v", err)
 	}
 
-	// TODO: Check if user has already voted, speed this process up by memcaching the user-poll relationship
+	// Check if user has already voted
+	// TODO: Speed this process up by memcaching the user-poll relationship
+	var votereceipts []db.VoteReceipt
+	q := datastore.NewQuery("VoteReceipt").Filter("Poll =", pollkey).Filter("User =", userkey)
+	vrkeys, err := q.GetAll(c, &votereceipts)
+	if err != nil {
+		c.Errorf("%v", err)
+	}
+	if len(vrkeys) > 0 {
+		errstr := "attempted to double vote"
+		c.Infof(errstr)
+		respondError(w, 500, errstr)
+		return
+	}
 
 	// Get incoming JSON data specifying poll
 	var vote_req VoteRequest
@@ -84,7 +237,7 @@ func (p PollApi) vote(r *restful.Request, w *restful.Response) {
 		} else {
 			yes = false
 		}
-		vote, votereceipt, private_key = db.NewYesNoVote(pollkey, *user, yes, db.Public)
+		vote, votereceipt, private_key = db.NewYesNoVote(pollkey, userkey, yes, db.Public)
 	} else {
 		c.Errorf("%s", poll)
 		c.Errorf("invalid polltype: %s", poll.Type)
@@ -92,7 +245,7 @@ func (p PollApi) vote(r *restful.Request, w *restful.Response) {
 		return
 	}
 
-	// TODO: Save vote and votereceipt
+	// Save vote and votereceipt
 	votekey := datastore.NewIncompleteKey(c, "Vote", nil)
 	votekey, err = datastore.Put(c, votekey, &vote)
 	if err != nil {
@@ -111,6 +264,7 @@ func (p PollApi) vote(r *restful.Request, w *restful.Response) {
 }
 
 func (p PollApi) getLatest(r *restful.Request, w *restful.Response) {
+	// TODO: Pagination
 	c := appengine.NewContext(r.Request)
 	q := datastore.NewQuery("Poll").Limit(20).Order("-Created")
 

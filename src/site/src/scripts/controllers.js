@@ -31,7 +31,7 @@ app.controller('PollsController', function($scope, $resource, $log, Poll) {
 
 app.factory('Poll', function($resource, user) {
     var Poll = $resource("/api/0/polls", {},
-        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.getAuthkey()}}});
+        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});
     console.log(new Poll());
     return Poll;
 });
@@ -58,19 +58,32 @@ app.controller('PollController', function($scope, $resource, $log, Vote) {
     $scope.votes = $scope.poll.weights.yes + $scope.poll.weights.no;
     $scope.rating = $scope.poll.weights.yes - $scope.poll.weights.no;
 
-    console.log($scope.poll)
+    console.log($scope.poll);
+
+    if($scope.user.is_logged_in() && $scope.user.has_voted_on($scope.poll.id)) {
+        // TODO: Do stuff
+        $scope.voted = true;
+    }
+
+    $scope.update = function() {
+            $scope.trues = Math.round(1000*(1+($scope.rating/$scope.votes))/2)/10;
+            $scope.falses = Math.round(1000*(1-($scope.rating/$scope.votes))/2)/10;
+    }
+    $scope.update();
 
     $scope.vote = function(option) {
         weights = option ? {"yes": 1} : {"no": 1}
         vote = new Vote({weights: weights});
         vote.$save({pollid: $scope.poll.id}).then(function (data) {
             console.log(data)
+            $scope.votes += 1;
+            $scope.rating = option ? $scope.rating+1 : $scope.rating-1;
+            $scope.update();
+            $scope.voted = true;
+        }, function(data) {
+            $scope.error = data.data.error;
+            $log.error(data.data.error);
         })
-        $scope.votes += 1;
-        $scope.rating = option ? $scope.rating+1 : $scope.rating-1;
-        $scope.trues = Math.round(1000*(1+($scope.rating/$scope.votes))/2)/10;
-        $scope.falses = Math.round(1000*(1-($scope.rating/$scope.votes))/2)/10;
-        $scope.voted = true;
     };
 });
 

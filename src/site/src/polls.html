@@ -5,74 +5,17 @@
 <div class="col-md-8" ng-controller="PollsController">
   <div ng-if="polls.length == 0">No results</div>
   <div ng-repeat="poll in polls" class="poll">
-    <div ng-controller="PollController" class="panel panel-default">
-      <div class="panel-heading" ng-click="poll.show = !poll.show" style="cursor: pointer">
-        <div class=row>
-          <div class="col-md-5">
-            <span class="title">{{poll.title}}</span>
-          </div>
-
-          <div class="col-md-2" style="text-align: center; color: #AAA; font-size: 15px; margin-top: 10px;">
-            <span ng-class="{'glyphicon-chevron-up': poll.show, 'glyphicon-chevron-down': !poll.show}" class="glyphicon"></span>
-          </div>
-
-          <div class="col-md-5">
-            <div class="metadata">
-              <b>Created by</b> <a ng-href="/profile/{{poll.creator}}">{{poll.creator}}</a>
-              <br>
-              <time>{{poll.created}}</time>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class=panel-body ng-show="poll.show">
-        <p ng-if="poll.description">{{poll.description}}</p>
-        <p ng-if="!poll.description"><i>No description available</i></p>
-
-          <hr>
-
-          <div class=row ng-hide="voted">
-              <div class="col-md-offset-4 col-md-4">
-                  <div class="col-md-6">
-                      <button style="width: 100%" class="btn btn-success" ng-click="vote(true)">Yes</button>
-                  </div>
-                  <div class=col-md-6>
-                      <button style="width: 100%" class="btn btn-danger" ng-click="vote(false)">No</button>
-                  </div>
-              </div>
-          </div>
-
-          <!-- TODO: Show results before voting (on demand) -->
-          <!-- TODO: Show percentage on hover -->
-        <div ng-show="voted" class=col-md-12>
-          <div class="progress">
-            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
-                <b>Yes</b> ({{trues}}%)
-            </div>
-            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
-                <b>No</b> ({{falses}}%)
-            </div>
-          </div>
-          <div>
-            Votes: {{votes}}<br>
-            Rating: {{rating}}
-          </div>
-        </div>
-      </div>
-    </div>
+    <ng-include src="'/static/poll.html'"></div>
+  </div>
 </div>
 
-  </div>
-
 <div class="col-md-4" ng-controller="NewPollController">
-
   <p><b>Create Poll</b></p>
   <br>
 
   <input class="form-control input-lg" style="margin-bottom: 0.3em;" type=text placeholder="Enter a good question here" ng-model="title"></input>
   <br>
-  
+
   <textarea class="form-control input" style="margin-bottom: 0.9em;" placeholder="Your good description goes here" ng-model="description"></textarea>
 
   <div class=row>
@@ -102,6 +45,5 @@
   <hr>
 
   Sidebar goes here
-
 </div>
 
