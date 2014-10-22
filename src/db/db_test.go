@@ -30,12 +30,13 @@ func TestPoll(t *testing.T) {
 	}
 	defer c.Close()
 
-	user := NewUser("user", "pass", "name", "email")
+	_ = NewUser("user", "pass", "name", "email")
+	userkey := datastore.NewIncompleteKey(c, "User", nil)
 	_ = NewYesNoPoll("title", "desc", "erb")
 	pollkey := datastore.NewIncompleteKey(c, "Poll", nil)
-	vote1, _, _ := NewYesNoVote(pollkey, user, true, 0)
-	vote2, _, _ := NewYesNoVote(pollkey, user, false, 0)
-	vote3, _, _ := newVote(pollkey, user, map[string]float32{"yes": 5, "no": 15}, 0)
+	vote1, _, _ := NewYesNoVote(pollkey, userkey, true, 0)
+	vote2, _, _ := NewYesNoVote(pollkey, userkey, false, 0)
+	vote3, _, _ := newVote(pollkey, userkey, map[string]float32{"yes": 5, "no": 15}, 0)
 
 	// TODO: Verify that polls are actually made by their creator
 	// TODO: Test different levels of privacy
