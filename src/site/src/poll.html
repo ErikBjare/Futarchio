@@ -16,10 +16,12 @@
   </div>
 
   <div class="row panel-body" ng-show="poll.show">
-    <p class="description col-md-12" ng-if="poll.description">{{poll.description}}</p>
-    <p ng-if="!poll.description"><i>No description available</i></p>
+    <p class="description col-md-12">
+        <span ng-if="poll.description">{{poll.description}}</span>
+        <span ng-if="!poll.description"><i>No description available</i></span>
+    </p>
 
-    <div ng-hide="voted">
+    <div ng-hide="voted" class=col-md-12>
       <hr>
       <div ng-if="error" class="alert alert-danger">
         <b>Error: </b> {{error|capitalize}}
