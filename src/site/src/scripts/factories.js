@@ -109,9 +109,8 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
         $http.get('/api/0/polls/myvotereceipts', {'headers': {'Authorization': user.authkey()}})
             .success(function(data) {
                 user.votereceipts = data;
-                console.log(data);
             }).error(function(data) {
-                console.log(data);
+                $log.error(data);
             });
     };
     user.get_votereceipts();

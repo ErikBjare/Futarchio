@@ -1,4 +1,4 @@
-app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies"]);
+app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies", "ngSanitize"]);
 
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider
