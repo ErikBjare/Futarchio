@@ -60,7 +60,7 @@ func (u UserApi) create(r *restful.Request, w *restful.Response) {
 
 	user := db.NewUser(userreg.Username, userreg.Password, userreg.Name, userreg.Email)
 	// TODO: Write tests for username & email uniqueness
-	key := datastore.NewKey(c, "User", userreg.Username, 0, nil)
+	key := datastore.NewKey(c, "User", user.Username, 0, nil)
 
 	var existing_user db.User
 	err = datastore.Get(c, key, &existing_user)

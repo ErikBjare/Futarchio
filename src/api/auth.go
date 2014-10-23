@@ -42,6 +42,9 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 		panic(err)
 	}
 
+	// Enforce lowercase to ensure case-insensitivity
+	ar.Username = strings.ToLower(ar.Username)
+
 	q := datastore.NewQuery("User").Limit(1)
 	if strings.Contains(ar.Username, "@") {
 		// Is an Email
@@ -57,7 +60,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 		// If user successfully authorized
 
 		// Check if auth key already exists
-		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1).EventualConsistency()
+		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1)
 		var auths []db.Auth
 		k, err := q.GetAll(c, &auths)
 		if len(k) != 0 && err != nil {

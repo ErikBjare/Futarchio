@@ -11,6 +11,7 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -31,10 +32,10 @@ func NewUser(username string, password string, name string, email string) User {
 	}
 
 	return User{
-		Username: username,
+		Username: strings.ToLower(username),
 		Password: hashed_pass,
 		Name:     name,
-		Email:    email,
+		Email:    strings.ToLower(email),
 		Created:  time.Now(),
 	}
 }
