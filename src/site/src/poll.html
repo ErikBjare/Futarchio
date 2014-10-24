@@ -1,19 +1,33 @@
 <div ng-controller="PollController" class="poll panel panel-default">
-  <div class="panel-heading" ng-click="poll.show = !poll.show" style="cursor: pointer">
-    <div class=row>
-      <div class="col-md-8">
-        <span class="title">{{poll.title}}</span>
-      </div>
+    <div ng-click="poll.show = !poll.show" style="cursor: pointer">
+        <div class="panel-heading">
+            <div class=row>
+                <div class="col-md-8">
+                    <span class="title">{{poll.title}}</span>
+                </div>
 
-      <div class="col-md-4">
-        <div class="metadata">
-          <b>Created by</b> <a ng-href="/profile/{{poll.creator}}">{{poll.creator}}</a>
-          <br>
-          <time>{{poll.created}}</time>
+                <div class="col-md-4">
+                    <div class="metadata">
+                        <b>Created by</b> <a ng-href="/profile/{{poll.creator}}">{{poll.creator}}</a>
+                        <br>
+                        <time>{{poll.created}}</time>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="panel-heading" style="background-color: #EEE; border: 0px solid #CCC; border-width: 1px 0 1px 0; padding: 2px; padding-left: 6px;">
+                <small>
+                        <span class="glyphicon" ng-class="{'glyphicon-plus': !poll.show, 'glyphicon-minus': poll.show}"style="opacity: 0.7;"></span>
+                    <span ng-if="!poll.show">
+                        Show
+                    </span>
+                    <span ng-if="poll.show">
+                        Hide
+                    </span>
+                    details
+                </small>
+        </div>
     </div>
-  </div>
 
   <div class="row panel-body" ng-show="poll.show">
     <p class="description col-md-12">
@@ -57,8 +71,8 @@
           </div>
       </div>
      
-        <!-- TODO: Move into switch statement (MultichoicePoll) when done -->
-        <div>
+        <!-- TODO: Complete and then move into switch statement (WeightsPoll) when done -->
+        <!--div>
             <div class="col-md-12">
                 <h3 class="text-center">Rank choices</h3>
                
@@ -73,10 +87,10 @@
 
 
             </div>
-            <div class="col-md-12">Add another choice</div>
-
-            Nothing here, yet.
-        </div>
+            <div class="col-md-12">
+                <button class=btn>Add another choice</button>
+            </div>
+        </div-->
 
 
       <div class="col-md-offset-4 col-md-4" style="margin-top:20px;">
