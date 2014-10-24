@@ -1,4 +1,4 @@
-app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies", "ngSanitize"]);
+app = angular.module('FutarchioApp', ["ngResource", "ngRoute", "ngCookies", "ngSanitize", "vr.directives.slider"]);
 
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider

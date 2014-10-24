@@ -29,14 +29,56 @@
       <div ng-if="!user.is_logged_in()" class="col-md-offset-3 col-md-6 alert alert-warning text-center">
         Only logged in users can vote
       </div>
-      <div class="col-md-offset-4 col-md-4">
-        <div class="col-md-6">
-          <button class="btn btn-success btn-block" ng-disabled="!user.is_logged_in()" ng-click="vote(true)">Yes</button>
-        </div>
-        <div class=col-md-6>
-          <button class="btn btn-danger btn-block" ng-disabled="!user.is_logged_in()" ng-click="vote(false)">No</button>
-        </div>
+
+      <!-- Different views for different votetypes -->
+      <div ng-switch="poll.type">
+          <div ng-switch-when="YesNoPoll">
+              <div class="col-md-offset-4 col-md-8">
+                  <div class="col-md-6">
+                      
+                      <div class="col-md-6">
+                          <button class="btn btn-success btn-block" 
+                              ng-disabled="!user.is_logged_in()" 
+                              ng-click="vote(true)">
+                              Yes
+                          </button>
+                      </div>
+
+                      <div class=col-md-6>
+                          <button class="btn btn-danger btn-block"
+                              ng-disabled="!user.is_logged_in()" 
+                              ng-click="vote(false)">
+                              No
+                          </button>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
       </div>
+     
+        <!-- TODO: Move into switch statement (MultichoicePoll) when done -->
+        <div>
+            <div class="col-md-12">
+                <h3 class="text-center">Rank choices</h3>
+               
+                <div class="row" ng-repeat="choice in choices"> 
+                    <div class="col-md-2">
+                        <h4>{{choice.name}}</h4>
+                    </div>
+                    <div class="col-md-10">
+                        <slider ng-model="choice.value" ng-model-range="choice.range" ng-class="{'positive': choice.range > 0, 'negative': choice.range < 0}" floor="-100" ceiling="100"></slider>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-12">Add another choice</div>
+
+            Nothing here, yet.
+        </div>
+
+
       <div class="col-md-offset-4 col-md-4" style="margin-top:20px;">
         <button class="btn btn-xs center-block" ng-click="show_results = !show_results">
           <span ng-show="!show_results">Show</span>

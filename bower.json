@@ -1,0 +1,20 @@
+{
+  "name": "Futarchio",
+  "version": "0.0.0",
+  "authors": [
+    "Erik Bjäreholt <erik.bjareholt@gmail.com>"
+  ],
+  "license": "none",
+  "homepage": "http://futarch.io/",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "venturocket-angular-slider": "~0.3.2"
+  }
+}

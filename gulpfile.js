@@ -1,21 +1,37 @@
 var gulp = require('gulp');
+
+/* Tooling */
 var concat = require('gulp-concat');
+var del = require('del');
+var rename = require('gulp-rename');
+var flatten = require('gulp-flatten');
+var gulpFilter = require('gulp-filter');
+
+/* Minifying stuff */
+var ngAnnotate = require('gulp-ng-annotate');
 var uglify = require('gulp-uglify');
+var htmlmin = require('gulp-htmlmin');
 var imagemin = require('gulp-imagemin');
 var sourcemaps = require('gulp-sourcemaps');
-var sass = require('gulp-sass');
-var del = require('del');
-var ngAnnotate = require('gulp-ng-annotate');
-var htmlmin = require('gulp-htmlmin');
 
-var src_path = 'src/site/src';
-var dist_path = 'src/site/dist';
+/* Stylesheet stuff */
+var sass = require('gulp-sass');
+
+/* Bower compatibility */
+var mainBowerFiles = require('main-bower-files');
+
+
+var root_dir = 'src';
+var src_path = root_dir+'/site/src';
+var dist_path = root_dir+'/site/dist';
 var paths = {
   scripts: src_path+'/scripts/**/*.js',
+  go: root_dir+'**/*.go',
   images: src_path+'/img/**/*',
   html: src_path+'/**/*.html',
   robots: src_path+'/robots.txt',
-  stylesheets: src_path+'/stylesheets/style.scss'
+  stylesheets_main: src_path+'/stylesheets/style.scss',
+  stylesheets_all: src_path+'/stylesheets/*.scss'
 };
 
 // Not all tasks need to use streams
@@ -25,9 +41,10 @@ gulp.task('clean', function(cb) {
   del([dist_path], cb);
 });
 
+
+// Minify and copy all JavaScript (except vendor scripts)
+// with sourcemaps all the way down
 gulp.task('scripts', [], function() {
-  // Minify and copy all JavaScript (except vendor scripts)
-  // with sourcemaps all the way down
   return gulp.src(paths.scripts)
     .pipe(sourcemaps.init())
       .pipe(ngAnnotate())
@@ -47,7 +64,7 @@ gulp.task('images', [], function() {
 
 // Generate CSS from SASS
 gulp.task('stylesheets', [], function() {
-  return gulp.src(paths.stylesheets)
+  return gulp.src(paths.stylesheets_main)
     .pipe(sass())
     .pipe(gulp.dest(dist_path));
 });
@@ -67,8 +84,43 @@ gulp.task('robots', [], function() {
 gulp.task('watch', function() {
   gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.images, ['images']);
-  gulp.watch(paths.stylesheets, ['stylesheets']);
+  gulp.watch(paths.stylesheets_all, ['stylesheets']);
   gulp.watch(paths.html, ['html']);
+});
+
+// grab libraries files from bower_components, minify and push in /public
+gulp.task('libs', function() {
+
+    var jsFilter = gulpFilter('*.js');
+    var cssFilter = gulpFilter('*.css');
+    var fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
+
+    return gulp.src(mainBowerFiles())
+
+    // grab vendor js files from bower_components, minify and push in /public
+    .pipe(jsFilter)
+    .pipe(gulp.dest(dist_path + '/scripts'))
+    .pipe(uglify())
+    .pipe(rename({
+        suffix: ".min"
+    }))
+    .pipe(gulp.dest(dist_path + '/scripts'))
+    .pipe(jsFilter.restore())
+
+    // grab vendor css files from bower_components, minify and push in /public
+    .pipe(cssFilter)
+    .pipe(gulp.dest(dist_path + '/stylesheets'))
+    // TODO: .pipe(minifycss())
+    .pipe(rename({
+        suffix: ".min"
+    }))
+    .pipe(gulp.dest(dist_path + '/stylesheets'))
+    .pipe(cssFilter.restore())
+
+    // grab vendor font files from bower_components and push in /public 
+    .pipe(fontFilter)
+    .pipe(flatten())
+    .pipe(gulp.dest(dist_path + '/fonts'));
 });
 
 // The default task (called when you run `gulp` from cli)
