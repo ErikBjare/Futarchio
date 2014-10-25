@@ -29,13 +29,6 @@ app.controller('PollsController', function($scope, $resource, $log, Poll) {
     });
 });
 
-app.factory('Poll', function($resource, user) {
-    var Poll = $resource("/api/0/polls", {},
-        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});
-    console.log(new Poll());
-    return Poll;
-});
-
 app.controller('NewPollController', function($scope, $resource, $log, $window, Poll) {
     $scope.createPoll = function() {
         var poll = new Poll(

@@ -7,6 +7,13 @@ app.factory('msgStack', function() {
     };
 });
 
+app.factory('Poll', function($resource, user) {                                                   
+    var Poll = $resource("/api/0/polls", {},                                                      
+        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});  
+    console.log(new Poll());                                                                      
+    return Poll;                                                                                  
+});                                                                                               
+
 app.factory('UserKeyVal', function($log, $resource) {
     // DEPRECATED
     // TODO: Remove refs
