@@ -4,6 +4,10 @@ import re
 import os
 import subprocess
 import argparse
+
+ROOT_DIR = "../"
+SRC_DIR = ROOT_DIR + "src/"
+
 def recurse_dir(folder):
     files = [folder + "/" + f for f in os.listdir(folder)]
     dirs = list(filter(lambda x: os.path.isdir(x), files))
@@ -15,7 +19,7 @@ def recurse_dir(folder):
         files.extend(new_files)
     return files
 
-site_src = recurse_dir("src/site/src")
+site_src = recurse_dir(SRC_DIR + "site/src")
 
 def count_lines(folder, pattern):
     print("Folder: {}, pattern: {}".format(folder, pattern))
@@ -31,18 +35,18 @@ def count_lines(folder, pattern):
 def list_all():
     # Site, HTML & JS
     print("HTML")
-    count_lines("src/site/src", ".*\.html$")
-    count_lines("src/site/src", ".*[^(\.min)]\\.js$")
+    count_lines(SRC_DIR + "site/src", ".*\.html$")
+    count_lines(SRC_DIR + "site/src", ".*[^(\.min)]\\.js$")
 
     # Go, backend and tests
     print("\nGo")
-    count_lines("src", ".*[^(_test)]\.go$")
+    count_lines(SRC_DIR, ".*[^(_test)]\.go$")
     print("\nGo tests")
-    count_lines("src", ".*_test\.go$")
+    count_lines(SRC_DIR, ".*_test\.go$")
 
     # Misc, Wiki etc.
     print("\nWiki")
-    count_lines("wiki", ".*\\.md$")
+    count_lines(ROOT_DIR + "wiki", ".*\\.md$")
 
 
 if __name__ == "__main__":
