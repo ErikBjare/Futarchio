@@ -21,6 +21,8 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Required to let datastore init
 	time.Sleep(time.Second)
 }
 
@@ -61,8 +63,6 @@ func TestAuth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The following comment line can be useful for debugging by printing body
-	//log.Println(string(body))
 
 	var users []db.User
 	err = json.Unmarshal(body, &users)
@@ -74,8 +74,6 @@ func TestAuth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The following comment line can be useful for debugging by printing body
-	//log.Println(string(body))
 
 	var user db.User
 	err = json.Unmarshal(body, &user)
@@ -86,11 +84,15 @@ func TestAuth(t *testing.T) {
 
 func getBody(url string, authkey string) ([]byte, error) {
 	client := &http.Client{}
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", authkey)
+	if authkey != "" {
+		req.Header.Add("Authorization", authkey)
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -105,6 +107,7 @@ func getBody(url string, authkey string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return body, err
 }
 
@@ -139,5 +142,12 @@ func TestUsers(t *testing.T) {
 		t.Error("Couldn't find Erik in database")
 	} else if len(keys) > 1 {
 		t.Error("More than one user with email erik@bjareho.lt in database")
+	}
+}
+
+func TestPolls(t *testing.T) {
+	_, err := getBody("http://localhost:8080/api/0/polls", "")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
