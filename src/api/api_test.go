@@ -21,6 +21,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	time.Sleep(time.Second)
 }
 
 func getAuthkey() (string, error) {
