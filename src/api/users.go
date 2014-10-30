@@ -6,7 +6,7 @@ import (
 	"appengine/datastore"
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
-	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -41,8 +41,7 @@ func (u UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
 	}
 
 	if len(result) == 0 {
-		w.AddHeader("Content-Type", "text/plain")
-		w.WriteErrorString(http.StatusNotFound, "404: User could not be found.")
+		respondError(w, 404, "user could not be found")
 		return
 	}
 
@@ -58,19 +57,29 @@ func (u UserApi) create(r *restful.Request, w *restful.Response) {
 		c.Errorf(err.Error())
 	}
 
+	// TODO: Validate email
+	// TODO: Move username validation to seperate function ValidateUsername (probably in db)
+	matched, err := regexp.MatchString("^[a-z0-9_]{3,20}$", userreg.Username)
+	if err != nil {
+		panic(err)
+	}
+	if !matched {
+		respondError(w, 500, "username contains invalid characters, can only contain 3-20 lowercase a-z, 0-9 and _")
+		return
+	}
+
 	user := db.NewUser(userreg.Username, userreg.Password, userreg.Name, userreg.Email)
-	// TODO: Write tests for username & email uniqueness
+	// TODO: Write tests for username & email uniqueness, also make sure they match their regexps
 	key := datastore.NewKey(c, "User", user.Username, 0, nil)
 
 	var existing_user db.User
 	err = datastore.Get(c, key, &existing_user)
-	if err == nil || err.Error() != "datastore: no such entity" {
-		if err == nil {
-			// TODO: correct errorcode
-			respondError(w, 500, "username is taken")
-		} else {
-			respondError(w, 500, err.Error())
-		}
+	if err == nil {
+		respondError(w, 500, "username is taken")
+		return
+	}
+	if err.Error() != "datastore: no such entity" {
+		respondError(w, 500, err.Error())
 		return
 	}
 
