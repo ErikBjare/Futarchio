@@ -1,21 +1,13 @@
-<div class="col-md-9">
-  <h1>Polls</h1>
-</div>
-
-<div class="col-md-8" ng-controller="PollsController">
-  <div ng-if="polls.length == 0">No results</div>
-  <div ng-repeat="poll in polls" class="poll">
-    <ng-include src="'/static/poll.html'"></div>
+<div class="col-md-6 col-md-offset-3" ng-controller="NewPollController">
+  <div ng-show="title" class="slide" style="margin-bottom: 1.0em;">
+    <button class="btn" ng-click="title = ''">Cancel</button>
   </div>
-</div>
 
-<div class="col-md-4" ng-controller="NewPollController">
-  <p><b>Create Poll</b></p>
+  <input class="form-control input-md" style="margin-bottom: 0.3em;" ng-disabled="!user.is_logged_in()" type=text placeholder="{{user.is_logged_in() && 'Enter a good question here' || 'You need to be logged in to create a new question'}}" ng-model="title"></input>
+
+
+  <div ng-show="title" class="slide">
   <br>
-
-  <input class="form-control input-lg" style="margin-bottom: 0.3em;" type=text placeholder="Enter a good question here" ng-model="title"></input>
-  <br>
-
   <textarea class="form-control input" style="margin-bottom: 0.9em;" placeholder="Your good description goes here" ng-model="description"></textarea>
 
   <div class=row>
@@ -37,16 +29,29 @@
         <option>Public</option>
       </select>
     </div>
+
+    <div style="margin-top: 2em">
+      <br>
+      <br>
+      <div class="col-xs-5 col-md-2 col-xs-offset-1 col-md-offset-4">
+        <button class="btn" style="width: 100%" ng-click="title = ''">Cancel</button>
+      </div>
+      <div class="col-xs-5 col-md-2">
+        <button class="btn btn-success" style="width: 100%" ng-click="createPoll()">Submit</button>
+      </div>
+      </div>
+    </div>
   </div>
-  <br>
-  <br>
-
-  <button class="center-block btn btn-success" ng-click="createPoll()">
-    Submit
-  </button>
-
-  <hr>
-
-  Sidebar goes here
+  <hr style="margin: 2em 0 2em 0;">
 </div>
 
+<div class="col-md-8 col-md-offset-2">
+  <div ng-controller="PollsController">
+    <div ng-if="polls.length == 0">
+        <h3><center>No results</center></h3>
+    </div>
+    <div ng-repeat="poll in polls" class="poll">
+      <ng-include src="'/static/poll.html'"></ng-include>
+    </div>
+  </div>
+</div>

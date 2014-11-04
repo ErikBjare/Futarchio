@@ -7,7 +7,7 @@ app.factory('msgStack', function() {
     };
 });
 
-app.factory('Poll', function($resource, user) {                                                   
+app.factory('Poll', function($resource, user) {
     var Poll = $resource("/api/0/polls", {},                                                      
         {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});  
     console.log(new Poll());                                                                      
@@ -20,13 +20,13 @@ app.factory('UserKeyVal', function($log, $resource) {
     var User = $resource('/api/0/users/:key/:val', {});
     return function(key, val) {
         var user = User.query(
-           {"key": key,
-            "val": val},
-            function(u) {
-                $log.info("Successfully fetched user");
-            }, function(u) {
-                $log.error("Error");
-            });
+            {"key": key,
+                "val": val},
+                function(u) {
+                    $log.info("Successfully fetched user");
+                }, function(u) {
+                    $log.error("Error");
+                });
         return user;
     };
 });
@@ -73,21 +73,21 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
         var deferred = $q.defer();
 
         $http.post('/api/0/auth', {username: username, password: password})
-        .success(function(data, status, headers, config) {
-            console.log(data);
-            user.authkey(data.key);
-            $http.get('/api/0/users/me', {"headers": {"Authorization": user.authkey()}})
-            .success(function(data) {
-                $cookieStore.put("me", {"username": data.username, "email": data.email});
-                deferred.resolve(data);
-            }).error(function(data) {
-                deferred.reject("error while fetching profile");
+            .success(function(data, status, headers, config) {
+                console.log(data);
+                user.authkey(data.key);
+                $http.get('/api/0/users/me', {"headers": {"Authorization": user.authkey()}})
+                .success(function(data) {
+                    $cookieStore.put("me", {"username": data.username, "email": data.email});
+                    deferred.resolve(data);
+                }).error(function(data) {
+                    deferred.reject("error while fetching profile");
+                });
+            }).error(function(data, status, headers, config) {
+                deferred.reject(data.error);
             });
-        }).error(function(data, status, headers, config) {
-            deferred.reject(data.error);
-        });
 
-        return deferred.promise;
+return deferred.promise;
     };
 
     user.logout = function() {
