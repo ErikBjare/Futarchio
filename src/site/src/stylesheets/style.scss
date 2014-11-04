@@ -10,25 +10,51 @@ html {
   min-height: 100%;
 }
 
+body {
+  margin-bottom: $footer_height+20;
+}
+
+.dark {
+  color: #EEE;
+  background-color: #222;
+  border: 0 #000 solid;
+
+  p {
+    text-shadow: 0 1px 3px #000;
+  }
+
+  .form-control {
+    @extend .dark;
+    background-color: #000;
+    border: 1px solid #999;
+  }
+}
+
+.dark-topshadow {
+  @extend .dark;
+  box-shadow: inset 0 15px 30px -10px #000;
+}
+
+.dark-bottomshadow {
+  @extend .dark;
+  box-shadow: inset 0px -15px 30px -10px #000;
+}
+
+.col-center {
+  margin: 0 auto;
+  float: none;
+}
+
 .footer {
+  @extend .dark-topshadow;
   position: absolute;
   padding-top: 20px;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: $footer_height;
-  color: #FFF;
-  background-color: #444;
-  border: 0 #AAA solid;
-  border-top-width: 4px;
-  box-shadow: 0 10px 15px 2px #333 inset;
+  border-top-width: 2px;
 }
-
-body {
-  margin-top: 70px;
-  margin-bottom: $footer_height+20;
-}
-
 
 .profile-thumbnail {
   display: inline-block;
@@ -69,34 +95,52 @@ body {
   color: #777;
 }
 
+.hover-opacity {
+  opacity: 0.8;
+  -webkit-transition: all .3s ease; /* Fade to color for Chrome and Safari */
+}
+
+.hover-opacity:hover {
+  opacity: 1.0;
+  color: #000;
+}
+
 .logo {
-    padding-top: 13px;
-    opacity: 0.7;
+  @extend .hover-opacity;
+  padding-top: 13px;
+  opacity: 0.7;
 
-    // TODO: Use some browser prefix helper, like Bourbon (http://bourbon.io/)
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+ */
-    filter: gray; /* IE6-9 */
-    -webkit-filter: #{"grayscale(25%)"}; /* Chrome 19+ & Safari 6+ */
-    -webkit-transition: all .3s ease; /* Fade to color for Chrome and Safari */
-    -webkit-backface-visibility: hidden; /* Fix for transition flickering */
+  // TODO: Use some browser prefix helper, like Bourbon (http://bourbon.io/)
+  filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+ */
+  filter: gray; /* IE6-9 */
+  -webkit-filter: #{"grayscale(25%)"}; /* Chrome 19+ & Safari 6+ */
+  -webkit-transition: all .3s ease; /* Fade to color for Chrome and Safari */
+  -webkit-backface-visibility: hidden; /* Fix for transition flickering */
 
-    .image {
-        display: inline-block;
-        height: 32px;
-        width: 32px;
-        margin-top: -5px;
-        
-    }
+  .image {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    margin-top: -5px;
+  }
 
-    .title {
-        color: #333;    
-        display: inline-block;
-        margin-left: 8px;
-    }
+  .title {
+    color: #333;
+    display: inline-block;
+    margin-left: 8px;
+  }
 }
 
 .logo:hover {
-        opacity: 1;
-        filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 1 0\'/></filter></svg>#grayscale");
-        -webkit-filter: #{"grayscale(0%)"};
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 1 0\'/></filter></svg>#grayscale");
+    -webkit-filter: #{"grayscale(0%)"};
+}
+
+.navbar-default .nav {
+  li {
+    a {
+      @extend .hover-opacity;
+      color: #444;
+    }
+  }
 }

@@ -1,12 +1,5 @@
-<form class="form-signin" role="form" ng-show="logged_in == false">
+<div ng-show="!user.is_logged_in()">
   <h2 class="form-signin-heading text-center">Register</h2>
 
-  <div ng-if="error" class="alert alert-danger">
-    <b>Error!</b> {{error|capitalize}}
-  </div>
-
-  <input type="text" name=username class="form-control" placeholder="Username" required="" autofocus="" ng-model="username">
-  <input type="password" name=password class="form-control" placeholder="Password" required="" ng-model="password">
-  <input type="text" name=email class="form-control" placeholder="Email" required="" ng-model="email">
-  <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="signup()">Sign up!</button>
+  <ng-include src="'/static/signup-form.html'"></ng-include>
 </form>

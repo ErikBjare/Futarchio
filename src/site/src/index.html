@@ -40,7 +40,7 @@
 
   </head>
   <body ng-controller="MainController">
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-default" role="navigation" style="border-bottom-color: #CCC;">
       <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li ng-repeat="link in links_left" ng-class="{'active': location.path() == '/'+link.url}">
               <a href="/{{link.url}}">
@@ -102,12 +102,12 @@
             <li><a href="/signup">Sign up</a></li>
             <li><a href="/login">Login</a></li>
           </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
+        </div>
+      </div>
     </nav>
 
-    <div class="container">
-      <div ng-view class=row></div>
+    <div class="container-fluid">
+      <div ng-view></div>
     </div>
 
     <div class="footer">

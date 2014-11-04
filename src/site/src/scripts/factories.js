@@ -8,11 +8,11 @@ app.factory('msgStack', function() {
 });
 
 app.factory('Poll', function($resource, user) {
-    var Poll = $resource("/api/0/polls", {},                                                      
-        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});  
-    console.log(new Poll());                                                                      
-    return Poll;                                                                                  
-});                                                                                               
+    var Poll = $resource("/api/0/polls", {},
+        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});
+    console.log(new Poll());
+    return Poll;
+});
 
 app.factory('UserKeyVal', function($log, $resource) {
     // DEPRECATED
@@ -120,7 +120,9 @@ return deferred.promise;
                 $log.error(data);
             });
     };
-    user.get_votereceipts();
+    if(user.is_logged_in()) {
+        user.get_votereceipts();
+    }
 
 
     user.has_voted_on = function(pollid) {

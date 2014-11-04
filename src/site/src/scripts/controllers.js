@@ -9,7 +9,13 @@ app.controller('MainController', function($scope, $route, $rootScope, $location,
     $scope.user = user;
 });
 
-app.controller('HomeController', function($scope, $log) {
+app.controller('HomeController', function($scope, $log, $location, $anchorScroll) {
+    $scope.gotoAbout = function() {
+        console.log("asd");
+        $location.hash("about");
+        $anchorScroll();
+        $location.hash("");
+    };
 });
 
 app.controller('AdminController', function($scope, $resource, msgStack) {
@@ -61,7 +67,7 @@ app.controller('PollController', function($scope, $resource, $log, Vote) {
     for(var k in $scope.poll.weights) {
         $scope.votes += $scope.poll.weights[k];
     }
-    
+
     if($scope.poll.type == "YesNoPoll") {
         $scope.rating = $scope.poll.weights.yes - $scope.poll.weights.no;
 
@@ -146,20 +152,19 @@ app.controller('LoginController', function($scope, $routeParams, $location, $win
 app.controller('SignupController', function($scope, $routeParams, $location, User, user) {
     if(user.is_logged_in()) {
         $location.path("/profile/"+user.username());
-    } else {
-        $scope.logged_in = false;
     }
 
     $scope.signup = function() {
+        $scope.signing_up = true;
         var user = new User({username: $scope.username, password: $scope.password, email: $scope.email});
         user.$save().then(function(data) {
             $scope.error = "";
             $location.path("/profile/"+$scope.username);
-            $scope.logging_in = false;
+            $scope.signing_up = false;
         }, function(data) {
             console.log(data.data);
             $scope.error = data.data.error;
-            $scope.logging_in = false;
+            $scope.signing_up = false;
         });
     };
 });
