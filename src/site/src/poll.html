@@ -90,32 +90,32 @@
         </div-->
 
 
-    <div class="col-xs-12">
+    <div class="col-xs-12" ng-if="!voted">
       <button class="btn btn-xs center-block" style="margin-top: 20px;" ng-click="show_results = !show_results">
         <span ng-show="!show_results">Show</span>
         <span ng-show="show_results">Hide</span>
         results
       </button>
     </div>
-  </div>
 
-  <!-- TODO: Show results before voting (on demand) -->
-  <!-- TODO: Show percentage on hover -->
-  <div ng-show="voted || show_results" class=col-md-12>
-    <hr>
-    <div ng-show="voted" class="alert alert-success well-sm">You have voted on this poll</div>
+    <!-- TODO: Show results before voting (on demand) -->
+    <!-- TODO: Show percentage on hover -->
+    <div ng-show="voted || show_results" class=col-md-12>
+      <hr>
+      <div ng-show="voted" class="alert alert-success well-sm">You have voted on this poll</div>
 
-    <div class="progress">
-      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
-        <b>Yes</b> ({{trues}}%)
+      <div class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
+          <b>Yes</b> ({{trues}}%)
+        </div>
+        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
+          <b>No</b> ({{falses}}%)
+        </div>
       </div>
-      <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
-        <b>No</b> ({{falses}}%)
+      <div>
+        Votes: {{votes}}<br>
+        Rating: {{rating}}
       </div>
-    </div>
-    <div>
-      Votes: {{votes}}<br>
-      Rating: {{rating}}
     </div>
   </div>
 </div>
