@@ -17,7 +17,7 @@
         </a>
       </p>
     </div>
-    <div class="col-md-4 hidden-sm hidden-xs">
+    <div class="col-md-4 hidden-sm hidden-xs" ng-if="!user.is_logged_in()">
       <ng-include src="'/static/signup-form.html'"></ng-include>
     </div>
   </div>
