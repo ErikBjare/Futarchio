@@ -11,3 +11,5 @@ For info, the Vision, ToDos and inspirational reading material, check out the wi
 
 ## Developing
 For how to set up the development enviroment, check out the [Development page on the wiki](https://github.com/ErikBjare/Futarchio/wiki/Development).
+
+We also have a Trello organization with planning boards, for an invitation contact Erik.
