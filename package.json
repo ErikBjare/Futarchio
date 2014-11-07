@@ -1,7 +1,7 @@
 {
-  "name": "WeArePeople",
+  "name": "Futarchio",
   "version": "0.0.0",
-  "description": "WeArePeople ===========",
+  "description": "Predicting a better future, for most of mankind.",
   "directories": {
     "doc": "docs"
   },
@@ -18,6 +18,7 @@
     "gulp-sass": "~1.0.0",
     "gulp-sourcemaps": "~1.2.2",
     "gulp-uglify": "~1.0.1",
+    "imagemin": "~2.2.1",
     "main-bower-files": "^2.1.0"
   },
   "devDependencies": {},
@@ -26,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:ErikBjare/wearepeople.git"
+    "url": "git@github.com:ErikBjare/Futarchio.git"
   },
   "author": "",
   "license": "BSD-2-Clause"
