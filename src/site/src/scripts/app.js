@@ -1,4 +1,4 @@
-app = angular.module('FutarchioApp', ["ngResource", "ngAnimate", "ngRoute", "ngCookies", "ngSanitize", "vr.directives.slider"]);
+app = angular.module('FutarchioApp', ["ngResource", "ngAnimate", "ngRoute", "ngCookies", "ngSanitize"]);
 
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider
@@ -47,7 +47,7 @@ app.animation('.slide', function() {
     return {
         beforeAddClass: function(element, className, done) {
             if(className === NG_HIDE_CLASS) {
-                element.slideUp(done); 
+                element.slideUp(done);
             }
         },
         removeClass: function(element, className, done) {

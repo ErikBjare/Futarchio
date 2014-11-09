@@ -68,28 +68,6 @@
       </div>
     </div>
 
-    <!-- TODO: Complete and then move into switch statement (WeightsPoll) when done -->
-    <!--div>
-            <div class="col-md-12">
-                <h3 class="text-center">Rank choices</h3>
-
-                <div class="row" ng-repeat="choice in choices">
-                    <div class="col-md-2">
-                        <h4>{{choice.name}}</h4>
-                    </div>
-                    <div class="col-md-10">
-                        <slider ng-model="choice.value" ng-model-range="choice.range" ng-class="{'positive': choice.range > 0, 'negative': choice.range < 0}" floor="-100" ceiling="100"></slider>
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="col-md-12">
-                <button class=btn>Add another choice</button>
-            </div>
-        </div-->
-
-
     <div class="col-xs-12" ng-if="!voted">
       <button class="btn btn-xs center-block" style="margin-top: 20px;" ng-click="show_results = !show_results">
         <span ng-show="!show_results">Show</span>
