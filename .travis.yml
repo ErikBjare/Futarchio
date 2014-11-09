@@ -10,7 +10,7 @@ before_install:
 
 install:
     - cd src
-    - go get -d -v ./... && go build -v ./...
+    - ../go_appengine/goapp get -d -v ./... && ../go_appengine/goapp build -v ./...
     - cd ..
 
 before_script:
