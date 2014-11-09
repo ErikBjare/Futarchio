@@ -34,6 +34,9 @@ app.config(function($routeProvider, $locationProvider) {
     templateUrl: '/static/login.html',
     controller: 'LoginController',
   })
+   .when('/signup/success', {
+       templateUrl: '/static/signup-success.html'
+   })
    .when('/signup', {
     templateUrl: '/static/signup.html',
     controller: 'SignupController',

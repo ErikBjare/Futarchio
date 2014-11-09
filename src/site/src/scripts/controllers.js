@@ -159,7 +159,7 @@ app.controller('SignupController', function($scope, $routeParams, $location, Use
         var user = new User({username: $scope.username, password: $scope.password, email: $scope.email});
         user.$save().then(function(data) {
             $scope.error = "";
-            $location.path("/profile/"+$scope.username);
+            $location.path("/signup/success");
             $scope.signing_up = false;
         }, function(data) {
             console.log(data.data);

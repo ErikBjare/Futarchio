@@ -115,6 +115,7 @@ func (u UserApi) create(r *restful.Request, w *restful.Response) {
 	}
 	if !strings.Contains(userreg.Email, "@") {
 		respondError(w, 500, "email did not contain a '@'")
+		return
 	}
 
 	// TODO: Move username validation to seperate function ValidateUsername (probably in db)
