@@ -45,22 +45,32 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 	// Enforce lowercase to ensure case-insensitivity
 	ar.Username = strings.ToLower(ar.Username)
 
-	q := datastore.NewQuery("User").Limit(1)
-	if strings.Contains(ar.Username, "@") {
-		// Is an Email
+	// Limit is two so that an error is raised upon multiple returns (which should be impossible)
+	q := datastore.NewQuery("User").Limit(2)
+	if strings.ContainsRune(ar.Username, '@') {
+		// Is an email
+		c.Debugf("Finding user to log in with email: ", ar.Username)
 		q = q.Filter("Email =", ar.Username)
 	} else {
+		// Is a username
+		c.Debugf("Finding user to log in with username: ", ar.Username)
 		q = q.Filter("Username =", ar.Username)
 	}
 
-	var user []db.User
-	userkey, err := q.GetAll(c, &user)
+	var users []db.User
+	userkeys, err := q.GetAll(c, &users)
 
-	if len(user) != 0 && user[0].CheckPassword(ar.Password) {
+	if len(users) > 1 {
+		c.Errorf("Got more than one user when trying to auth")
+		respondError(w, 500, "found more than one match for username/email, can not log in")
+		return
+	}
+
+	if len(users) != 0 && users[0].CheckPassword(ar.Password) {
 		// If user successfully authorized
 
 		// Check if auth key already exists
-		q := datastore.NewQuery("Auth").Ancestor(userkey[0]).Limit(1)
+		q := datastore.NewQuery("Auth").Ancestor(userkeys[0]).Limit(1)
 		var auths []db.Auth
 		k, err := q.GetAll(c, &auths)
 		if len(k) != 0 && err != nil {
@@ -77,7 +87,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			// Add it to the memcache
 			item := &memcache.Item{
 				Key:   auth.Key,
-				Value: []byte(userkey[0].Encode()),
+				Value: []byte(userkeys[0].Encode()),
 			}
 
 			if err := memcache.Add(c, item); err == memcache.ErrNotStored {
@@ -87,7 +97,7 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 			}
 
 			// Put the item into the datastore
-			_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Auth", userkey[0]), &auth)
+			_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Auth", userkeys[0]), &auth)
 			if err != nil {
 				panic(err)
 			}

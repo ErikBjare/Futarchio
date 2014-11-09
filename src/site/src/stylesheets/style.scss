@@ -58,12 +58,13 @@ body {
 
 .profile-thumbnail {
   display: inline-block;
-  height: 24px;
-  width: 24px;
-  margin-bottom: -8px;
-  margin-right: 5px;
+  height: 32px;
+  width: 32px;
+  margin-top: -8px;
+  margin-bottom: -10px;
+  margin-right: 8px;
   border: 1px #888 solid;
-  border-radius: 3px;
+  border-radius: 100%;
   background-size: cover;
 }
 

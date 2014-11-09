@@ -54,6 +54,19 @@ app.factory('gravatar', function($log, $resource) {
 
 app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $window, gravatar) {
     var user = {};
+
+    user.notifications = [];
+    /*
+    user.notifications = [
+        {title: "Example notification",
+         description: "Example description, lalalalala.\nasdasdad",
+         url: "/notifications/1"},
+        {title: "Notif 2",
+         description: "Another one",
+         url: "/notifications/2"}
+    ];
+    */
+
     user.is_logged_in = function() {
         val = $cookieStore.get("me") && user.authkey();
         return val ? true : false;

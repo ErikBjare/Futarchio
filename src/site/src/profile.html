@@ -1,11 +1,7 @@
 <div class=container>
   <div class=col-md-12>
-    <p ng-show="!profile.username && !loading_error" class=loading>
-      Loading...
-    </p>
-
     <p ng-show="loading_error" class=loading>
-      There was an error while trying to load this profile
+      An error occurred while trying to load this profile
     </p>
 
     <div ng-show="profile.username" class=profile>
@@ -20,8 +16,11 @@
         Name: {{profile.name}}<br>
         Email: {{profile.email}}
       </div>
-      <div class="col-xs-9">
+      <div class="col-xs-6">
         Public activity will go here!
+      </div>
+      <div class="col-xs-3">
+        Stats will go here!
       </div>
     </div>
   </div>

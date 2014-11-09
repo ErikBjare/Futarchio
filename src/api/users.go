@@ -12,15 +12,66 @@ import (
 
 type UserApi Api
 
+func (u UserApi) Register() {
+	ws := new(restful.WebService)
+
+	ws.
+		Path("/api/0/users").
+		Doc("Users").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
+	ws.Route(ws.GET("").To(u.getByKeyVal).
+		Doc("get a list of all users").
+		Operation("placeholderOp").
+		Filter(basicAuthenticate).
+		Writes([]db.User{}))
+	ws.Route(ws.POST("").To(u.create).
+		Doc("create a user").
+		Operation("createUser").
+		Reads(UserRegistration{}))
+	ws.Route(ws.GET("/me").To(u.getByAuth).
+		Doc("get the authorized user").
+		Operation("getByAuth").
+		Filter(basicAuthenticate).
+		Writes(UserResponse{}))
+	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
+		Doc("get a user by its properties").
+		Operation("placeholderOp").
+		Param(ws.PathParameter("key", "property to look up").DataType("string")).
+		Param(ws.PathParameter("val", "value to match").DataType("string")).
+		Writes([]db.User{}))
+
+	restful.Add(ws)
+}
+
+type UserResponse struct {
+	db.User
+	Poll_count int `json:"poll_count"`
+	Vote_count int `json:"vote_count"`
+}
+
+// Serves private info such as stats
+func buildUserResponse(c appengine.Context, u *db.User, key *datastore.Key) UserResponse {
+	poll_count, err := datastore.NewQuery("Poll").Filter("Creator =", u.Username).Count(c)
+	if err != nil {
+		panic(err)
+	}
+	vote_count, err := datastore.NewQuery("VoteReceipt").Filter("User =", key).Count(c)
+	if err != nil {
+		panic(err)
+	}
+	return UserResponse{*u, poll_count, vote_count}
+}
+
 func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 
-	user, _ := auth(c, r)
+	user, key := auth(c, r)
 	if user != nil {
-		respondOne(w, user)
+		ur := buildUserResponse(c, user, key)
+		respondOne(w, ur)
 	} else {
-		w.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
-		w.WriteErrorString(401, "401: Not Authorized")
+		respondError(w, 500, "something went wrong when trying to get user")
 	}
 }
 
@@ -57,7 +108,15 @@ func (u UserApi) create(r *restful.Request, w *restful.Response) {
 		c.Errorf(err.Error())
 	}
 
-	// TODO: Validate email
+	// TODO: Validate email properly
+	if userreg.Email == "" {
+		respondError(w, 500, "email field was empty")
+		return
+	}
+	if !strings.Contains(userreg.Email, "@") {
+		respondError(w, 500, "email did not contain a '@'")
+	}
+
 	// TODO: Move username validation to seperate function ValidateUsername (probably in db)
 	matched, err := regexp.MatchString("^[a-z0-9_]{3,20}$", userreg.Username)
 	if err != nil {
@@ -107,36 +166,4 @@ type UserRegistration struct {
 	Password string `json:"password"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
-}
-
-func (u UserApi) Register() {
-	ws := new(restful.WebService)
-
-	ws.
-		Path("/api/0/users").
-		Doc("Users").
-		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("").To(u.getByKeyVal).
-		Doc("get a list of all users").
-		Operation("placeholderOp").
-		Filter(basicAuthenticate).
-		Writes([]db.User{}))
-	ws.Route(ws.POST("").To(u.create).
-		Doc("create a user").
-		Operation("createUser").
-		Reads(UserRegistration{}))
-	ws.Route(ws.GET("/me").To(u.getByAuth).
-		Doc("get the authorized user").
-		Operation("getByAuth").
-		Filter(basicAuthenticate).
-		Writes(db.User{}))
-	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
-		Doc("get a user by its properties").
-		Operation("placeholderOp").
-		Param(ws.PathParameter("key", "property to look up").DataType("string")).
-		Param(ws.PathParameter("val", "value to match").DataType("string")).
-		Writes([]db.User{}))
-
-	restful.Add(ws)
 }

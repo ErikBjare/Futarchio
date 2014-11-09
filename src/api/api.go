@@ -8,15 +8,24 @@ import (
 	"github.com/ErikBjare/Futarchio/src/db"
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
+	"math/rand"
+	"time"
 )
 
-func init() {
-	UserApi{}.Register()
-	AuthApi{}.Register()
-	PollApi{}.Register()
+type Api swagger.Api
+
+type IApi interface {
+	Register()
 }
 
-type Api swagger.Api
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	apis := []IApi{UserApi{}, AuthApi{}, PollApi{}, NotificationApi{}}
+	for _, api := range apis {
+		api.Register()
+	}
+}
 
 /*
    Respond Functions
