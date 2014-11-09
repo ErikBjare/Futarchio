@@ -2,22 +2,21 @@ language: go
 
 go:
     - 1.2
-   #- 1.3
-   #- tip
 
 before_install:
     - bash ./scripts/setup_gae.sh
+    - export PATH="$PATH:$(pwd)/go_appengine"
 
 install:
     - cd src
-    - ../go_appengine/goapp get -d -v ./... && ../go_appengine/goapp build -v ./...
+    - goapp get -d -v ./... && goapp build -v ./...
     - cd ..
 
 before_script:
     - cd src/app
-    - ../../go_appengine/goapp serve &
+    - goapp serve &
     - cd ../..
     - sleep 5 # give some time to start
 
 script:
-    - ./go_appengine/goapp test -v -cover ./src/...
+    - goapp test -v -cover ./src/...
