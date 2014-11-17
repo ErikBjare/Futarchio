@@ -3,18 +3,15 @@ package db
 import (
 	"appengine"
 	"appengine/datastore"
-	"time"
 )
 
-// Represents a statement which people can make predictions o, create with poll initializers
-// TODO: Finalization condition (time/expiry, vote, etc.)
+// Claim - Represents a statement which people can make predictions o, create with poll initializers
+// TODO: Rename to statement?
 type Claim struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Creator     string    `json:"creator"`
-	Created     time.Time `json:"created"`
+	Post
 	// Type can be one of ["CredenceClaim"]
 	Type string `json:"type"`
+	// TODO: Finalization condition/type (time/expiry, vote, etc.)
 }
 
 // Creates a new poll.
@@ -22,17 +19,14 @@ type Claim struct {
 // Should rarely be used, use specialized poll constructors instead.
 func newClaim(title, desc string, creator string) Claim {
 	return Claim{
-		Title:       title,
-		Description: desc,
-		Creator:     creator,
-		Created:     time.Now(),
+		Post: NewPost(title, desc, creator),
 	}
 }
 
-// Returns the current standings of the claim
+// Stats - Returns the current standings of the claim
 // TODO: Calculate average, mean and stddev
 func (p *Claim) Stats(c appengine.Context, claimkey *datastore.Key) map[string]float32 {
-	c.Errorf("Unimplemented: Standings")
+	c.Errorf("Unimplemented: Claim.Stats")
 	var votes []Vote
 	q := datastore.NewQuery("Prediction").Filter("Claim =", claimkey)
 	_, err := q.GetAll(c, &votes)
@@ -44,7 +38,8 @@ func (p *Claim) Stats(c appengine.Context, claimkey *datastore.Key) map[string]f
 	return map[string]float32{}
 }
 
-// Creates a claim based on credence
+// NewCredenceClaim - Creates a claim based on credence
+// TODO: Rename to something more intuitive
 func NewCredenceClaim(title, desc string, creator string) Claim {
 	p := newClaim(title, desc, creator)
 	p.Type = "CredenceClaim"
@@ -53,14 +48,9 @@ func NewCredenceClaim(title, desc string, creator string) Claim {
 
 // A Prediction on a claim
 type Prediction struct {
+	Post
+
 	Claim *datastore.Key `json:"claimid"`
-
-	// The username of the predictor
-	User string `json:"userid"`
-
 	// The credence assigned by the predictor, a value in the open interval (0-1)
 	Credence float32 `json:"credence"`
-
-	// The date and time of creation
-	Created time.Time `json:"created"`
 }

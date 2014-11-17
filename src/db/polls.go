@@ -13,12 +13,9 @@ import (
 	"time"
 )
 
-// Represents a base poll, create with poll initializers
+// Poll - Represents a base poll, create with poll initializers
 type Poll struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Creator     string    `json:"creator"`
-	Created     time.Time `json:"created"`
+	Post
 	// Type can be one of "YesNoPoll", "CredencePoll", "MultipleChoicePoll", "AllocationPoll"
 	Type    string   `json:"type"`
 	Choices []string `json:"choices"`
@@ -27,21 +24,18 @@ type Poll struct {
 // Creates a new poll.
 //
 // Should rarely be used, use specialized poll constructors instead.
-func newPoll(title, desc string, creator string) Poll {
+func newPoll(title, desc, creator string) Poll {
 	return Poll{
-		Title:       title,
-		Description: desc,
-		Creator:     creator,
-		Created:     time.Now(),
+		Post: NewPost(title, desc, creator),
 	}
 }
 
-// Adds a choice to a poll
+// AddChoice - Adds a choice to a poll
 func (p *Poll) AddChoice(name string) {
 	p.Choices = append(p.Choices, name)
 }
 
-// Returns the current standings of the poll
+// Weights - Returns the current standings of the poll
 func (p *Poll) Weights(c appengine.Context, pollkey *datastore.Key) map[string]float32 {
 	var votes []Vote
 	q := datastore.NewQuery("Vote").Filter("Poll =", pollkey)
@@ -53,7 +47,7 @@ func (p *Poll) Weights(c appengine.Context, pollkey *datastore.Key) map[string]f
 	return SumVotes(votes)
 }
 
-// Creates a yes/no poll
+// NewYesNoPoll - Creates a yes/no poll
 func NewYesNoPoll(title, desc string, creator string) Poll {
 	p := newPoll(title, desc, creator)
 	p.Type = "YesNoPoll"
@@ -61,7 +55,7 @@ func NewYesNoPoll(title, desc string, creator string) Poll {
 	return p
 }
 
-// Creates a multiple choice poll
+// MultichoicePoll - Creates a multiple choice poll
 func MultichoicePoll(title, desc string, creator string, choices []string) Poll {
 	p := newPoll(title, desc, creator)
 	p.Type = "MultichoicePoll"
@@ -69,7 +63,7 @@ func MultichoicePoll(title, desc string, creator string, choices []string) Poll 
 	return p
 }
 
-// A vote
+// Vote - A vote
 type Vote struct {
 	Poll *datastore.Key `json:"pollid"`
 
@@ -92,6 +86,7 @@ type Vote struct {
 	Created time.Time `json:"created"`
 }
 
+// Weights - Getter for weights
 func (v *Vote) Weights() map[string]float32 {
 	reader := bytes.NewReader(v.EncodedWeights)
 	dec := gob.NewDecoder(reader)
@@ -103,6 +98,7 @@ func (v *Vote) Weights() map[string]float32 {
 	return weights
 }
 
+// SetWeights - Setter for weights
 func (v *Vote) SetWeights(w map[string]float32) error {
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
@@ -114,9 +110,9 @@ func (v *Vote) SetWeights(w map[string]float32) error {
 	return nil
 }
 
-// A receipt that the user has voted
+// VoteReceipt - A receipt on a users vote
 //
-// Only useful if voter voted anonymously
+// Only useful if voter voted anonymously or privately
 type VoteReceipt struct {
 	Poll *datastore.Key `json:"pollid"`
 	User *datastore.Key `json:"userid"`
@@ -125,8 +121,13 @@ type VoteReceipt struct {
 }
 
 const (
-	Public    = 0
-	Private   = 5
+	// Public entities have their creator viewable by all
+	Public = 0
+
+	// Private entities have their creator viewable only by the user which created them
+	Private = 5
+
+	// Anonymous entities are only verifiable if you know the private key
 	Anonymous = 10
 )
 
@@ -136,9 +137,9 @@ const (
 // Privacy is either Public (0), Private (5) or Anonymous (10)
 // TODO: Add entropy to private key, use bcrypt?
 func newVote(pollkey *datastore.Key, userkey *datastore.Key, choice map[string]float32, privacy int) (Vote, VoteReceipt, string) {
-	private_key := userkey.Encode() + "#" + strconv.Itoa(rand.Int())
+	privateKey := userkey.Encode() + "#" + strconv.Itoa(rand.Int())
 
-	hash := sha256.Sum256([]byte(private_key))
+	hash := sha256.Sum256([]byte(privateKey))
 	vote := Vote{
 		Poll:    pollkey,
 		Key:     base64.StdEncoding.EncodeToString([]byte(hash[:])),
@@ -161,13 +162,13 @@ func newVote(pollkey *datastore.Key, userkey *datastore.Key, choice map[string]f
 
 	// If vote is private or public, store private key in receipt
 	if privacy <= Private {
-		votereceipt.Key = private_key
+		votereceipt.Key = privateKey
 	}
 
-	return vote, votereceipt, private_key
+	return vote, votereceipt, privateKey
 }
 
-// Creates new Vote for a Yes or No poll.
+// NewYesNoVote - Creates new Vote for a Yes or No poll.
 //
 // If user == nil, then vote anonymously
 func NewYesNoVote(pollkey *datastore.Key, userkey *datastore.Key, yes bool, privacy int) (Vote, VoteReceipt, string) {
@@ -180,15 +181,14 @@ func NewYesNoVote(pollkey *datastore.Key, userkey *datastore.Key, yes bool, priv
 	return newVote(pollkey, userkey, choice, privacy)
 }
 
-// Sums a collection of votes
+// SumVotes - Sums a collection of votes
 //
-// TODO: Vote normalization
 // TODO: Make it work not exclusively for yes and no
 func SumVotes(vs []Vote) map[string]float32 {
 	weights := map[string]float32{"yes": 0, "no": 0}
 
 	// Stores the total size of the vote weights for normalization
-	var votesum float32 = 0.0
+	var votesum float32
 	for _, v := range vs {
 		w := v.Weights()
 		for _, f := range w {

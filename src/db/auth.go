@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Represents an authentication key
+// Auth - Represents an authentication key
 //
 // Should always be an ancestor of User in the datastore
 type Auth struct {
@@ -17,9 +17,10 @@ type Auth struct {
 	Expires time.Time `json:"expires"`
 }
 
+// NewAuth - Creates a new Auth
 func NewAuth() Auth {
-	auth_bytes := sha256.Sum256([]byte(strconv.Itoa(rand.Int())))
-	authkey := base64.StdEncoding.EncodeToString([]byte(auth_bytes[:]))
+	authBytes := sha256.Sum256([]byte(strconv.Itoa(rand.Int())))
+	authkey := base64.StdEncoding.EncodeToString([]byte(authBytes[:]))
 	return Auth{
 		Key:     authkey,
 		Expires: time.Now().Add(24 * time.Hour),
