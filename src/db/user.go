@@ -14,7 +14,8 @@ type User struct {
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
 	Created  time.Time `json:"created"`
-	Admin    bool      `json:"-"`
+	// Rank should never be accessed directly, always use getters and setters.
+	Rank int `json:"-"`
 }
 
 // NewUser - Creates a new user
@@ -48,4 +49,9 @@ func (u User) CheckPassword(password string) bool {
 		log.Println(err)
 	}
 	return !(err != nil)
+}
+
+// Admin - Returns true if user is admin, else false.
+func (u User) Admin() bool {
+	return u.Rank >= 1000
 }

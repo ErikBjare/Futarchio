@@ -20,7 +20,7 @@ func (n NotificationApi) Register() {
 	ws.Route(ws.GET("").To(n.getNotifications).
 		Doc("get the current users notifications").
 		Operation("getNotifications").
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Writes([]Notification{}))
 
 	restful.Add(ws)

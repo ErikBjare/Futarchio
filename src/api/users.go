@@ -23,7 +23,7 @@ func (u UserApi) Register() {
 	ws.Route(ws.GET("").To(u.getByKeyVal).
 		Doc("get a list of all users").
 		Operation("placeholderOp").
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Writes([]db.User{}))
 	ws.Route(ws.POST("").To(u.create).
 		Doc("create a user").
@@ -32,7 +32,7 @@ func (u UserApi) Register() {
 	ws.Route(ws.GET("/me").To(u.getByAuth).
 		Doc("get the authorized user").
 		Operation("getByAuth").
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Writes(UserResponse{}))
 	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
 		Doc("get a user by its properties").

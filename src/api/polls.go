@@ -39,14 +39,14 @@ func (p PollApi) Register() {
 		Operation("getLatest").
 		Writes([]PollResponse{}))
 	ws.Route(ws.POST("").To(p.createPoll).
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Doc("create a poll").
 		Operation("createPoll").
 		Reads(db.Poll{}))
 	ws.Route(ws.POST("/{pollid}/vote").To(p.vote).
 		Doc("vote on a poll").
 		Operation("vote").
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Param(ws.PathParameter("pollid", "Id of poll to vote on").DataType("string")).
 		Reads(VoteRequest{}).
 		Writes(db.VoteReceipt{}))
@@ -64,7 +64,7 @@ func (p PollApi) Register() {
 
 	// TODO: Move these two to User endpoint?
 	ws.Route(ws.GET("/myvotereceipts").To(p.getMyVotereceipts).
-		Filter(basicAuthenticate).
+		Filter(authFilter).
 		Doc("get the current users votereceipts").
 		Operation("getMyVotereceipts").
 		Writes([]db.VoteReceipt{}))
