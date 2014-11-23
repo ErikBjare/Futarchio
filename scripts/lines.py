@@ -27,7 +27,7 @@ def count_lines(folder, pattern):
     a = [re.fullmatch(pattern, f) for f in files]
     c = [l.string for l in filter(lambda a: a, a)]
     c.sort()
-    
+
     cmd = ["wc"]
     cmd.extend(c)
     subprocess.call(cmd)
@@ -36,11 +36,11 @@ def list_all():
     # Site, HTML & JS
     print("HTML")
     count_lines(SRC_DIR + "site/src", ".*\.html$")
-    count_lines(SRC_DIR + "site/src", ".*[^(\.min)]\\.js$")
+    count_lines(SRC_DIR + "site/src", ".*\\.js$")
 
     # Go, backend and tests
     print("\nGo")
-    count_lines(SRC_DIR, ".*[^(_test)]\.go$")
+    count_lines(SRC_DIR, ".*\.go$")
     print("\nGo tests")
     count_lines(SRC_DIR, ".*_test\.go$")
 
