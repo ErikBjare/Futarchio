@@ -36,14 +36,14 @@ func NewUser(username string, password string, name string, email string) User {
 }
 
 // SetPassword - Sets a new password for the given user
-func (u User) SetPassword(password string) error {
+func (u *User) SetPassword(password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 11)
 	u.Password = hashedPassword
 	return err
 }
 
 // CheckPassword - Checks the password for a given user
-func (u User) CheckPassword(password string) bool {
+func (u *User) CheckPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
 	if err != nil {
 		log.Println(err)
@@ -52,6 +52,6 @@ func (u User) CheckPassword(password string) bool {
 }
 
 // Admin - Returns true if user is admin, else false.
-func (u User) Admin() bool {
+func (u *User) Admin() bool {
 	return u.Rank >= 1000
 }
