@@ -1,16 +1,17 @@
 package db
 
 import (
+	"appengine/datastore"
 	"time"
 )
 
 // UserCreated - Serves as a base entity for things created by users such as comments, polls and predictions.
 type UserCreated struct {
-	Creator string    `json:"creator"`
-	Created time.Time `json:"created"`
+	Creator *datastore.Key `json:"creator"`
+	Created time.Time      `json:"created"`
 }
 
-func newUserCreated(creator string) UserCreated {
+func newUserCreated(creator *datastore.Key) UserCreated {
 	return UserCreated{
 		Creator: creator,
 		Created: time.Now(),
@@ -25,7 +26,7 @@ type Post struct {
 }
 
 // NewPost - Creates a new Post
-func NewPost(title, desc, creator string) Post {
+func NewPost(title, desc string, creator *datastore.Key) Post {
 	return Post{
 		UserCreated: newUserCreated(creator),
 		Title:       title,

@@ -32,7 +32,7 @@ func TestPoll(t *testing.T) {
 
 	_ = NewUser("user", "pass", "name", "email")
 	userkey := datastore.NewIncompleteKey(c, "User", nil)
-	_ = NewYesNoPoll("title", "desc", "erb")
+	_ = NewYesNoPoll("title", "desc", userkey)
 	pollkey := datastore.NewIncompleteKey(c, "Poll", nil)
 	vote1, _, _ := NewYesNoVote(pollkey, userkey, true, 0)
 	vote2, _, _ := NewYesNoVote(pollkey, userkey, false, 0)

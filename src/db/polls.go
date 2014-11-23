@@ -24,7 +24,7 @@ type Poll struct {
 // Creates a new poll.
 //
 // Should rarely be used, use specialized poll constructors instead.
-func newPoll(title, desc, creator string) Poll {
+func newPoll(title, desc string, creator *datastore.Key) Poll {
 	return Poll{
 		Post: NewPost(title, desc, creator),
 	}
@@ -48,7 +48,7 @@ func (p *Poll) Weights(c appengine.Context, pollkey *datastore.Key) map[string]f
 }
 
 // NewYesNoPoll - Creates a yes/no poll
-func NewYesNoPoll(title, desc string, creator string) Poll {
+func NewYesNoPoll(title, desc string, creator *datastore.Key) Poll {
 	p := newPoll(title, desc, creator)
 	p.Type = "YesNoPoll"
 	p.Choices = []string{"yes", "no"}
@@ -56,7 +56,7 @@ func NewYesNoPoll(title, desc string, creator string) Poll {
 }
 
 // MultichoicePoll - Creates a multiple choice poll
-func MultichoicePoll(title, desc string, creator string, choices []string) Poll {
+func MultichoicePoll(title, desc string, creator *datastore.Key, choices []string) Poll {
 	p := newPoll(title, desc, creator)
 	p.Type = "MultichoicePoll"
 	p.Choices = choices

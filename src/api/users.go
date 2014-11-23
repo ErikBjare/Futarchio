@@ -22,9 +22,15 @@ func (u UserApi) Register() {
 		Produces(restful.MIME_JSON)
 	ws.Route(ws.GET("").To(u.getByKeyVal).
 		Doc("get a list of all users").
-		Operation("placeholderOp").
+		Operation("getAll").
 		Filter(authFilter).
 		Writes([]db.User{}))
+	ws.Route(ws.GET("/{key}").To(u.getByKey).
+		Doc("get a user by key").
+		Operation("placeholderOp").
+		Param(ws.PathParameter("key", "key of user to get").DataType("string")).
+		Filter(authFilter).
+		Writes(db.User{}))
 	ws.Route(ws.POST("").To(u.create).
 		Doc("create a user").
 		Operation("createUser").
@@ -36,7 +42,7 @@ func (u UserApi) Register() {
 		Writes(UserResponse{}))
 	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
 		Doc("get a user by its properties").
-		Operation("placeholderOp").
+		Operation("getByKeyVal").
 		Param(ws.PathParameter("key", "property to look up").DataType("string")).
 		Param(ws.PathParameter("val", "value to match").DataType("string")).
 		Writes([]db.User{}))
@@ -46,13 +52,14 @@ func (u UserApi) Register() {
 
 type UserResponse struct {
 	db.User
-	Poll_count int `json:"poll_count"`
-	Vote_count int `json:"vote_count"`
+	Poll_count int            `json:"poll_count"`
+	Vote_count int            `json:"vote_count"`
+	Key        *datastore.Key `json:"key"`
 }
 
 // Serves private info such as stats
 func buildUserResponse(c appengine.Context, u *db.User, key *datastore.Key) UserResponse {
-	poll_count, err := datastore.NewQuery("Poll").Filter("Creator =", u.Username).Count(c)
+	poll_count, err := datastore.NewQuery("Poll").Filter("Creator =", key).Count(c)
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +67,7 @@ func buildUserResponse(c appengine.Context, u *db.User, key *datastore.Key) User
 	if err != nil {
 		panic(err)
 	}
-	return UserResponse{*u, poll_count, vote_count}
+	return UserResponse{*u, poll_count, vote_count, key}
 }
 
 func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
@@ -73,6 +80,24 @@ func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	} else {
 		respondError(w, 500, "something went wrong when trying to get user")
 	}
+}
+
+func (u UserApi) getByKey(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+
+	key, err := datastore.DecodeKey(r.PathParameter("key"))
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+
+	var user db.User
+	err = datastore.Get(c, key, &user)
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+	respondOne(w, user)
 }
 
 func (u UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {

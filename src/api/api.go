@@ -5,6 +5,7 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -17,7 +18,7 @@ type IApi interface {
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	apis := []IApi{UserApi{}, AuthApi{}, PollApi{}, NotificationApi{}}
+	apis := []IApi{UserApi{}, AuthApi{}, PollApi{}, NotificationApi{}, PredictionApi{}}
 	for _, api := range apis {
 		api.Register()
 	}
@@ -37,6 +38,9 @@ func respondSuccess(w *restful.Response, msg string) {
 }
 
 func respondMany(w *restful.Response, entities interface{}) {
+	if reflect.ValueOf(entities).Len() == 0 {
+		entities = []string{}
+	}
 	w.WriteEntity(entities)
 }
 

@@ -49,6 +49,11 @@ func getAuthkey() (string, error) {
 	return msg.Key, nil
 }
 
+type UserWithKey struct {
+	db.User
+	Key *datastore.Key `json:"key"`
+}
+
 func TestAuth(t *testing.T) {
 	authkey, err := getAuthkey()
 	if err != nil {
@@ -75,10 +80,25 @@ func TestAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var user db.User
+	var user UserWithKey
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		t.Error(err)
+	}
+
+	body, err = getBody("http://localhost:8080/api/0/users/"+user.Key.Encode(), authkey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var user2 db.User
+	err = json.Unmarshal(body, &user2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if user.Username != user2.Username {
+		t.Error("usernames did not match")
 	}
 }
 
