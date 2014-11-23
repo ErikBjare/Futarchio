@@ -14,22 +14,31 @@ type User struct {
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
 	Created  time.Time `json:"created"`
+	Admin    bool      `json:"-"`
 }
 
 // NewUser - Creates a new user
 func NewUser(username string, password string, name string, email string) User {
-	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), 11)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return User{
+	user := User{
 		Username: strings.ToLower(username),
-		Password: hashedPass,
 		Name:     name,
 		Email:    strings.ToLower(email),
 		Created:  time.Now(),
 	}
+
+	err := user.SetPassword(password)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return user
+}
+
+// SetPassword - Sets a new password for the given user
+func (u User) SetPassword(password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 11)
+	u.Password = hashedPassword
+	return err
 }
 
 // CheckPassword - Checks the password for a given user
