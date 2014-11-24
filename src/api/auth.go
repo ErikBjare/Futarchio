@@ -89,8 +89,9 @@ func (a AuthApi) authorizeUser(r *restful.Request, w *restful.Response) {
 				Value: []byte(userkeys[0].Encode()),
 			}
 
+			// TODO: Comment
 			if err := memcache.Add(c, item); err == memcache.ErrNotStored {
-				c.Infof("item with key %q already exists", item.Key)
+				c.Debugf("item with key %q already exists, error: "+err.Error(), item.Key)
 			} else if err != nil {
 				c.Errorf("error adding item: %v", err)
 			}
