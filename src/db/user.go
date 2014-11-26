@@ -1,6 +1,7 @@
 package db
 
 import (
+	"appengine/datastore"
 	"code.google.com/p/go.crypto/bcrypt"
 	"log"
 	"strings"
@@ -14,7 +15,10 @@ type User struct {
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
 	Created  time.Time `json:"created"`
+	// TODO: Is this an efficient way to implement following?
+	Following []*datastore.Key `json:"following"`
 	// Rank should never be accessed directly, always use getters and setters.
+	// Subject to change.
 	Rank int `json:"-"`
 }
 

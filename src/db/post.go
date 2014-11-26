@@ -3,6 +3,7 @@ package db
 import (
 	"appengine"
 	"appengine/datastore"
+	"errors"
 	"time"
 )
 
@@ -38,7 +39,7 @@ func NewPost(title, desc string, creator *datastore.Key) Post {
 // Comment is simply a basic comment, can be voted and commented on.
 // TODO: Far from done
 // How to make fetching nested comments efficient?
-// Option 1: Keep comment-able entity as parent, have parent as
+// Option 1: Keep comment-able entity as parent, keep parent _post_ key in a variable.
 // Should probably be the ancestor of a parent comment/post.
 type Comment struct {
 	UserCreated
@@ -50,29 +51,38 @@ type Comment struct {
 //
 // Maybe a decent candidate for storing entities together with their keys
 type Entity struct {
-	key *datastore.Key
+	key  *datastore.Key
+	kind string
 }
 
-func NewEntity(c *appengine.Context, kind string, parent *datastore.Key) *Entity {
-	return &Entity{key: datastore.NewIncompleteKey(*c, kind, parent)}
+func NewEntity(kind string) *Entity {
+	return &Entity{kind: kind}
 }
 
 func (e *Entity) Key() (*datastore.Key, error) {
 	return e.key, nil
 }
 
-func (e *Entity) SetKey(key *datastore.Key) {
-	e.key = key
+// Can only be set if key doesn't already exist
+func (e *Entity) NewIncompleteKey(c appengine.Context, parent *datastore.Key) error {
+	if e.key != nil {
+		return errors.New("key already in place")
+	}
+	e.key = datastore.NewIncompleteKey(c, e.kind, parent)
+	return nil
 }
 
-// Votable is a base entity for things that can be voted on
+// Can only be set if key doesn't already exist
+func (e *Entity) SetKey(key *datastore.Key) error {
+	if e.key != nil {
+		return errors.New("key already in place")
+	}
+	e.key = key
+	return nil
+}
+
+// Votable is a base entity for things that can be voted up or down reddit/HN/SE-style
 // TODO: Store votes, preventing double-voting
-// Should just use a simpler votereceipt.
-// Can 'votable' handle race-conditions?
-// Perhaps a better solution would be to simply do:
-//	q := datastore.NewQuery("PostVote").Filter("Key =", key)
-//	up := q.Filter("IsUp =", true).Count()
-//	down := q.Filter("IsUp =", false).Count()
 type Votable struct {
 	Entity
 }

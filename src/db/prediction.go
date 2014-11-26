@@ -5,18 +5,16 @@ import (
 	"appengine/datastore"
 )
 
-// Statement - Represents a statement which people can make predictions o, create with poll initializers
+// Statement - Represents a statement which people can make predictions on, create with poll initializers
 type Statement struct {
 	Post
-	// Type can be one of ["CredenceClaim"]
-	Type string `json:"type"`
 	// TODO: Finalization condition/type (time/expiry, vote, etc.)
 }
 
 // Creates a new statement.
 //
 // Should rarely be used, use specialized poll constructors instead.
-func newStatement(title, desc string, creator *datastore.Key) Statement {
+func NewStatement(title, desc string, creator *datastore.Key) Statement {
 	return Statement{
 		Post: NewPost(title, desc, creator),
 	}
@@ -37,19 +35,19 @@ func (p *Statement) Stats(c appengine.Context, claimkey *datastore.Key) map[stri
 	return map[string]float32{}
 }
 
-// NewCredenceStatement - Creates a statement where predictions are assigned a credence score by their predictors. The standard type of statement.
-// TODO: Rename to something more intuitive
-func NewCredenceStatement(title, desc string, creator *datastore.Key) Statement {
-	p := newStatement(title, desc, creator)
-	p.Type = "CredenceClaim"
-	return p
-}
-
 // A Prediction on a statement
 type Prediction struct {
-	Post
+	UserCreated
 
-	Claim *datastore.Key `json:"claimid"`
+	Statement *datastore.Key `json:"statement"`
 	// The credence assigned by the predictor, a value in the open interval (0-1)
 	Credence float32 `json:"credence"`
+}
+
+func NewPrediction(userkey *datastore.Key, stmtkey *datastore.Key, credence float32) Prediction {
+	return Prediction{
+		UserCreated: newUserCreated(userkey),
+		Statement:   stmtkey,
+		Credence:    credence,
+	}
 }

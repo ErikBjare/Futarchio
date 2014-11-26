@@ -70,7 +70,7 @@ func buildUserResponse(c appengine.Context, u *db.User, key *datastore.Key) User
 	return UserResponse{*u, poll_count, vote_count, key}
 }
 
-func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
+func (u *UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 
 	user, key := auth(c, r)
@@ -82,7 +82,7 @@ func (u UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	}
 }
 
-func (u UserApi) getByKey(r *restful.Request, w *restful.Response) {
+func (u *UserApi) getByKey(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 
 	key, err := datastore.DecodeKey(r.PathParameter("key"))
@@ -100,7 +100,7 @@ func (u UserApi) getByKey(r *restful.Request, w *restful.Response) {
 	respondOne(w, user)
 }
 
-func (u UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
+func (u *UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 	key := r.PathParameter("key")
 	val := r.PathParameter("val")
@@ -124,7 +124,7 @@ func (u UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
 	respondMany(w, result)
 }
 
-func (u UserApi) create(r *restful.Request, w *restful.Response) {
+func (u *UserApi) create(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 
 	var userreg UserRegistration
