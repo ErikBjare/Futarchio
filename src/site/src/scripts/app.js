@@ -2,44 +2,70 @@ app = angular.module('FutarchioApp', ["ngResource", "ngAnimate", "ngRoute", "ngC
 
 app.config(function($routeProvider, $locationProvider) {
   $routeProvider
-   .when('/', {
+
+  // Home
+  .when('/', {
     templateUrl: '/static/home.html',
     controller: 'HomeController',
   })
-   .when('/polls', {
+
+  // Votes and polls
+  .when('/vote', {
     templateUrl: '/static/polls.html',
     controller: 'PollsController',
   })
-   .when('/predictions', {
+  .when('/poll/:key', {
+    templateUrl: '/static/poll.html',
+    controller: 'PollController',
+  })
+
+  // Predictions and statements
+  .when('/predict', {
     templateUrl: '/static/predictions.html',
-    controller: 'PredictionsController',
+    controller: 'StatementsController',
   })
-   .when('/profile/:username', {
-    templateUrl: '/static/profile.html',
-    controller: 'ProfileController',
+  .when('/statement/:key', {
+    templateUrl: '/static/predictions.html',
+    controller: 'StatementController',
   })
-   .when('/profile', {
-    templateUrl: '/static/profile.html',
-    controller: 'ProfileController',
+  .when('/prediction/:key', {
+    templateUrl: '/static/predictions.html',
+    controller: 'PredictionController',
   })
-   .when('/admin', {
-    templateUrl: '/static/admin.html',
-    controller: 'AdminController',
+
+  // User profiles
+  .when('/profile', {
+   templateUrl: '/static/profile.html',
+   controller: 'ProfileController',
   })
-   .when('/logout', {
+  .when('/profile/:username', {
+   templateUrl: '/static/profile.html',
+   controller: 'ProfileController',
+  })
+
+  // Admin
+  .when('/admin', {
+   templateUrl: '/static/admin.html',
+   controller: 'AdminController',
+  })
+
+  // Login and logout
+  .when('/logout', {
     templateUrl: '/static/logout.html',
     controller: 'LogoutController',
   })
-   .when('/login', {
+  .when('/login', {
     templateUrl: '/static/login.html',
     controller: 'LoginController',
   })
-   .when('/signup/success', {
-       templateUrl: '/static/signup-success.html'
-   })
-   .when('/signup', {
+
+  // Registration
+  .when('/signup', {
     templateUrl: '/static/signup.html',
     controller: 'SignupController',
+  })
+  .when('/signup/success', {
+    templateUrl: '/static/signup-success.html'
   });
 
   $locationProvider.html5Mode(true);

@@ -49,14 +49,25 @@ app.controller('NewPollController', function($scope, $resource, $log, $window, P
     };
 });
 
-app.controller('PredictionsController', function($scope, $resource, $log) {
+app.controller("StatementController", function($scope, $resource, Statement, Prediction) {
+    $scope.predict = function() {
+        console.log($scope.stmt);
+        prediction = new Prediction({credence: $scope.credence});
+        prediction.$save({"key": $scope.stmt.key});
+    };
+
+    $resource("/api/0/statements/" + $scope.stmt.key + "/predictions").query(function(data) {
+        $scope.predictions = data;
+    });
+});
+
+app.controller('StatementsController', function($scope, $resource, $log, Statement) {
+    Statement.query(function(data) {
+        $scope.statements = data;
+    });
 });
 
 app.controller('PollController', function($scope, $resource, $log, Vote) {
-    $scope.choices = [{"name": "Choice 1", "value": 0}, {"name": "Choice 2", "value": 0}];
-    $scope.$broadcast('refreshSlider');
-
-
     if($scope.user.is_logged_in() && $scope.user.has_voted_on($scope.poll.id)) {
         $scope.voted = true;
     } else {

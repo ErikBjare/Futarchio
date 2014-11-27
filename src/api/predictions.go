@@ -40,22 +40,27 @@ func (p PredictionApi) Register() {
 		Produces(restful.MIME_JSON)
 	ws.Route(ws.GET("").To(p.getLatest).
 		Doc("get the latest statements").
-		Operation("getLatest").
+		Operation("latest").
 		Writes([]StatementResponse{}))
 	ws.Route(ws.POST("").To(p.createStmt).
 		Doc("create a new statement").
-		Operation("getLatest").
+		Operation("create").
 		Filter(authFilter).
 		Reads(StatementCreator{}).
 		Writes(StatementResponse{}))
 	ws.Route(ws.GET("/{key}").To(p.stmtByKey).
 		Doc("get the statement with given key").
-		Operation("getLatest").
+		Operation("getByKey").
 		Param(ws.PathParameter("key", "key of statement to fetch").DataType("string")).
 		Writes(StatementResponse{}))
+	ws.Route(ws.GET("/{key}/predictions").To(p.predsByStmt).
+		Doc("get the statement with given key").
+		Operation("getByKey").
+		Param(ws.PathParameter("key", "key of statement to fetch").DataType("string")).
+		Writes([]PredictionResponse{}))
 	ws.Route(ws.POST("/{key}/predict").To(p.predict).
 		Doc("create a prediction on statement").
-		Operation("getLatest").
+		Operation("predict").
 		Param(ws.PathParameter("key", "key of statement to fetch").DataType("string")).
 		Reads(PredictionCreator{}).
 		Writes(PredictionResponse{}))
@@ -65,12 +70,12 @@ func (p PredictionApi) Register() {
 	ws = new(restful.WebService)
 	ws.
 		Path("/api/0/predictions").
-		Doc("Statements").
+		Doc("Predictions").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 	ws.Route(ws.GET("/{key}").To(p.predByKey).
 		Doc("get the prediction with given key").
-		Operation("getLatest").
+		Operation("getByKey").
 		Writes(PredictionResponse{}))
 	restful.Add(ws)
 }
@@ -111,8 +116,30 @@ func (p *PredictionApi) createStmt(r *restful.Request, w *restful.Response) {
 	}
 
 	respondOne(w, StatementResponse{stmt, key})
-
 	// TODO: Test
+}
+
+func (p *PredictionApi) predsByStmt(r *restful.Request, w *restful.Response) {
+	c := appengine.NewContext(r.Request)
+	key, err := datastore.DecodeKey(r.PathParameter("key"))
+	if err != nil {
+		c.Errorf("%v", err)
+	}
+
+	var preds []db.Prediction
+	keys, err := datastore.NewQuery("Predictions").Filter("Statement =", key).Order("-Created").GetAll(c, &preds)
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+
+	predsresp := make([]PredictionResponse, len(preds))
+	for i := range preds {
+		predsresp[i].Prediction = preds[i]
+		predsresp[i].Key = keys[i]
+	}
+
+	respondMany(w, predsresp)
 }
 
 func (p *PredictionApi) stmtByKey(r *restful.Request, w *restful.Response) {

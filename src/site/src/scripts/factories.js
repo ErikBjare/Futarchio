@@ -8,35 +8,27 @@ app.factory('msgStack', function() {
 });
 
 app.factory('Poll', function($resource, user) {
-    var Poll = $resource("/api/0/polls", {},
+    return $resource("/api/0/polls", {},
         {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});
-    console.log(new Poll());
-    return Poll;
 });
 
-app.factory('UserKeyVal', function($log, $resource) {
-    // DEPRECATED
-    // TODO: Remove refs
-    var User = $resource('/api/0/users/:key/:val', {});
-    return function(key, val) {
-        var user = User.query(
-            {"key": key,
-                "val": val},
-                function(u) {
-                    $log.info("Successfully fetched user");
-                }, function(u) {
-                    $log.error("Error");
-                });
-        return user;
-    };
+app.factory('Vote', function($log, $resource, user) {
+    return $resource('/api/0/polls/:pollid/vote', {},
+        {"save": {method: "POST", headers: {"Authorization": user.authkey()}}});
+});
+
+app.factory('Statement', function($resource, user) {
+    return $resource("/api/0/statements", {},
+        {"save": {method: "POST", isArray: false, headers: {"Authorization": user.authkey()}}});
+});
+
+app.factory('Prediction', function($log, $resource, user) {
+    return $resource('/api/0/statements/:key/predict', {},
+        {"save": {method: "POST", headers: {"Authorization": user.authkey()}}});
 });
 
 app.factory('User', function($log, $resource) {
     return $resource('/api/0/users', {}, {});
-});
-
-app.factory('Vote', function($log, $resource, user) {
-    return $resource('/api/0/polls/:pollid/vote?api_key='+user.authkey());
 });
 
 app.factory('gravatar', function($log, $resource) {

@@ -1,4 +1,22 @@
 <div class="container">
-  <h1>Nothing here, yet</h1>
+
+  <div ng-repeat="stmt in statements" ng-controller="StatementController">
+    <h3>{{stmt.title}}</h3>
+    <div>
+      <small>Created by {{stmt.creator}}</small>
+    </div>
+    {{stmt.description}}
+
+    <div>
+      <input type="number" ng-model="credence">
+      <button class="btn btn-success" ng-click="predict()">Predict</button>
+    </div>
+
+    <div>
+      <ul>
+        <li ng-repeat="pred in predictions">{{pred.credence}} by {{pred.creator}} @ {{pred.created}}</li>
+      </ul>
+    </div>
+  </div>
   <!-- TODO: Closed beta? -->
 </div>
