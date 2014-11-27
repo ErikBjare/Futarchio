@@ -3,9 +3,16 @@ language: go
 go:
     - 1.2
 
+# Setup GAE and start Xvfb
 before_install:
     - bash ./scripts/setup_gae.sh
     - export PATH="$PATH:$(pwd)/go_appengine"
+    - sh -e /etc/init.d/xvfb start # start xvfb
+    - export DISPLAY=:99.0 # set xvfb display
+    - wget http://selenium-release.storage.googleapis.com/2.43/selenium-server-standalone-2.43.1.jar # get selenium standalone
+    - java -jar selenium-server-standalone-2.43.1.jar > /dev/null & # run selenium server
+    - pip install selenium # install python selenium package
+    - setxkbmap us # prevents python selenium from garbling special chars if xkbmap != us
 
 install:
     - cd src
@@ -20,3 +27,4 @@ before_script:
 
 script:
     - goapp test -v -cover ./src/...
+    - python -m unittest discover -s ./tests/dist -p '*.py'

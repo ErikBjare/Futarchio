@@ -3,7 +3,6 @@ package db
 import (
 	"appengine"
 	"appengine/datastore"
-	"errors"
 	"time"
 )
 
@@ -47,44 +46,9 @@ type Comment struct {
 	Text   string
 }
 
-// Entity
-//
-// Maybe a decent candidate for storing entities together with their keys
-type Entity struct {
-	key  *datastore.Key
-	kind string
-}
-
-func NewEntity(kind string) *Entity {
-	return &Entity{kind: kind}
-}
-
-func (e *Entity) Key() (*datastore.Key, error) {
-	return e.key, nil
-}
-
-// Can only be set if key doesn't already exist
-func (e *Entity) NewIncompleteKey(c appengine.Context, parent *datastore.Key) error {
-	if e.key != nil {
-		return errors.New("key already in place")
-	}
-	e.key = datastore.NewIncompleteKey(c, e.kind, parent)
-	return nil
-}
-
-// Can only be set if key doesn't already exist
-func (e *Entity) SetKey(key *datastore.Key) error {
-	if e.key != nil {
-		return errors.New("key already in place")
-	}
-	e.key = key
-	return nil
-}
-
 // Votable is a base entity for things that can be voted up or down reddit/HN/SE-style
 // TODO: Store votes, preventing double-voting
 type Votable struct {
-	Entity
 }
 
 type Votes struct {
@@ -92,11 +56,7 @@ type Votes struct {
 	Down int
 }
 
-func (v *Votable) CountVotes(c appengine.Context) (*Votes, error) {
-	key, err := v.Key()
-	if err != nil {
-		return nil, err
-	}
+func CountVotes(c appengine.Context, key *datastore.Key) (*Votes, error) {
 	q := datastore.NewQuery("PostVote").Filter("Key =", key)
 	up, err := q.Filter("IsUp =", true).Count(c)
 	if err != nil {
