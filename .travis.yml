@@ -14,6 +14,8 @@ before_install:
     - java -jar selenium-server-standalone-2.43.1.jar > /dev/null & # run selenium server
     - pip install --user selenium # install python selenium package
     - setxkbmap us # prevents python selenium from garbling special chars if xkbmap != us
+    - npm install
+    - gulp build # run gulp
 
 install:
     - cd src

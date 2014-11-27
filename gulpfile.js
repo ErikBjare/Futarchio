@@ -117,7 +117,7 @@ gulp.task('libs', function() {
     .pipe(gulp.dest(dist_path + '/stylesheets'))
     .pipe(cssFilter.restore())
 
-    // grab vendor font files from bower_components and push in /public 
+    // grab vendor font files from bower_components and push in /public
     .pipe(fontFilter)
     .pipe(flatten())
     .pipe(gulp.dest(dist_path + '/fonts'));
@@ -125,3 +125,4 @@ gulp.task('libs', function() {
 
 // The default task (called when you run `gulp` from cli)
 gulp.task('default', ['watch', 'scripts', 'images', 'stylesheets', 'html', 'robots']);
+gulp.task('build', ['scripts', 'images', 'stylesheets', 'html', 'robots']);
