@@ -29,5 +29,5 @@ before_script:
     - sleep 5 # give some time to start
 
 script:
-    - goapp test -v -cover ./src/...
-    - python -m unittest discover -s ./tests/dist -p '*.py'
+    - goapp test -v -cover ./src/...                            # Go tests
+    - python -m unittest discover -s ./tests/dist -p '*.py'     # Selenium tests

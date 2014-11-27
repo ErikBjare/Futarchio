@@ -9,13 +9,23 @@ import (
 
 type PredictionApi Api
 
-type createStatement struct {
+type StatementCreator struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
 type StatementResponse struct {
 	db.Statement
+	Key *datastore.Key `json:"key"`
+}
+
+type PredictionCreator struct {
+	Credence float32 `json:"credence"`
+}
+
+type PredictionResponse struct {
+	db.Prediction
+	Key *datastore.Key `json:"key"`
 }
 
 // TODO: More descriptive Operation("")'s
@@ -36,16 +46,19 @@ func (p PredictionApi) Register() {
 		Doc("create a new statement").
 		Operation("getLatest").
 		Filter(authFilter).
-		Reads(createStatement{}).
+		Reads(StatementCreator{}).
 		Writes(StatementResponse{}))
 	ws.Route(ws.GET("/{key}").To(p.stmtByKey).
 		Doc("get the statement with given key").
 		Operation("getLatest").
-		Writes([]StatementResponse{}))
+		Param(ws.PathParameter("key", "key of statement to fetch").DataType("string")).
+		Writes(StatementResponse{}))
 	ws.Route(ws.POST("/{key}/predict").To(p.predict).
 		Doc("create a prediction on statement").
 		Operation("getLatest").
-		Writes([]StatementResponse{}))
+		Param(ws.PathParameter("key", "key of statement to fetch").DataType("string")).
+		Reads(PredictionCreator{}).
+		Writes(PredictionResponse{}))
 	restful.Add(ws)
 
 	// Predictions
@@ -58,36 +71,46 @@ func (p PredictionApi) Register() {
 	ws.Route(ws.GET("/{key}").To(p.predByKey).
 		Doc("get the prediction with given key").
 		Operation("getLatest").
-		Writes([]StatementResponse{}))
+		Writes(PredictionResponse{}))
 	restful.Add(ws)
 }
 
 func (p *PredictionApi) getLatest(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 	var statements []db.Statement
-	datastore.NewQuery("Statement").GetAll(c, &statements)
+	keys, err := datastore.NewQuery("Statement").GetAll(c, &statements)
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
 
-	respondMany(w, statements)
+	statementresps := make([]StatementResponse, len(statements))
+	for i := range keys {
+		statementresps[i].Statement = statements[i]
+		statementresps[i].Key = keys[i]
+	}
+
+	respondMany(w, statementresps)
 }
 
 func (p *PredictionApi) createStmt(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 	_, userkey := auth(c, r)
 
-	var inputStmt createStatement
+	var inputStmt StatementCreator
 	err := r.ReadEntity(&inputStmt)
 	if err != nil {
 		c.Errorf("%v", err)
 	}
 
-	stmtkey := datastore.NewIncompleteKey(c, "Statement", nil)
+	key := datastore.NewIncompleteKey(c, "Statement", nil)
 	stmt := db.NewStatement(inputStmt.Title, inputStmt.Description, userkey)
-	_, err = datastore.Put(c, stmtkey, &stmt)
+	key, err = datastore.Put(c, key, &stmt)
 	if err != nil {
 		c.Errorf("%v", err)
 	}
 
-	respondOne(w, stmt)
+	respondOne(w, StatementResponse{stmt, key})
 
 	// TODO: Test
 }
@@ -99,7 +122,8 @@ func (p *PredictionApi) stmtByKey(r *restful.Request, w *restful.Response) {
 		c.Errorf("%v", err)
 	}
 
-	var stmt db.Statement
+	var stmt StatementResponse
+	stmt.Key = key
 	err = datastore.Get(c, key, &stmt)
 	if err != nil {
 		c.Errorf("%v", err)
@@ -115,7 +139,8 @@ func (p *PredictionApi) predByKey(r *restful.Request, w *restful.Response) {
 		c.Errorf("%v", err)
 	}
 
-	var pred db.Prediction
+	var pred PredictionResponse
+	pred.Key = key
 	err = datastore.Get(c, key, &pred)
 	if err != nil {
 		c.Errorf("%v", err)
@@ -124,23 +149,39 @@ func (p *PredictionApi) predByKey(r *restful.Request, w *restful.Response) {
 	respondOne(w, pred)
 }
 
-type credenceMsg struct {
-	Credence float32 `json:"credence"`
-}
-
 func (p *PredictionApi) predict(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
+	_, userkey := auth(c, r)
+
+	// TODO: Check so that the user hasn't already made a prediction (or should historical predictions be preserved? Probably.)
+
 	stmtkey, err := datastore.DecodeKey(r.PathParameter("key"))
 	if err != nil {
 		c.Errorf("%v", err)
 	}
 
-	var credMsg credenceMsg
-	r.ReadEntity(&credMsg)
+	var predcreator PredictionCreator
+	err = r.ReadEntity(&predcreator)
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
 
-	_, userkey := auth(c, r)
+	// Check if credence in valid range
+	if !(0 < predcreator.Credence && predcreator.Credence < 1) {
+		respondError(w, 500, "credence was not in valid range")
+		return
+	}
 
 	predkey := datastore.NewIncompleteKey(c, "Predictions", nil)
-	datastore.Put(c, predkey, db.NewPrediction(userkey, stmtkey, credMsg.Credence))
+	pred := db.NewPrediction(userkey, stmtkey, predcreator.Credence)
+	predkey, err = datastore.Put(c, predkey, &pred)
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+
+	predresp := PredictionResponse{pred, predkey}
+	respondOne(w, predresp)
 	// TODO: Tests
 }

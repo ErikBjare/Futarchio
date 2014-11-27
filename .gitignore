@@ -5,3 +5,4 @@ bower_components
 npm-debug.log
 *.iml
 .idea
+*.pyc
