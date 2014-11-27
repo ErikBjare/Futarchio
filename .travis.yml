@@ -1,5 +1,5 @@
 language: go
-sudo: true
+sudo: false # enforced for educational pack anyway, just making it clear
 
 go:
     - 1.2
@@ -12,7 +12,7 @@ before_install:
     - export DISPLAY=:99.0 # set xvfb display
     - wget http://selenium-release.storage.googleapis.com/2.43/selenium-server-standalone-2.43.1.jar # get selenium standalone
     - java -jar selenium-server-standalone-2.43.1.jar > /dev/null & # run selenium server
-    - pip install selenium # install python selenium package
+    - pip install --user selenium # install python selenium package
     - setxkbmap us # prevents python selenium from garbling special chars if xkbmap != us
 
 install:
