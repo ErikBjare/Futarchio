@@ -1,5 +1,5 @@
 application: futarchio
-version: dev
+version: production
 runtime: go
 api_version: go1
 

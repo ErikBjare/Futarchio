@@ -1,12 +1,7 @@
 indexes:
 
-- kind: User
-  ancestor: yes
+- kind: Prediction
   properties:
-  - name: username
-  - name: email
-
-- kind: Auth
-  ancestor: yes
-  properties:
-  - name: key
+  - name: Statement
+  - name: Created
+    direction: desc

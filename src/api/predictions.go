@@ -83,7 +83,7 @@ func (p PredictionApi) Register() {
 func (p *PredictionApi) getLatest(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
 	var statements []db.Statement
-	keys, err := datastore.NewQuery("Statement").GetAll(c, &statements)
+	keys, err := datastore.NewQuery("Statement").Order("-Created").GetAll(c, &statements)
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return

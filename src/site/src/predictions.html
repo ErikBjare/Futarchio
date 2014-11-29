@@ -14,14 +14,11 @@
 
   <div ng-repeat="stmt in statements" class="row" ng-controller="StatementController">
     <h3>{{stmt.title}}</h3>
-    <div>
-      <small>Created by {{stmt.creator}}</small>
-      <br>
-      <small title="{{stmt.created}}">{{stmt.created|fromNow}}</small>
-    </div>
-
     <div class=row>
       <div class="col-md-9">
+        <small>Created by {{stmt.creator}}</small>
+        <br>
+        <small title="{{stmt.created}}">{{stmt.created|fromNow}}</small>
         <br>
         <div>
           {{stmt.description}}
