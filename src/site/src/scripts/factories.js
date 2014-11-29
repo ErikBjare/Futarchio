@@ -59,11 +59,13 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
     ];
     */
 
+    // Returns true if logged in, else false
     user.is_logged_in = function() {
         val = $cookieStore.get("me") && user.authkey();
         return val ? true : false;
     };
 
+    // Getter and setter for authkey
     user.authkey = function(authkey) {
         if(authkey !== undefined) {
             $cookieStore.put("auth", authkey);
@@ -74,6 +76,7 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
         return authkey;
     };
 
+    // Attempts to log in with username and password
     user.login = function(username, password) {
         var deferred = $q.defer();
 
@@ -83,7 +86,7 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
                 user.authkey(data.key);
                 $http.get('/api/0/users/me', {"headers": {"Authorization": user.authkey()}})
                 .success(function(data) {
-                    $cookieStore.put("me", {"username": data.username, "email": data.email});
+                    $cookieStore.put("me", data);
                     deferred.resolve(data);
                 }).error(function(data) {
                     deferred.reject("error while fetching profile");
@@ -92,7 +95,7 @@ app.factory('user', function($q, $log, $http, $route, $cookieStore, $location, $
                 deferred.reject(data.error);
             });
 
-return deferred.promise;
+        return deferred.promise;
     };
 
     user.logout = function() {

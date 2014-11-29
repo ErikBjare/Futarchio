@@ -15,6 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "venturocket-angular-slider": "~0.3.2"
+    "angular": "~1.3.4",
+    "moment": "~2.8.4"
   }
 }

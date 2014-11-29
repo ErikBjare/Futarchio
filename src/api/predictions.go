@@ -127,7 +127,7 @@ func (p *PredictionApi) predsByStmt(r *restful.Request, w *restful.Response) {
 	}
 
 	var preds []db.Prediction
-	keys, err := datastore.NewQuery("Predictions").Filter("Statement =", key).Order("-Created").GetAll(c, &preds)
+	keys, err := datastore.NewQuery("Prediction").Filter("Statement =", key).Order("-Created").GetAll(c, &preds)
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return
@@ -200,7 +200,7 @@ func (p *PredictionApi) predict(r *restful.Request, w *restful.Response) {
 		return
 	}
 
-	predkey := datastore.NewIncompleteKey(c, "Predictions", nil)
+	predkey := datastore.NewIncompleteKey(c, "Prediction", nil)
 	pred := db.NewPrediction(userkey, stmtkey, predcreator.Credence)
 	predkey, err = datastore.Put(c, predkey, &pred)
 	if err != nil {

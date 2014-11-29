@@ -80,15 +80,16 @@ gulp.task('robots', [], function() {
     .pipe(gulp.dest(dist_path));
 });
 
-  // Rerun the task when a file changes
+// Rerun the task when a file changes
 gulp.task('watch', function() {
   gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.images, ['images']);
   gulp.watch(paths.stylesheets_all, ['stylesheets']);
   gulp.watch(paths.html, ['html']);
+  gulp.watch(["bower.json"], ['libs']);
 });
 
-// grab libraries files from bower_components, minify and push in /public
+// grab libraries files from bower_components, minify and send to dist
 gulp.task('libs', function() {
 
     var jsFilter = gulpFilter('*.js');
@@ -97,7 +98,7 @@ gulp.task('libs', function() {
 
     return gulp.src(mainBowerFiles())
 
-    // grab vendor js files from bower_components, minify and push in /public
+    // grab vendor js files from bower_components, minify and send to dist
     .pipe(jsFilter)
     .pipe(gulp.dest(dist_path + '/scripts'))
     .pipe(uglify())
@@ -107,7 +108,7 @@ gulp.task('libs', function() {
     .pipe(gulp.dest(dist_path + '/scripts'))
     .pipe(jsFilter.restore())
 
-    // grab vendor css files from bower_components, minify and push in /public
+    // grab vendor css files from bower_components, minify and send to dist
     .pipe(cssFilter)
     .pipe(gulp.dest(dist_path + '/stylesheets'))
     // TODO: .pipe(minifycss())
@@ -117,12 +118,12 @@ gulp.task('libs', function() {
     .pipe(gulp.dest(dist_path + '/stylesheets'))
     .pipe(cssFilter.restore())
 
-    // grab vendor font files from bower_components and push in /public
+    // grab vendor font files from bower_components and send to dist
     .pipe(fontFilter)
     .pipe(flatten())
     .pipe(gulp.dest(dist_path + '/fonts'));
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'scripts', 'images', 'stylesheets', 'html', 'robots']);
-gulp.task('build', ['scripts', 'images', 'stylesheets', 'html', 'robots']);
+gulp.task('build', ['libs', 'scripts', 'images', 'stylesheets', 'html', 'robots']);
+gulp.task('default', ['build', 'watch']);

@@ -11,7 +11,6 @@ app.controller('MainController', function($scope, $route, $rootScope, $location,
 
 app.controller('HomeController', function($scope, $log, $location, $anchorScroll) {
     $scope.gotoAbout = function() {
-        console.log("asd");
         $location.hash("about");
         $anchorScroll();
         $location.hash("");
@@ -52,12 +51,24 @@ app.controller('NewPollController', function($scope, $resource, $log, $window, P
 app.controller("StatementController", function($scope, $resource, Statement, Prediction) {
     $scope.predict = function() {
         console.log($scope.stmt);
-        prediction = new Prediction({credence: $scope.credence});
+        prediction = new Prediction({credence: $scope.credence/100});
         prediction.$save({"key": $scope.stmt.key});
     };
 
     $resource("/api/0/statements/" + $scope.stmt.key + "/predictions").query(function(data) {
         $scope.predictions = data;
+    });
+});
+
+app.controller('CreateStatementController', function($scope, $resource, $log, Statement) {
+    $scope.create = function() {
+        var stmt = new Statement({title: $scope.title, description: $scope.description});
+        stmt.$save().then(function() {
+
+        });
+    };
+    Statement.query(function(data) {
+        $scope.statements = data;
     });
 });
 
@@ -111,11 +122,9 @@ app.controller('PollController', function($scope, $resource, $log, Vote) {
     console.log($scope.poll);
 });
 
-app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, UserKeyVal) {
+app.controller('ProfileController', function($scope, $routeParams, $location, $cookieStore, gravatar, User) {
     if(!$routeParams.username) {
-        console.log("Missing username routeParam");
         me = $cookieStore.get("me");
-        console.log(me);
         if(me !== undefined) {
             console.log("Redirecting to profile");
             $location.path("/profile/"+me.username);
@@ -126,8 +135,7 @@ app.controller('ProfileController', function($scope, $routeParams, $location, $c
         return;
     }
 
-    UserKeyVal("username", $routeParams.username).$promise.then(function(payload) {
-        console.log(payload);
+    User.query({"username": $routeParams.username}).$promise.then(function(payload) {
         $scope.profile = payload[0];
         $scope.profile.gravatar_hash = gravatar.hash($scope.profile.email);
     }, function(error) {

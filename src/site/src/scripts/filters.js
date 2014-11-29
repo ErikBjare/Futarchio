@@ -7,3 +7,9 @@ app.filter('capitalize', function() {
         return "";
     };
 });
+
+app.filter('fromNow', function() {
+    return function(datetimeStr) {
+        return moment(datetimeStr).fromNow();
+    };
+});

@@ -20,17 +20,12 @@ func (u UserApi) Register() {
 		Doc("Users").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("").To(u.getByKeyVal).
+	ws.Route(ws.GET("").To(u.query).
 		Doc("get a list of all users").
 		Operation("getAll").
-		Filter(authFilter).
+		Param(ws.QueryParameter("key", "key of user to get").DataType("string")).
+		Param(ws.QueryParameter("username", "username of user to get").DataType("string")).
 		Writes([]db.User{}))
-	ws.Route(ws.GET("/{key}").To(u.getByKey).
-		Doc("get a user by key").
-		Operation("placeholderOp").
-		Param(ws.PathParameter("key", "key of user to get").DataType("string")).
-		Filter(authFilter).
-		Writes(db.User{}))
 	ws.Route(ws.POST("").To(u.create).
 		Doc("create a user").
 		Operation("createUser").
@@ -40,14 +35,15 @@ func (u UserApi) Register() {
 		Operation("getByAuth").
 		Filter(authFilter).
 		Writes(UserResponse{}))
-	ws.Route(ws.GET("/{key}/{val}").To(u.getByKeyVal).
-		Doc("get a user by its properties").
-		Operation("getByKeyVal").
-		Param(ws.PathParameter("key", "property to look up").DataType("string")).
-		Param(ws.PathParameter("val", "value to match").DataType("string")).
-		Writes([]db.User{}))
 
 	restful.Add(ws)
+}
+
+type UserRegistration struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 }
 
 type UserResponse struct {
@@ -82,46 +78,44 @@ func (u *UserApi) getByAuth(r *restful.Request, w *restful.Response) {
 	}
 }
 
-func (u *UserApi) getByKey(r *restful.Request, w *restful.Response) {
+func (u *UserApi) query(r *restful.Request, w *restful.Response) {
 	c := appengine.NewContext(r.Request)
+	keystr := r.QueryParameter("key")
+	username := r.QueryParameter("username")
 
-	key, err := datastore.DecodeKey(r.PathParameter("key"))
-	if err != nil {
-		respondError(w, 500, err.Error())
-		return
+	var users []db.User
+	if keystr != "" {
+		key, err := datastore.DecodeKey(keystr)
+		if err != nil {
+			respondError(w, 500, err.Error())
+			return
+		}
+
+		var user db.User
+		err = datastore.Get(c, key, &user)
+		if err != nil {
+			respondError(w, 500, err.Error())
+			return
+		}
+
+		users = []db.User{user}
+	} else {
+		q := datastore.NewQuery("User")
+		if username != "" {
+			q = q.Filter("Username =", username)
+		}
+		_, err := q.GetAll(c, &users)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	var user db.User
-	err = datastore.Get(c, key, &user)
-	if err != nil {
-		respondError(w, 500, err.Error())
-		return
-	}
-	respondOne(w, user)
-}
-
-func (u *UserApi) getByKeyVal(r *restful.Request, w *restful.Response) {
-	c := appengine.NewContext(r.Request)
-	key := r.PathParameter("key")
-	val := r.PathParameter("val")
-
-	q := datastore.NewQuery("User")
-	if key != "" && val != "" {
-		q = q.Filter(strings.Replace(key, key[0:1], strings.ToUpper(key[0:1]), 1)+" =", val)
-	}
-
-	result := []db.User{}
-	_, err := q.GetAll(c, &result)
-	if err != nil {
-		panic(err)
-	}
-
-	if len(result) == 0 {
+	if len(users) == 0 {
 		respondError(w, 404, "user could not be found")
 		return
 	}
 
-	respondMany(w, result)
+	respondMany(w, users)
 }
 
 func (u *UserApi) create(r *restful.Request, w *restful.Response) {
@@ -185,11 +179,4 @@ func (u *UserApi) create(r *restful.Request, w *restful.Response) {
 		respondError(w, 500, err.Error())
 	}
 	respondSuccess(w, "successfully created user")
-}
-
-type UserRegistration struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
 }

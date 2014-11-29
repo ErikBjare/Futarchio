@@ -1,22 +1,69 @@
 <div class="container">
 
-  <div ng-repeat="stmt in statements" ng-controller="StatementController">
+  <div class="row">
+    <div ng-controller="CreateStatementController" class="col-md-6 col-md-offset-3">
+      <div ng-show="error">{{error}}</div>
+      <input type="text" ng-model="title" placeholder="Statement to make predictions on" class="form-control">
+      <br>
+      <textarea ng-model="description" placeholder="Description of statement" class="form-control"></textarea>
+      <br>
+      <button ng-click="create()" class="btn btn-success center-block">Create new statement</button>
+      <hr>
+    </div>
+  </div>
+
+  <div ng-repeat="stmt in statements" class="row" ng-controller="StatementController">
     <h3>{{stmt.title}}</h3>
     <div>
       <small>Created by {{stmt.creator}}</small>
-    </div>
-    {{stmt.description}}
-
-    <div>
-      <input type="number" ng-model="credence">
-      <button class="btn btn-success" ng-click="predict()">Predict</button>
+      <br>
+      <small title="{{stmt.created}}">{{stmt.created|fromNow}}</small>
     </div>
 
-    <div>
-      <ul>
-        <li ng-repeat="pred in predictions">{{pred.credence}} by {{pred.creator}} @ {{pred.created}}</li>
-      </ul>
+    <div class=row>
+      <div class="col-md-9">
+        <br>
+        <div>
+          {{stmt.description}}
+        </div>
+
+        <br>
+        <div>
+          Predictions:
+          <div ng-show="predictions.length == 0">
+            <b>No predictions made on this statement yet, be the first!</b>
+          </div>
+          <ul>
+            <li ng-repeat="pred in predictions">
+              {{pred.credence*100}}% by {{pred.creator}} @ {{pred.created|fromNow}}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <b>Make a new prediction</b>
+        <br>
+        <br>
+        <i>I believe with...</i>
+        <div class="input-group">
+          <input type=number min=0 max=100 style="text-align: right;" ng-model=credence class="form-control">
+          <div class="input-group-addon">%</div>
+        </div>
+        <i>...certainty that this statement holds true.</i>
+        <br>
+
+        <div ng-show="credence">
+          <!-- TODO: Move to guide on how to make predictions -->
+          <br>
+          Being {{credence}}% sure is being right {{100-credence}} out of 100 times <!-- TODO: Better explained -->
+        </div>
+
+        <br>
+        <button class="btn btn-success center-block" ng-click="predict()">Predict</button>
+      </div>
     </div>
+    <hr ng-if="!$last">
   </div>
   <!-- TODO: Closed beta? -->
 </div>
