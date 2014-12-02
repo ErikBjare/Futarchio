@@ -64,18 +64,7 @@ func TestAuth(t *testing.T) {
 	// TODO: Should probably be removed once Memcache is implemented
 	time.Sleep(time.Second)
 
-	body, err := getBody("http://localhost:8080/api/0/users", authkey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var users []db.User
-	err = json.Unmarshal(body, &users)
-	if err != nil {
-		t.Error(err)
-	}
-
-	body, err = getBody("http://localhost:8080/api/0/users/me", authkey)
+	body, err := getBody("http://localhost:8080/api/0/users/me", authkey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,18 +75,18 @@ func TestAuth(t *testing.T) {
 		t.Error(err)
 	}
 
-	body, err = getBody("http://localhost:8080/api/0/users/"+user.Key.Encode(), authkey)
+	body, err = getBody("http://localhost:8080/api/0/users?key="+user.Key.Encode(), authkey)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var user2 db.User
-	err = json.Unmarshal(body, &user2)
+	var users []UserResponse
+	err = json.Unmarshal(body, &users)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if user.Username != user2.Username {
+	if user.Username != users[0].Username {
 		t.Error("usernames did not match")
 	}
 }
