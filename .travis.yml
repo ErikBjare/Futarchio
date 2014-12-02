@@ -5,7 +5,13 @@ go:
     - 1.2
 
 notifications:
-    irc: "chat.freenode.net#futarchio"
+    irc:
+        channels:
+            - "chat.freenode.net#futarchio"
+        on_success: change # default: always
+        on_failure: always # default: always
+        use_notice: true
+        skip_join: false
 
 # Setup GAE and start Xvfb
 before_install:
