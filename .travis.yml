@@ -15,7 +15,7 @@ before_install:
     - pip install --user selenium # install python selenium package
     - setxkbmap us # prevents python selenium from garbling special chars if xkbmap != us
     - npm install
-    - bower install
+    - ./node_modules/bower/bin/bower install
     - gulp build # run gulp
 
 install:
