@@ -4,6 +4,9 @@ sudo: false # enforced for educational pack anyway, just making it clear
 go:
     - 1.2
 
+notifications:
+    irc: "chat.freenode.net#futarchio"
+
 # Setup GAE and start Xvfb
 before_install:
     - bash ./scripts/setup_gae.sh
