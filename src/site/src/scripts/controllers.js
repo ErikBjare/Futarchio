@@ -63,8 +63,11 @@ app.controller("StatementController", function($scope, $resource, Statement, Pre
 app.controller('CreateStatementController', function($scope, $resource, $log, Statement) {
     $scope.create = function() {
         var stmt = new Statement({title: $scope.title, description: $scope.description});
-        stmt.$save().then(function() {
+        stmt.$save().$promise.then(function() {
 
+        }, function() {
+            $scope.error = "Failed to create statement";
+            console.log("Failed to create statement");
         });
     };
     Statement.query(function(data) {
