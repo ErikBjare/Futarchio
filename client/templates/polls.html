@@ -1,0 +1,19 @@
+<template name="polls">
+<div class=container ng-controller="PollsController">
+    <div class="col-md-6 col-md-offset-3">
+        {{> newpoll}}
+        <hr style="margin: 2em 0 2em 0;">
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+        <div ng-if="polls.length == 0">
+            <center><h3>No results</h3></center>
+        </div>
+        <div class="poll">
+          {{#each polls}}
+            {{> poll}}
+          {{/each}}
+        </div>
+    </div>
+</div>
+</template>

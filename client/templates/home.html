@@ -1,0 +1,84 @@
+<template name="home">
+<div class="jumbotron row dark" style="margin-top: -20px;">
+  <div class="container">
+    <div class="col-md-8">
+      <h1>Futarchio</h1>
+      <p>
+        <i>Predicting a better future, for most of mankind.</i>
+        <br>
+        <br>
+
+        A place where we can vote on our values and become better at predicting the future.
+      </p>
+
+      <p>
+        <br>
+        <a class="btn btn-primary btn-lg" href="#about">
+          Learn more
+        </a>
+      </p>
+    </div>
+    <div class="col-md-4 hidden-sm hidden-xs" ng-if="!user.is_logged_in()">
+      <!--ng-include src="'/static/signup-form.html'"></ng-include-->
+    </div>
+  </div>
+</div>
+
+
+<div class="container">
+  <div class="col-lg-8 col-lg-offset-2" id=about>
+    <h2>What is Futarchio?</h2>
+    Futarchio <i>[Fute - r - kio]</i> is a platform where you can vote for your values and make predictions based on your beliefs. This effectively implements the two major components in a system of government called a Futocracy, where you <i>"Vote on values, but bet beliefs"</i>. This combo has many potential uses. Prediction markets and similar platforms can be used to find out who can make the most accurate predictions, or simply be used as a tool to test your own predictions against future evidence.
+
+
+    <h3>Short introduction</h3>
+
+    <h4>Goals</h4>
+    <ol>
+      <li>To create a platform which maximizes the quantifiability of decisions and their outcomes by belief aggregation</li>
+      <li>To use that data to make better decisions</li>
+      <li>To have accountability in decisions and performance measurement in predictions</li>
+      <li>To be able to make "recommender" systems (which weight the beliefs on their performance)</li>
+    </ol>
+
+    <h4>Example usecases for goals</h4>
+    <ul>
+      <li>Autonomous agents that act upon the data (stock market bots, chess bots, controlling <a href="https://en.wikipedia.org/wiki/Decentralized_Autonomous_Organization">DACs</a></li>
+      <li>Accountability for politicians and other people in power</li>
+      <li>Credence calibration and verification</li>
+      <li>Belief reports weighted with probabilities of being true</li>
+    </ul>
+
+
+    <h3>Rewarding accurate predictions</h3>
+    In a normal prediction market, you bet money on the outcome. We are not a normal prediction market however, here we only deal with reputation and other data being indicative of a users performance. The reason for doing this is that when you are financially vested in the outcome of a prediction, you might be able to use money to manipulate the outcome and make profit. We might be wrong about the risks associated, but at this point in time we'd rather not take the risk nor do we have the resources to implement it (yet).
+
+    <h2>Usecases</h2>
+
+
+    <h3>Improving Democracy</h3>
+    An uninformed public is one of the most dangerous things in a democracy. We believe our platform to be a useful tool for every democracy in the world by doing the following:
+    <ol>
+      <li>Let people vote on their values instead of politicians.</li>
+      <li>Let people predict the outcomes of reforms and policies according to their beliefs.</li>
+      <li>Let the votes and predictions be indicators for which reforms and policies to implement.</li>
+    </ol>
+
+    <h3>Validity of studies</h3>
+    <blockquote>
+      <i>“There are many hypotheses in science which are wrong. That’s perfectly all right: it’s the aperture to finding out what’s right. Science is a self-correcting process.”</i><br>
+      - Carl Sagan
+    </blockquote>
+
+    Science is great, but many studies today fall for biases <a href="https://en.wikipedia.org/wiki/Experimenter's_bias">(here is a summary)</a> which are likely to sooner or later get revealed and the conclusion proven wrong. Prediction markets can be used to establish a consensus of whether a study or hypothesis is flawed or not, and let those who get it right be acknowledged accordingly.
+    <br>
+
+    <h3>...and beyond</h3>
+
+    Prediction markets have many uses, we challenge you to see if you can come up with any of your own. If you do, let us know by sending a mail to: [No email here yet, check back later]
+
+    <h3>Want to know more?</h3>
+    We can keep you updated if you follow us on <a href="https://twitter.com/futarchio">Twitter</a>, <a href="https://facebook.com/Futarchio">Facebook</a> and <a href="https://plus.google.com/101725812209925735885/">Google+</a>.
+  </div>
+</div>
+</template>

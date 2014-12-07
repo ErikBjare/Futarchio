@@ -1,0 +1,118 @@
+@mixin box-shadow($settings) {
+    -webkit-box-shadow: inset 2px 2px 5px;
+    box-shadow: inset 2px 2px 5px;
+}
+
+@mixin bar-gradient($from, $to) {
+    @include box-shadow(inset 2px 2px 5px);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0, $from), color-stop(1, $to));
+    background: -webkit-linear-gradient(top, $from 0, $to 100%);
+    background: -moz-linear-gradient(top, $from 0, $to 100%);
+    background: -o-linear-gradient(top, $from 0, $to 100%);
+    background: -ms-linear-gradient(top, $from 0, $to 100%);
+    background: linear-gradient(top, $from 0, $to 100%);
+}
+    
+slider {
+    display: inline-block;
+    position: relative;
+    height: 7px;
+    width: 100%;
+    margin: 25px 5px 25px 5px;
+    vertical-align: middle;
+
+    span {
+        white-space: nowrap;
+        position: absolute;
+        display: inline-block;
+    }
+
+    span.base {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+    }
+
+    span.bar {
+        @include bar_gradient(#c0c0c0, #8d8d8d);
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        -webkit-border-radius: 1em/1em;
+        border-radius: 1em/1em;
+    }
+
+    span.bar.selection {
+        width: 0%;
+        z-index: 1;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #13b6ff), color-stop(1, #00a8f3));
+        background: -webkit-linear-gradient(top, #13b6ff 0, #00a8f3 100%);
+        background: -moz-linear-gradient(top, #13b6ff 0, #00a8f3 100%);
+        background: -o-linear-gradient(top, #13b6ff 0, #00a8f3 100%);
+        background: -ms-linear-gradient(top, #13b6ff 0, #00a8f3 100%);
+        background: linear-gradient(top, #13b6ff 0, #00a8f3 100%);
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+
+    span.bar.unselected {
+        width: 0%;
+    }
+
+    span.pointer {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        top: -8px;
+        background-color: #fff;
+        border: 1px solid #000;
+        z-index: 2;
+        -webkit-border-radius: 1em/1em;
+        border-radius: 1em/1em;
+    }
+
+    span.pointer:after {
+        content: '';
+        background-color: #808080;
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        -webkit-border-radius: 1em/1em;
+        border-radius: 1em/1em;
+    }
+
+    span.pointer:hover:after {
+        background-color: #000;
+    }
+
+    span.pointer.active:after {
+        background-color: #f00;
+    }
+
+    span.bubble {
+        cursor: default;
+        top: -22px;
+        padding: 1px 3px 1px 3px;
+        font-size: 0.7em;
+        font-family: sans-serif;
+    }
+
+    span.bubble.selection {
+        top: 15px;
+    }
+
+    span.bubble.limit {
+        color: #808080;
+    }
+}
+
+
+slider.positive span.bar.selection {
+    @include bar_gradient(#0f0, #5f5);
+}
+
+slider.negative span.bar.selection {
+    @include bar_gradient(#f00, #f55);
+}

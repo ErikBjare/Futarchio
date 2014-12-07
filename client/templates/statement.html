@@ -1,0 +1,57 @@
+<template name="statement">
+<h3>{{title}}</h3>
+<div class=row>
+  <div class="col-md-9">
+    <small>Created by {{creator}}</small>
+    <br>
+    <small title="{{createdAt}}">{{fromNow createdAt}}</small>
+    <br>
+    <div>
+      {{description}}
+    </div>
+    <br>
+
+    <div>
+      {{> votebuttons}}
+    </div>
+    <br>
+
+    <br>
+    <div>
+      Predictions:
+      <ul>
+        {{#each predictions}}
+        <li>
+          {{credence}} by {{creator}}<br>
+          <small>{{fromNow createdAt}}</small>
+        </li>
+        {{else}}
+        <b><br>No predictions made on this statement yet, be the first!</b>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <b>Make a new prediction</b>
+    <br>
+    <br>
+    <i>I believe with...</i>
+    <div class="input-group">
+      <input id="credence" type=number min=0 max=100 style="text-align: right;" class="form-control">
+      <div class="input-group-addon">%</div>
+    </div>
+    <i>...certainty that this statement holds true.</i>
+    <br>
+
+    <div ng-show="credence">
+      <!-- TODO: Move to guide on how to make predictions -->
+      <br>
+      Being {{credence}}% sure is being right {{credence}}<!-- TODO: 100-cred --> out of 100 times <!-- TODO: Better explained -->
+    </div>
+
+    <br>
+    <button id="predict" class="btn btn-success center-block">Predict</button>
+  </div>
+</div>
+</template>
