@@ -1,8 +1,6 @@
 Template.polls.helpers({
     polls: function() {
-        console.log("Fetching polls");
-        polls = Polls.find({}, {sort: {createdAt: -1}});
-        return polls;
+        return Polls.find({}, {sort: {createdAt: -1}});
     }
 });
 
@@ -12,7 +10,6 @@ Template.poll.helpers({
 
 Template.statement.events({
     "click button#predict": function() {
-        console.log(this);
         Predictions.insert({
             credence: event.target.credence.value,
             createdBy: Meteor.userId()
@@ -23,9 +20,7 @@ Template.statement.events({
 
 Template.statements.helpers({
     statements: function() {
-        console.log("Fetching statements");
-        stmts = Statements.find({}, {order: {"createdAt": -1}});
-        return stmts;
+        return Statements.find({}, {sort: {"createdAt": -1}});
     },
     showAdd: function() {
         return Session.get("addStmt-visible");
@@ -40,12 +35,11 @@ Template.statements.events({
 
 Template.newpoll.events({
     "submit": function(event) {
-        Polls.insert({
+        poll = new Poll({
             title: event.target.title.value,
-            description: event.target.description.value,
-            createdBy: Meteor.userId(),
-            createdAt: new Date()
+            description: event.target.description.value
         });
+        Polls.insert(poll);
 
         event.target.title.value = "";
         event.target.description.value = "";
@@ -56,12 +50,11 @@ Template.newpoll.events({
 
 Template.newstatement.events({
     "submit": function(event) {
-        Statements.insert({
+        stmt = new Statement({
             title: event.target.title.value,
-            description: event.target.description.value,
-            createdBy: Meteor.userId(),
-            createdAt: new Date()
+            description: event.target.description.value
         });
+        Statements.insert(stmt);
 
         event.target.title.value = "";
         event.target.description.value = "";

@@ -7,8 +7,6 @@ meteor-platform
 autopublish
 insecure
 accounts-password
-accounts-facebook
-accounts-google
 mrt:bootstrap-3
 mrt:accounts-ui-bootstrap-3
 fourseven:scss
@@ -17,4 +15,3 @@ momentjs:moment
 urigo:angular
 aldeed:collection2
 mike:mocha
-
