@@ -1,0 +1,20 @@
+language: node_js
+sudo: false # enforced for educational pack anyway, just making it clear
+
+node_js:
+    - "0.11"
+
+services:
+    - mongodb
+
+notifications:
+    irc:
+        channels:
+            - "chat.freenode.net#futarchio"
+        on_success: change # default: always
+        on_failure: always # default: always
+        use_notice: true
+        skip_join: false
+
+before_install:
+    - "curl -L http://git.io/3l-rRA | /bin/sh"
