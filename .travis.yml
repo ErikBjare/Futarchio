@@ -17,4 +17,8 @@ notifications:
         skip_join: false
 
 before_install:
-    - "curl -L http://git.io/3l-rRA | /bin/sh"
+    - "git clone https://github.com/meteor/meteor.git ~/meteor"
+    - "export PATH=~/meteor:$PATH"
+
+script:
+    - "meteor --test"
