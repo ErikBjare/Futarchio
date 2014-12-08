@@ -1,10 +1,9 @@
 <template name="newpoll">
 <form>
-  <input id="title" class="form-control input-md" style="margin-bottom: 0.3em;" ng-disabled="disabled" type=text placeholder="">
+  <input id="title" class="form-control input-md" style="border-bottom-left-radius: 0; border-bottom-right-radius:0 ;" ng-disabled="disabled" type=text placeholder="Good title">
+  <textarea id="description" class="form-control input" style="border-top-left-radius: 0; border-top-right-radius: 0;" placeholder="Even better description"></textarea>
 
   <br>
-  <textarea id="description" class="form-control input" style="margin-bottom: 0.9em;" placeholder="Your good description goes here"></textarea>
-
   <div class=row>
     <div class="col-sm-6">
       <small style="text-align: center; display: block;">Voting options</small>
@@ -28,11 +27,8 @@
     <div style="margin-top: 2em">
       <br>
       <br>
-      <div class="col-xs-5 col-md-3 col-xs-offset-1 col-md-offset-3">
-        <button class="btn" style="width: 100%">Cancel</button>
-      </div>
-      <div class="col-xs-5 col-md-3">
-        <button class="btn btn-success" style="width: 100%">Submit</button>
+      <div class="col-md-4 col-md-offset-4">
+        <button id="submit" class="btn btn-success" style="width: 100%">Create new poll</button>
       </div>
     </div>
   </div>

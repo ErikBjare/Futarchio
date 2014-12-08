@@ -1,20 +1,20 @@
 <template name="statements">
 <div class="container">
   <div class="row">
-    <div class="col-md-12">
-    </div>
     <div class="col-md-6 col-md-offset-3">
       <button id="addbtn" class="btn">
         {{#if showAdd}}
-        <span class="glyphicon glyphicon-remove"></span> Cancel
+          <span class="glyphicon glyphicon-remove"></span> Cancel
         {{else}}
-        <span class="glyphicon glyphicon-plus"></span> Add
+          <span class="glyphicon glyphicon-plus"></span> New Statement
         {{/if}}
       </button>
-      {{#if showAdd}}
-      <br><br>
-        {{> newstatement}}
-      {{/if}}
+      {{#momentum plugin='slide-height'}}
+        {{#if showAdd}}
+          <br>
+          {{> newstatement}}
+        {{/if}}
+      {{/momentum}}
       <hr>
     </div>
   </div>

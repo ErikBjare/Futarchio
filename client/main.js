@@ -1,6 +1,15 @@
 Template.polls.helpers({
     polls: function() {
         return Polls.find({}, {sort: {createdAt: -1}});
+    },
+    showNewPoll: function() {
+        return Session.get("showNewPoll");
+    }
+});
+
+Template.polls.events({
+    "click #newPollBtn": function() {
+        Session.set("showNewPoll", !Session.get("showNewPoll"));
     }
 });
 
@@ -45,6 +54,10 @@ Template.newpoll.events({
         event.target.description.value = "";
 
         return false;
+    },
+    "focus #title": function(event){
+        console.log("Hi");
+        Session.set("titleIsNotEmpty", true);
     }
 });
 
