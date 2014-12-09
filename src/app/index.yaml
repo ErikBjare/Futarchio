@@ -1,7 +1,0 @@
-indexes:
-
-- kind: Prediction
-  properties:
-  - name: Statement
-  - name: Created
-    direction: desc

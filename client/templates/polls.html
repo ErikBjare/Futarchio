@@ -1,0 +1,32 @@
+<template name="polls">
+<div class=container ng-controller="PollsController">
+  <div class="col-md-6 col-md-offset-3">
+    <button id="newPollBtn" class="btn">
+      {{#if session "showNewPoll"}}
+        <span class="glyphicon glyphicon-remove"></span> Cancel
+      {{else}}
+      <span class="glyphicon glyphicon-plus"></span> New Poll
+      {{/if}}
+    </button>
+
+    {{#momentum plugin='slide-height'}}
+    {{#if session "showNewPoll"}}
+      <br>
+      {{> newpoll}}
+    {{/if}}
+    {{/momentum}}
+    <hr style="margin: 2em 0 2em 0;">
+  </div>
+
+  <div class="col-md-8 col-md-offset-2">
+    <div ng-if="polls.length == 0">
+      <center><h3>No results</h3></center>
+    </div>
+    <div class="poll">
+      {{#each polls}}
+      {{> poll}}
+      {{/each}}
+    </div>
+  </div>
+</div>
+</template>

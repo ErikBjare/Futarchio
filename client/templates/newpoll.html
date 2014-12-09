@@ -1,0 +1,36 @@
+<template name="newpoll">
+<form>
+  <input id="title" class="form-control input-md" style="border-bottom-left-radius: 0; border-bottom-right-radius:0 ;" ng-disabled="disabled" type=text placeholder="Good title">
+  <textarea id="description" class="form-control input" style="border-top-left-radius: 0; border-top-right-radius: 0;" placeholder="Even better description"></textarea>
+
+  <br>
+  <div class=row>
+    <div class="col-sm-6">
+      <small style="text-align: center; display: block;">Voting options</small>
+      <select class="form-control input-sm" ng-model="type">
+        <option value="YesNoPoll">Yes or No</option>
+        <option value="SinglechoicePoll" disabled>Single Choice</option>
+        <option value="MultichoicePoll" disabled>Multiple Choice</option>
+        <option value="WeightPoll" disabled>Weights</option>
+        <option value="RatingPoll" disabled>1 to 10</option>
+      </select>
+    </div>
+
+    <div class="col-sm-6">
+      <small style="text-align: center; display: block;">Vote privacy (Not done)</small>
+      <select disabled class="form-control input-sm">
+        <option>Anonymous</option>
+        <option>Public</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 2em">
+      <br>
+      <br>
+      <div class="col-md-4 col-md-offset-4">
+        <button id="submit" class="btn btn-success" style="width: 100%">Create new poll</button>
+      </div>
+    </div>
+  </div>
+</form>
+</template>

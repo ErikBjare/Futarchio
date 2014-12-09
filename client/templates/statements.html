@@ -1,0 +1,31 @@
+<template name="statements">
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <button id="addbtn" class="btn">
+        {{#if session "showNewStmt"}}
+          <span class="glyphicon glyphicon-remove"></span> Cancel
+        {{else}}
+          <span class="glyphicon glyphicon-plus"></span> New Statement
+        {{/if}}
+      </button>
+      {{#momentum plugin='slide-height'}}
+        {{#if session "showNewStmt"}}
+          <br>
+          {{> newstatement}}
+        {{/if}}
+      {{/momentum}}
+      <hr>
+    </div>
+  </div>
+
+  {{#each statements}}
+  <div class=row>
+    <div class="col-md-8 col-md-offset-2">
+      {{> statement}}
+      <hr>
+    </div>
+  </div>
+  {{/each}}
+</div>
+</template>
