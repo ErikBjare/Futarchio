@@ -3,7 +3,6 @@ Futarchio
 
 *Predicting a better future, for most of mankind.*
 
-[![Build Status](https://magnum.travis-ci.com/ErikBjare/Futarchio.svg?token=notW4xLUUdiMs8LZFVsB&branch=meteor)](https://magnum.travis-ci.com/ErikBjare/Futarchio) 
 [![Codeship Status for ErikBjare/Futarchio](https://codeship.com/projects/99df3fa0-60ec-0132-382e-1288075d9375/status)](https://codeship.com/projects/51705)
 
 
