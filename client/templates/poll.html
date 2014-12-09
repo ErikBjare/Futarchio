@@ -1,6 +1,6 @@
 <template name="poll">
 <div class="poll panel panel-default" ng-controller="PollController">
-  <div ng-click="poll.show = !poll.show" style="cursor: pointer">
+  <div>
     <div class="row panel-heading">
       <div class="col-md-8">
         <span class="title">{{title}}</span>
@@ -8,28 +8,34 @@
 
       <div class="col-md-4">
         <div class="metadata">
-          <b>Created by</b> <a ng-href="/profile/{{createdBy}}">{{createdBy}}</a>
+          <b>Created by</b> <a href="/profile/{{usernameOf createdBy}}">{{usernameOf createdBy}}</a>
           <br>
           <time>{{fromNow createdAt}}</time>
         </div>
       </div>
     </div>
-    <div class="panel-heading" style="background-color: #EEE; border: 0px solid #CCC; border-width: 1px 0 1px 0; padding: 2px; padding-left: 6px;">
+    <div id="showDetails" class="panel-heading" style="cursor: pointer; background-color: #EEE; border: 0px solid #CCC; border-width: 1px 0 1px 0; padding: 2px; padding-left: 6px;">
       <small>
-        <span class="glyphicon" ng-class="{'glyphicon-plus': !poll.show, 'glyphicon-minus': poll.show}" style="opacity: 0.7;"></span>
-        <span ng-if="!poll.show">
-          Show
-        </span>
-        <span ng-if="poll.show">
+        {{#if showDetails}}
+          <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
           Hide
-        </span>
+        {{else}}
+          <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
+          Show
+        {{/if}}
         details
       </small>
     </div>
   </div>
 
-  <div class="row panel-body" ng-show="poll.show">
+  {{#momentum plugin="slide-height"}}
+  {{#if showDetails}}
+  <div class="row panel-body">
     <p class="description col-md-12">{{description}}</p>
+
+    <div class="col-md-12">
+    {{> votebuttons}}
+    </div>
 
     <div ng-hide="voted" class=col-md-12>
       <hr>
@@ -38,32 +44,31 @@
         <b>Error: </b> {{capitalize error}}
       </div>
       {{/if}}
+
+      {{#if currentUser}}
+      {{else}}
       <div ng-if="!user.is_logged_in()" class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
         Only logged in users can vote
       </div>
+      {{/if}}
 
-      <!-- Different views for different votetypes -->
+      <!-- TODO: Different views for different votetypes -->
       <div ng-switch="poll.type">
         <div class="col-xs-9 col-sm-7 col-md-5 col-center">
           <div class="col-xs-6">
-            <button class="btn btn-success btn-block"
-              ng-disabled="!user.is_logged_in()"
-              ng-click="vote(true)">
+            <button class="btn btn-success btn-block">
               Yes
             </button>
           </div>
 
           <div class=col-xs-6>
-            <button class="btn btn-danger btn-block"
-              ng-disabled="!user.is_logged_in()"
-              ng-click="vote(false)">
+            <button class="btn btn-danger btn-block">
               No
             </button>
           </div>
         </div>
       </div>
     </div>
-
     <div class="col-xs-12" ng-if="!voted">
       <button class="btn btn-xs center-block" style="margin-top: 20px;" ng-click="show_results = !show_results">
         <span ng-show="!show_results">Show</span>
@@ -74,7 +79,7 @@
 
     <!-- TODO: Show results before voting (on demand) -->
     <!-- TODO: Show percentage on hover -->
-    <div ng-show="voted || show_results" class=col-md-12>
+    <div ng-show="show_results" class=col-md-12>
       <hr>
       <div ng-show="voted" class="alert alert-success well-sm">You have voted on this poll</div>
 
@@ -92,5 +97,8 @@
       </div>
     </div>
   </div>
+  {{/if}}
+  {{/momentum}}
+
 </div>
 </template>

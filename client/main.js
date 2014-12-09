@@ -1,9 +1,6 @@
 Template.polls.helpers({
     polls: function() {
         return Polls.find({}, {sort: {createdAt: -1}});
-    },
-    showNewPoll: function() {
-        return Session.get("showNewPoll");
     }
 });
 
@@ -13,32 +10,55 @@ Template.polls.events({
     }
 });
 
+Template.poll.created = function() {
+    this.data.showDetails = new ReactiveVar();
+    this.data.showDetails.set(false);
+};
+
 Template.poll.helpers({
-    error: ""
+    error: "",
+    showDetails: function() {
+        return this.showDetails.get();
+    }
+});
+
+Template.poll.events({
+    "click #showDetails": function(e, template) {
+        template.data.showDetails.set(!(template.data.showDetails.get()));
+    }
+});
+
+Template.statement.helpers({
+    predictions: function() {
+        return Predictions.find({"statement": this._id}, {sort: {"createdAt": -1}});
+    },
+    predictionsCount: function() {
+        return Predictions.find({"statement": this._id}).count();
+    }
 });
 
 Template.statement.events({
-    "click button#predict": function() {
-        Predictions.insert({
-            credence: event.target.credence.value,
-            createdBy: Meteor.userId()
+    "submit": function(event, template) {
+        console.log(event);
+        pred = new Prediction({
+            "credence": event.target.credence.value,
+            "statement": template.data._id
         });
+        Predictions.insert(pred);
         console.log("Inserted prediction");
+        return false;
     }
 });
 
 Template.statements.helpers({
     statements: function() {
         return Statements.find({}, {sort: {"createdAt": -1}});
-    },
-    showAdd: function() {
-        return Session.get("addStmt-visible");
     }
 });
 
 Template.statements.events({
     "click button#addbtn": function(event) {
-        Session.set("addStmt-visible", !Session.get("addStmt-visible"));
+        Session.set("showNewStmt", !Session.get("showNewStmt"));
     }
 });
 
@@ -54,10 +74,6 @@ Template.newpoll.events({
         event.target.description.value = "";
 
         return false;
-    },
-    "focus #title": function(event){
-        console.log("Hi");
-        Session.set("titleIsNotEmpty", true);
     }
 });
 
@@ -75,3 +91,32 @@ Template.newstatement.events({
         return false;
     }
 });
+
+Template.votebuttons.helpers({
+    score: function() {
+        upVotes = Votes.find({"post": this._id, value: 1}).count();
+        downVotes = Votes.find({"post": this._id, value: -1}).count();
+        score = upVotes - downVotes;
+        return score.toString();
+    }
+});
+
+Template.votebuttons.events({
+    "click #up": function(event, template) {
+        vote = new Vote({
+            type: "UpDown",
+            value: 1,
+            post: template.data._id
+        });
+        Votes.insert(vote);
+    },
+    "click #down": function(event, template) {
+        vote = new Vote({
+            type: "UpDown",
+            value: -1,
+            post: template.data._id
+        });
+        Votes.insert(vote);
+    }
+});
+
