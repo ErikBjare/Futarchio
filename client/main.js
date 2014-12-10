@@ -1,3 +1,14 @@
+Accounts.ui.config({
+    requestPermissions: {
+      facebook: ['user_likes'],
+      github: ['user', 'repo']
+    },
+    requestOfflineToken: {
+      google: true
+    },
+    passwordSignupFields: 'USERNAME_AND_EMAIL'
+});
+
 Template.polls.helpers({
     polls: function() {
         return Polls.find({}, {sort: {createdAt: -1}});
@@ -39,13 +50,14 @@ Template.statement.helpers({
 
 Template.statement.events({
     "submit": function(event, template) {
-        console.log(event);
         pred = new Prediction({
             "credence": event.target.credence.value,
             "statement": template.data._id
         });
         Predictions.insert(pred);
-        console.log("Inserted prediction");
+
+        event.target.credence.value = "";
+
         return false;
     }
 });
