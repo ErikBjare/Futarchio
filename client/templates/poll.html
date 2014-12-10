@@ -1,5 +1,5 @@
 <template name="poll">
-<div class="poll panel panel-default" ng-controller="PollController">
+<div class="poll panel panel-default">
   <div>
     <div class="row panel-heading">
       <div class="col-md-8">
@@ -37,7 +37,7 @@
     {{> votebuttons}}
     </div>
 
-    <div ng-hide="voted" class=col-md-12>
+    <div class=col-md-12>
       <hr>
       {{#if error}}
       <div class="alert alert-danger">
@@ -47,13 +47,13 @@
 
       {{#if currentUser}}
       {{else}}
-      <div ng-if="!user.is_logged_in()" class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
+      <div class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
         Only logged in users can vote
       </div>
       {{/if}}
 
       <!-- TODO: Different views for different votetypes -->
-      <div ng-switch="poll.type">
+      <div>
         <div class="col-xs-9 col-sm-7 col-md-5 col-center">
           <div class="col-xs-6">
             <button class="btn btn-success btn-block">
@@ -69,19 +69,23 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-12" ng-if="!voted">
-      <button class="btn btn-xs center-block" style="margin-top: 20px;" ng-click="show_results = !show_results">
-        <span ng-show="!show_results">Show</span>
-        <span ng-show="show_results">Hide</span>
+
+    <div class="col-xs-12">
+      <button id="showResults" class="btn btn-xs center-block" style="margin-top: 20px;">
+        {{#if showResults}}
+          <span>Hide</span>
+        {{else}}
+          <span>Show</span>
+        {{/if}}
         results
       </button>
     </div>
 
     <!-- TODO: Show results before voting (on demand) -->
     <!-- TODO: Show percentage on hover -->
-    <div ng-show="show_results" class=col-md-12>
+    <div class=col-md-12>
       <hr>
-      <div ng-show="voted" class="alert alert-success well-sm">You have voted on this poll</div>
+      <div class="alert alert-success well-sm">You have voted on this poll</div>
 
       <div class="progress">
         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
