@@ -31,25 +31,28 @@ def count_lines(folder, pattern):
     subprocess.call(cmd)
 
 def list_all():
-    # Site, HTML & JS
+    # HTML
     print("HTML")
-    count_lines(SRC_DIR + "/site/src", ".*\.html$")
-    print("\nJS")
-    count_lines(SRC_DIR + "/site/src", ".*\\.js$")
+    count_lines(ROOT_DIR + "client", ".*\.html$")
 
-    # Go, backend and tests
-    print("\nGo")
-    count_lines(SRC_DIR, ".*\.go$")
-    print("\nGo tests")
-    count_lines(SRC_DIR, ".*_test\.go$")
+    # JS
+    print("\nJS [lib, client, server]")
+    count_lines(ROOT_DIR + "lib", ".+\\.js$")
+    count_lines(ROOT_DIR + "server", ".+\\.js$")
+    count_lines(ROOT_DIR + "client", ".+\\.js$")
+
+    # JS Tests
+    print("\nJS Tests")
+    count_lines(ROOT_DIR + "tests", ".+\\.js")
+
 
     # Selenium tests
-    print("\nSelenium tests (Python)")
-    count_lines(ROOT_DIR + "tests/dist", ".*\.py$")
+    # print("\nSelenium tests (Python)")
+    # count_lines(ROOT_DIR + "tests", ".+\\.py$")
 
     # Misc, Wiki etc.
     print("\nWiki")
-    count_lines(ROOT_DIR + "wiki", ".*\\.md$")
+    count_lines(ROOT_DIR + "wiki", ".+\\.md$")
 
 
 if __name__ == "__main__":
