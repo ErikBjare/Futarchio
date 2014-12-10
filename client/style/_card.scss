@@ -1,0 +1,27 @@
+.card {
+    .title {
+        font-size: 18px;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .points {
+        line-height: 10px;
+        font-size: 0.8em;
+        color: gray;
+    }
+
+    .metadata {
+        font-size: 0.85em;
+        text-align: right;
+    }
+
+    .description {
+        white-space: pre-wrap;
+    }
+
+    .panel-heading {
+        padding: 6px;
+    }
+}
+

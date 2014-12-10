@@ -14,25 +14,36 @@ Template.polls.events({
     }
 });
 
-Template.poll.created = function() {
+Template.card.created = function() {
     this.data.showDetails = new ReactiveVar();
     this.data.showDetails.set(false);
 };
 
-Template.poll.helpers({
+Template.card.helpers({
     error: "",
     showDetails: function() {
         return this.showDetails.get();
+    },
+    detailsTemplate: function() {
+        return Template[Template.parentData().type + "Details"];
     }
 });
 
-Template.poll.events({
+Template.card.events({
     "click #showDetails": function(e, template) {
         template.data.showDetails.set(!(template.data.showDetails.get()));
     }
 });
 
-Template.statement.helpers({
+Template.poll.created = function() {
+    this.data.type = "poll";
+};
+
+Template.statement.created = function() {
+    this.data.type = "statement";
+};
+
+Template.statementDetails.helpers({
     predictions: function() {
         return Predictions.find({"statement": this._id}, {sort: {"createdAt": -1}});
     },
@@ -41,11 +52,13 @@ Template.statement.helpers({
     }
 });
 
-Template.statement.events({
+Template.statementDetails.events({
     "submit": function(event, template) {
+        console.log(this);
+        console.log(this.post);
         pred = new Prediction({
             "credence": event.target.credence.value,
-            "statement": template.data._id
+            "statement": this._id
         });
         Predictions.insert(pred);
 
@@ -94,15 +107,6 @@ Template.newstatement.events({
         event.target.description.value = "";
 
         return false;
-    }
-});
-
-Template.votebuttons.helpers({
-    score: function() {
-        upVotes = Votes.find({"post": this._id, value: 1}).count();
-        downVotes = Votes.find({"post": this._id, value: -1}).count();
-        score = upVotes - downVotes;
-        return score.toString();
     }
 });
 

@@ -1,35 +1,28 @@
 <template name="statement">
-<h3>{{title}}</h3>
-<div class=row>
+{{> card . details="statementDetails"}}
+</template>
+
+<template name="singleStatement">
+<!-- TODO: Remove code duplication, also in singlePoll -->
+<div class="container">
+  {{> statement}}
+</div>
+</template>
+
+<template name="statementDetails">
+<div class="row">
   <div class="col-md-9">
-    <small>Created by {{usernameOf createdBy}}</small>
-    <br>
-    <small title="{{createdAt}}">{{fromNow createdAt}}</small>
-    <br>
-    <div>
-      {{description}}
-    </div>
-    <br>
-
-    <div>
-      {{> votebuttons}}
-    </div>
-    <br>
-
-    <br>
-    <div>
-      {{predictionsCount}} Predictions:
-      <ul>
-        {{#each predictions}}
-        <li>
-          {{credence}}% by {{usernameOf createdBy}}<br>
-          <small>at {{fromNow createdAt}}</small>
-        </li>
-        {{else}}
-        <b>No predictions made on this statement yet, be the first!</b>
-        {{/each}}
-      </ul>
-    </div>
+    {{predictionsCount}} Predictions:
+    <ul>
+      {{#each predictions}}
+      <li>
+        {{credence}}% by {{> userlink userid=createdBy}}<br>
+        <small>at {{fromNow createdAt}}</small>
+      </li>
+      {{else}}
+      <b>No predictions made on this statement yet, be the first!</b>
+      {{/each}}
+    </ul>
   </div>
 
   <div class="col-md-3">

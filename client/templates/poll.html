@@ -1,108 +1,76 @@
 <template name="poll">
-<div class="poll panel panel-default">
-  <div>
-    <div class="row panel-heading">
-      <div class="col-md-8">
-        <span class="title">{{title}}</span>
-      </div>
+{{> card . details="pollDetails"}}
+</template>
 
-      <div class="col-md-4">
-        <div class="metadata">
-          <b>Created by</b> <a href="/profile/{{usernameOf createdBy}}">{{usernameOf createdBy}}</a>
-          <br>
-          <time>{{fromNow createdAt}}</time>
-        </div>
-      </div>
-    </div>
-    <div id="showDetails" class="panel-heading" style="cursor: pointer; background-color: #EEE; border: 0px solid #CCC; border-width: 1px 0 1px 0; padding: 2px; padding-left: 6px;">
-      <small>
-        {{#if showDetails}}
-          <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
-          Hide
-        {{else}}
-          <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
-          Show
-        {{/if}}
-        details
-      </small>
-    </div>
-  </div>
-
-  {{#momentum plugin="slide-height"}}
-  {{#if showDetails}}
-  <div class="row panel-body">
-    <p class="description col-md-12">{{description}}</p>
-
-    <div class="col-md-12">
-    {{> votebuttons}}
-    </div>
-
-    <div class=col-md-12>
-      <hr>
-      {{#if error}}
-      <div class="alert alert-danger">
-        <b>Error: </b> {{capitalize error}}
-      </div>
-      {{/if}}
-
-      {{#if currentUser}}
-      {{else}}
-      <div class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
-        Only logged in users can vote
-      </div>
-      {{/if}}
-
-      <!-- TODO: Different views for different votetypes -->
-      <div>
-        <div class="col-xs-9 col-sm-7 col-md-5 col-center">
-          <div class="col-xs-6">
-            <button class="btn btn-success btn-block">
-              Yes
-            </button>
-          </div>
-
-          <div class=col-xs-6>
-            <button class="btn btn-danger btn-block">
-              No
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xs-12">
-      <button id="showResults" class="btn btn-xs center-block" style="margin-top: 20px;">
-        {{#if showResults}}
-          <span>Hide</span>
-        {{else}}
-          <span>Show</span>
-        {{/if}}
-        results
-      </button>
-    </div>
-
-    <!-- TODO: Show results before voting (on demand) -->
-    <!-- TODO: Show percentage on hover -->
-    <div class=col-md-12>
-      <hr>
-      <div class="alert alert-success well-sm">You have voted on this poll</div>
-
-      <div class="progress">
-        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
-          <b>Yes</b> ({{trues}}%)
-        </div>
-        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
-          <b>No</b> ({{falses}}%)
-        </div>
-      </div>
-      <div>
-        Votes: {{votes}}<br>
-        Rating: {{rating}}
-      </div>
-    </div>
-  </div>
-  {{/if}}
-  {{/momentum}}
-
+<template name="singlePoll">
+<div class="container">
+  {{> poll}}
 </div>
+</template>
+
+<template name="pollDetails">
+{{#with poll}}
+  <div class=col-md-12>
+    {{#if error}}
+    <div class="alert alert-danger">
+      <b>Error: </b> {{capitalize error}}
+    </div>
+    {{/if}}
+
+    {{#if currentUser}}
+    {{else}}
+    <div class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
+      Only logged in users can vote
+    </div>
+    {{/if}}
+
+    <!-- TODO: Different views for different votetypes -->
+    <div>
+      <div class="col-xs-9 col-sm-7 col-md-5 col-center">
+        <div class="col-xs-6">
+          <button class="btn btn-success btn-block">
+            Yes
+          </button>
+        </div>
+
+        <div class=col-xs-6>
+          <button class="btn btn-danger btn-block">
+            No
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <button id="showResults" class="btn btn-xs center-block" style="margin-top: 20px;">
+      {{#if showResults}}
+      <span>Hide</span>
+      {{else}}
+      <span>Show</span>
+      {{/if}}
+      results
+    </button>
+  </div>
+
+  <!-- TODO: Show results before voting (on demand) -->
+  <!-- TODO: Show percentage on hover -->
+  <div class=col-md-12>
+    <hr>
+    <div class="alert alert-success well-sm">You have voted on this poll</div>
+
+    <div class="progress">
+      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{t}}" aria-valuemin="0" aria-valuemax="100" style="width: {{trues}}%">
+        <b>Yes</b> ({{trues}}%)
+      </div>
+      <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{f}}" aria-valuemin="0" aria-valuemax="100" style="width: {{falses}}%">
+        <b>No</b> ({{falses}}%)
+      </div>
+    </div>
+    <div>
+      Votes: {{votes}}<br>
+      Rating: {{rating}}
+    </div>
+  </div>
+{{/with}}
 </template>

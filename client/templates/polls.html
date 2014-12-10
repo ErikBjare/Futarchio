@@ -1,33 +1,35 @@
 <template name="polls">
 <div class=container>
-  <div class="col-md-6 col-md-offset-3">
-    <button id="newPollBtn" class="btn">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <button id="newPollBtn" class="btn">
+        {{#if session "showNewPoll"}}
+        <span class="glyphicon glyphicon-remove"></span> Cancel
+        {{else}}
+        <span class="glyphicon glyphicon-plus"></span> New Poll
+        {{/if}}
+      </button>
+
+      {{#momentum plugin='slide-height'}}
       {{#if session "showNewPoll"}}
-      <span class="glyphicon glyphicon-remove"></span> Cancel
-      {{else}}
-      <span class="glyphicon glyphicon-plus"></span> New Poll
+      <br>
+      {{> newpoll}}
       {{/if}}
-    </button>
-
-    {{#momentum plugin='slide-height'}}
-    {{#if session "showNewPoll"}}
-    <br>
-    {{> newpoll}}
-    {{/if}}
-    {{/momentum}}
-    <hr style="margin: 2em 0 2em 0;">
-  </div>
-
-  <div class="col-md-8 col-md-offset-2">
-    {{#each polls}}
-    <div class="poll">
-      {{> poll}}
+      {{/momentum}}
+      <hr>
     </div>
-    {{else}}
-    <div>
-      <center><h3>No results</h3></center>
+
+    <div class="col-md-8 col-md-offset-2">
+      {{#each polls}}
+      <div class="row">
+        {{> poll}}
+      </div>
+      {{else}}
+      <div>
+        <center><h3>No results</h3></center>
+      </div>
+      {{/each}}
     </div>
-    {{/each}}
   </div>
 </div>
 </template>

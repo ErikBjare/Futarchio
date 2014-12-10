@@ -4,8 +4,14 @@ Template.registerHelper("session", function(str) {
 
 Template.registerHelper("usernameOf", function(userid) {
     user = Meteor.users.findOne({"_id": userid});
-    if(user === undefined)
-        return "ERROR: USER NOT FOUND";
+    if(user === undefined) {
+        console.error("User " + userid + " not found");
+        return "[ERROR: USER NOT FOUND]";
+    }
+    if(user.username === undefined) {
+        console.error("User " + userid + " has no username");
+        return "?";
+    }
     return user.username;
 });
 
@@ -21,3 +27,12 @@ Template.registerHelper("fromNow", function(date) {
         return moment(date).fromNow();
     }
 });
+
+Template.registerHelper("points", function(id) {
+    console.log("Fetching points for: " + id);
+    upVotes = Votes.find({"post": id, value: 1}).count();
+    downVotes = Votes.find({"post": id, value: -1}).count();
+    points = upVotes - downVotes;
+    return points.toString();
+});
+

@@ -1,17 +1,23 @@
 <template name="profile">
-<div class=col-md-12>
-  <div class=profile>
+<div class=container>
+  <div class="row profile">
     <div class="col-xs-3">
       <div>
         <!-- TODO: Gravatar hash -->
         <img class=image width="100%" src="http://www.gravatar.com/avatar/{{gravatar_hash}}?s=300">
       </div>
       <h2>{{profile.name}}</h2>
-      <h4>@{{profile.username}}</h4>
+      <h4>@{{username}}</h4>
 
-      Username: {{profile.username}}<br>
+      Username: {{username}}<br>
+
+      {{#if profile.name}}
       Name: {{profile.name}}<br>
+      {{/if}}
+
+      {{#if profile.email}}
       Email: {{profile.email}}
+      {{/if}}
 
       <hr>
 

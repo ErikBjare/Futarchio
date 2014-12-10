@@ -19,13 +19,14 @@
     </div>
   </div>
 
-  {{#each statements}}
   <div class=row>
     <div class="col-md-8 col-md-offset-2">
-      {{> statement}}
-      <hr>
+      {{#each statements}}
+      <div class=row>
+        {{> statement}}
+      </div>
+        {{/each}}
     </div>
   </div>
-  {{/each}}
 </div>
 </template>
