@@ -30,13 +30,18 @@ if (typeof MochaWeb !== 'undefined'){
 
         describe("Models", function() {
             it("should validate", function(done) {
-                score = new Score();
-                chai.assert.isUndefined(check(score, Schemas.Score));
-
-                poll = new Poll({"title": "test", "description": "description here"});
+                var poll = new Poll({
+                     title: "test",
+                     description: "description here",
+                     type: "YesNo"
+                });
                 chai.assert.isUndefined(check(poll, Polls.simpleSchema()));
 
-                poll = new Poll({"title": 1, "description": "this poll shouldn't pass"});
+                poll = new Poll({
+                    title: 1,
+                    description: "this poll shouldn't pass",
+                    type: "YesNo"
+                });
                 try {
                     check(poll, Polls.simpleSchema());
                     chai.assert.fail();

@@ -1,8 +1,3 @@
-
-Template.statement.created = function() {
-    this.data.type = "statement";
-};
-
 Template.statementDetails.helpers({
     predictions: function() {
         return Predictions.find({"statement": this._id}, {sort: {"createdAt": -1}});
@@ -16,7 +11,7 @@ Template.statementDetails.events({
     "submit": function(event, template) {
         console.log(this);
         console.log(this.post);
-        pred = new Prediction({
+        var pred = new Prediction({
             "credence": event.target.credence.value,
             "statement": this._id
         });
@@ -42,7 +37,7 @@ Template.statements.events({
 
 Template.newstatement.events({
     "submit": function(event) {
-        stmt = new Statement({
+        var stmt = new Statement({
             title: event.target.title.value,
              description: event.target.description.value
         });

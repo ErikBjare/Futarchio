@@ -9,7 +9,7 @@
 </template>
 
 <template name="pollDetails">
-{{#with poll}}
+<div class="row">
   <div class=col-md-12>
     {{#if error}}
     <div class="alert alert-danger">
@@ -25,20 +25,46 @@
     {{/if}}
 
     <!-- TODO: Different views for different votetypes -->
-    <div>
-      <div class="col-xs-9 col-sm-7 col-md-5 col-center">
-        <div class="col-xs-6">
-          <button class="btn btn-success btn-block">
-            Yes
-          </button>
-        </div>
+    <div class="col-xs-9 col-sm-7 col-md-5 col-center">
+    </div>
 
-        <div class=col-xs-6>
-          <button class="btn btn-danger btn-block">
-            No
+    <div class="row">
+
+      {{#if eq type "YesNo"}}
+      <div class="col-xs-6 col-md-3 col-md-offset-3">
+        <button value="1" class="vote btn btn-success btn-block">
+          Yes
+        </button>
+      </div>
+      <div class="col-xs-6 col-md-3">
+        <button value="-1" class="vote btn btn-danger btn-block">
+          No
+        </button>
+      </div>
+      {{/if}}
+
+      {{#if eq type "YesNoRange"}}
+      <div class="col-xs-12">
+        <div class="btn-group center-block">
+          {{#each options}}
+          <button value="{{score}}"
+            class="vote btn
+                  {{#if class}}
+                    {{class}}
+                  {{else}}
+                    btn-default
+                  {{/if}}" style="width: 11.11%; opacity: {{opacity}}">
+            {{#if label}}
+              {{label}}
+            {{else}}
+              {{score}}
+            {{/if}}
           </button>
+          {{/each}}
         </div>
       </div>
+      {{/if}}
+
     </div>
   </div>
 
@@ -68,9 +94,26 @@
       </div>
     </div>
     <div>
-      Votes: {{votes}}<br>
+      Votes: {{length votes}}<br>
       Rating: {{rating}}
     </div>
+
+    <ul>
+      {{#each votes}}
+      <li>
+        User: {{> userlink userid=createdBy}},
+        Value:
+        {{#if eq ../type "YesNo"}}
+          {{#if eq value 1}}
+            YES
+          {{else}}
+            NO
+          {{/if}}
+        {{else}}
+          {{value}}
+        {{/if}}</li>
+      {{/each}}
+    </ul>
   </div>
-{{/with}}
+</div>
 </template>

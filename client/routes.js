@@ -58,8 +58,7 @@ Router.route('/profile/:username', function () {
     var username = params.username;
     this.render("profile", {
         data: function() {
-            user = Meteor.users.findOne({"username": username});
-            console.log(user);
+            var user = Meteor.users.findOne({"username": username});
             return user;
         }
     });

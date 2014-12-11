@@ -1,16 +1,13 @@
 Template.votebuttons.events({
-    "click #up": function(event, template) {
-        vote = new Vote({
+    "click": function(event, template) {
+        if(!_.contains(["up", "down"], event.target.id)) {
+            console.warn("invalid votebutton id: " + event.target.id);
+            return;
+        }
+
+        var vote = new Vote({
             type: "UpDown",
-            value: 1,
-            post: template.data._id
-        });
-        Votes.insert(vote);
-    },
-    "click #down": function(event, template) {
-        vote = new Vote({
-            type: "UpDown",
-            value: -1,
+            value: event.target.id ? 1 : -1,
             post: template.data._id
         });
         Votes.insert(vote);

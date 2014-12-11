@@ -2,8 +2,20 @@ Template.registerHelper("session", function(str) {
     return Session.get(str);
 });
 
+Template.registerHelper('eq', function(v1, v2, options) {
+    if(v1 == v2){
+        return true;
+    } else {
+        return false;
+    }
+});
+
+Template.registerHelper('length', function(l) {
+    return l.length;
+});
+
 Template.registerHelper("usernameOf", function(userid) {
-    user = Meteor.users.findOne({"_id": userid});
+    var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
         console.error("User " + userid + " not found");
         return "[ERROR: USER NOT FOUND]";
@@ -16,7 +28,11 @@ Template.registerHelper("usernameOf", function(userid) {
 });
 
 Template.registerHelper("capitalize", function(str) {
-    if(str !== undefined && str.length > 0) return str[0].toUpperCase() + str.substr(1);
+    if(str !== undefined && str.length > 0)
+        return str[0].toUpperCase() + str.substr(1);
+    else {
+        console.warning("capitalize function got undefined or empty string as argument");
+    }
 });
 
 Template.registerHelper("fromNow", function(date) {
@@ -29,10 +45,9 @@ Template.registerHelper("fromNow", function(date) {
 });
 
 Template.registerHelper("points", function(id) {
-    console.log("Fetching points for: " + id);
-    upVotes = Votes.find({"post": id, value: 1}).count();
-    downVotes = Votes.find({"post": id, value: -1}).count();
-    points = upVotes - downVotes;
+    var upVotes = Votes.find({"post": id, value: 1}).count();
+    var downVotes = Votes.find({"post": id, value: -1}).count();
+    var points = upVotes - downVotes;
     return points.toString();
 });
 
