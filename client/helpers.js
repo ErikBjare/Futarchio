@@ -3,7 +3,7 @@ Template.registerHelper("session", function(str) {
 });
 
 Template.registerHelper('eq', function(v1, v2, options) {
-    if(v1 == v2){
+    if(v1 === v2){
         return true;
     } else {
         return false;
@@ -28,9 +28,9 @@ Template.registerHelper("usernameOf", function(userid) {
 });
 
 Template.registerHelper("capitalize", function(str) {
-    if(str !== undefined && str.length > 0)
+    if(str !== undefined && str.length > 0) {
         return str[0].toUpperCase() + str.substr(1);
-    else {
+    } else {
         console.warning("capitalize function got undefined or empty string as argument");
     }
 });

@@ -4,7 +4,13 @@
     <div class="col-xs-3">
       <div>
         <!-- TODO: Gravatar hash -->
-        <img class=image width="100%" src="http://www.gravatar.com/avatar/{{gravatar_hash}}?s=300">
+        {{#if profile.email}}
+          <img class=image width="100%" alt="profile picture" src="{{gravatarUrl profile.email}}?s=300">
+        {{else}}
+          <!-- {{! TODO: Fix placeholder image}} -->
+          <img class=image width="100%" alt="missing profile picture" src="/favicon.png">
+          No profile picture
+        {{/if}}
       </div>
       <h2>{{profile.name}}</h2>
       <h4>@{{username}}</h4>
