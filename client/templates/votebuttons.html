@@ -1,15 +1,15 @@
 <template name="votebuttons">
-<div style="float: left;">
-  <div class="btn-group">
-    <button id="up" class="btn btn-xs btn-success">
-      <span class="glyphicon glyphicon-chevron-up"></span>
-    </button>
-    <button class="btn btn-xs" disabled>
-      <b>{{points _id}}</b>
-    </button>
-    <button id="down" class="btn btn-xs btn-danger">
-      <span class="glyphicon glyphicon-chevron-down"></span>
-    </button>
+<div class="votebuttons">
+  <div class=button>
+    <span id="up" class="glyphicon glyphicon-chevron-up"></span>
+  </div>
+
+  <div id="points">
+    0
+  </div>
+
+  <div class=button>
+    <span id="down" class="glyphicon glyphicon-chevron-down"></span>
   </div>
 </div>
 </template>

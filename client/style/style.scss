@@ -1,6 +1,7 @@
 @import 'mixins';
 @import 'login';
 @import 'card';
+@import 'votebuttons';
 @import 'slider';
 
 $footer_height: 140px;
@@ -8,6 +9,7 @@ $footer_height: 140px;
 html {
   position: relative;
   min-height: 100%;
+  overflow-y: scroll;
 }
 
 body {

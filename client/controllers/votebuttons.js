@@ -7,7 +7,7 @@ Template.votebuttons.events({
 
         var vote = new Vote({
             type: "UpDown",
-            value: event.target.id ? 1 : -1,
+            value: event.target.id == "up" ? 1 : -1,
             post: template.data._id
         });
         Votes.insert(vote);

@@ -1,0 +1,35 @@
+.votebuttons {
+    margin-right: 0.5em;
+    width: 1em;
+    text-align: center;
+
+    div {
+        padding: 0;
+    }
+
+    .button {
+        font-size: 0.75em;
+        line-height: 0.5;
+    }
+
+    #points {
+        font-size: 0.9em;
+        line-height: 1.2em;
+    }
+
+    #up, #down {
+        cursor: pointer;
+    }
+
+    #up:hover {
+        color: green;
+    }
+
+    #down:hover {
+        color: red;
+    }
+
+    #up {
+        padding-left: 1px;
+    }
+}

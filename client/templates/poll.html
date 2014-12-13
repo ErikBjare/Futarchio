@@ -17,12 +17,11 @@
     </div>
     {{/if}}
 
-    {{#if currentUser}}
-    {{else}}
+    {{#unless currentUser}}
     <div class="well-sm col-md-offset-3 col-md-6 alert alert-warning text-center">
       Only logged in users can vote
     </div>
-    {{/if}}
+    {{/unless}}
 
     <!-- TODO: Different views for different votetypes -->
     <div class="col-xs-9 col-sm-7 col-md-5 col-center">
@@ -31,14 +30,14 @@
     <div class="row">
 
       {{#if eq type "YesNo"}}
-      <div class="col-xs-6 col-md-3 col-md-offset-3">
-        <button value="1" class="vote btn btn-success btn-block">
-          Yes
+      <div class="col-xs-6 col-md-2 col-md-offset-4">
+        <button value="1" class="vote btn btn-sm btn-success btn-block">
+          <b>Yes</b>
         </button>
       </div>
-      <div class="col-xs-6 col-md-3">
-        <button value="-1" class="vote btn btn-danger btn-block">
-          No
+      <div class="col-xs-6 col-md-2">
+        <button value="-1" class="vote btn btn-sm btn-danger btn-block">
+          <b>No</b>
         </button>
       </div>
       {{/if}}
@@ -81,8 +80,10 @@
 
   <!-- TODO: Show results before voting (on demand) -->
   <!-- TODO: Show percentage on hover -->
+  {{#if showResults}}
   <div class=col-md-12>
     <hr>
+    <!-- TODO: Remove, replace with selected vote button? -->
     <div class="alert alert-success well-sm">You have voted on this poll</div>
 
     <div class="progress">
@@ -115,5 +116,7 @@
       {{/each}}
     </ul>
   </div>
+  {{/if}}
+
 </div>
 </template>

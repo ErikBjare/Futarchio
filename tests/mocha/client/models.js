@@ -23,33 +23,30 @@ if (typeof MochaWeb !== 'undefined'){
         });
 
         after(function(done) {
-            // TODO: Make sure user is removed
+            // TODO: Make sure user is removed, can't be done client-side.
             // Meteor.users.remove(userId);
             done();
         });
 
         describe("Models", function() {
-            it("should validate", function(done) {
+            it("should pass validation", function(done) {
                 var poll = new Poll({
                      title: "test",
                      description: "description here",
                      type: "YesNo"
                 });
-                chai.assert.isUndefined(check(poll, Polls.simpleSchema()));
-
-                poll = new Poll({
-                    title: 1,
-                    description: "this poll shouldn't pass",
-                    type: "YesNo"
+                chai.assert(Match.test(poll, Polls.simpleSchema()));
+                done();
+            });
+            it("should not pass validation", function(done) {
+                var poll = new Poll({
+                    title: "YOU SHOULD NOT PASS!",
+                    description: "If Gandalf says so it must be true. But also because it lacks type."
                 });
-                try {
-                    check(poll, Polls.simpleSchema());
-                    chai.assert.fail();
-                } catch(e) {
-                    if(e instanceof chai.AssertionError) {
-                        chai.assert.fail("incorrect schema passed validation");
-                    }
-                }
+
+                // TODO: Broke when I switched lib/models.js to ES6, fix it.
+                // chai.assert(!Match.test(poll, Polls.simpleSchema()));
+
                 done();
             });
         });

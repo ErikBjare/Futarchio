@@ -1,27 +1,22 @@
 .card {
-    .title {
-        font-size: 18px;
-        padding: 0px;
-        margin: 0px;
-    }
-
-    .points {
-        line-height: 10px;
-        font-size: 0.8em;
+    .panel-heading {
         color: gray;
-    }
+        padding: 6px;
 
-    .metadata {
-        font-size: 0.85em;
-        text-align: right;
+        .title {
+            font-size: 18px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .metadata {
+            line-height: 10px;
+            font-size: 0.8em;
+        }
     }
 
     .description {
         white-space: pre-wrap;
-    }
-
-    .panel-heading {
-        padding: 6px;
     }
 }
 

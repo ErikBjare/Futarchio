@@ -1,3 +1,5 @@
+// Polls
+
 Template.polls.helpers({
     polls: function() {
         return Polls.find({}, {sort: {createdAt: -1}});
@@ -9,6 +11,14 @@ Template.polls.events({
         Session.set("showNewPoll", !Session.get("showNewPoll"));
     }
 });
+
+
+// Poll details
+
+Template.pollDetails.created = function() {
+    this.data.showResults = new ReactiveVar();
+    this.data.showResults.set(false);
+};
 
 Template.pollDetails.helpers({
     options: function() {
@@ -25,11 +35,15 @@ Template.pollDetails.helpers({
         ];
     },
     votes: function() {
-        return Votes.find({post: this._id});
+        return Votes.find({post: this._id, type: this.type});
+    },
+    showResults: function() {
+        console.log(this);
+        return this.showResults.get();
     }
 });
 
-Template.poll.events({
+Template.pollDetails.events({
     "click button.vote": function(e, template) {
         var vote = new Vote({
             type: template.data.type,
@@ -38,8 +52,13 @@ Template.poll.events({
 
         });
         Votes.insert(vote);
+    },
+    "click button#showResults": function(e, template) {
+        this.showResults.set(!this.showResults.get());
     }
 });
+
+// New poll
 
 Template.newpoll.events({
     "submit": function(event) {

@@ -1,38 +1,30 @@
 <template name="card">
 <div class="row">
   <div class="card panel panel-default">
-    <div>
-      <div class="row panel-heading">
-        <div class="col-md-8">
-          <span class="title">{{title}}</span>
+    <div class="panel-heading" style="height: 3em; padding: 0.1em;">
+      <div class="pull-left">
+        {{> votebuttons}}
+      </div>
 
-          <div class="points">
-            {{points _id}} points
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="metadata">
-            <b>Created by</b> {{> userlink userid=createdBy}}
-            <br>
-            <a href="/{{type}}/{{_id}}">
-              <time title="{{createdAt}}">{{fromNow createdAt}}</time>
-            </a>
-          </div>
+      <div class="pull-left">
+        <span class="title">
+          <a href="/{{cardType}}/{{_id}}">
+            {{title}}
+          </a>
+        </span>
+        <div class="metadata">
+          Points: {{points _id}} | Created by {{> userlink userid=createdBy}} <time title="{{createdAt}}">{{fromNow createdAt}}</time>
         </div>
       </div>
-      <div id="showDetails" class="panel-heading" style="cursor: pointer; background-color: #EEE; border: 0px solid #CCC; border-width: 1px 0 1px 0; padding: 2px; padding-left: 6px;">
-        <small>
-          {{#if showDetails}}
-          <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
-          Hide
-          {{else}}
-          <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
-          Show
-          {{/if}}
-          details
-        </small>
+
+      <div id="showDetails" style="cursor: pointer;" class="pull-right">
+        {{#if showDetails}}
+        <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
+        {{else}}
+        <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
+        {{/if}}
       </div>
+
     </div>
 
     {{#momentum plugin="slide-height"}}
@@ -41,11 +33,11 @@
       <p class="description col-md-12">{{description}}</p>
 
       <div class="col-md-12">
+        <hr>
         {{> detailsTemplate}}
       </div>
 
       <div class="col-md-12">
-        {{> votebuttons}}
       </div>
     </div>
     {{/if}}
