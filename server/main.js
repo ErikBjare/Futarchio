@@ -19,7 +19,7 @@ Votes.deny({
             Votes.remove(existingVote._id);
 
             // Overwrite if vote with differing value already exists
-            if(existingVote.value != doc.value) {
+            if(existingVote.value !== doc.value) {
                 return false;
             }
 

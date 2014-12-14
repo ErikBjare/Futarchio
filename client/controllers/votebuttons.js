@@ -5,12 +5,12 @@ Template.votebuttons.helpers({
             return "";
         }
 
-        if(vote.value == 1) {
-            return upOrDown == "up" ? "color: #3F3;" : "";
-        } else if (vote.value == -1) {
-            return upOrDown == "down" ? "color: #F33;" : "";
+        if(vote.value === 1) {
+            return upOrDown === "up" ? "color: #3F3;" : "";
+        } else if (vote.value === -1) {
+            return upOrDown === "down" ? "color: #F33;" : "";
         } else {
-            console.error("Invalid vote.value");
+            console.error("Invalid vote.value: " + vote.value);
             return "";
         }
     }
@@ -25,7 +25,7 @@ Template.votebuttons.events({
 
         var vote = new Vote({
             type: "UpDown",
-            value: event.target.id == "up" ? 1 : -1,
+            value: event.target.id === "up" ? 1 : -1,
             post: template.data._id
         });
         Votes.insert(vote);
