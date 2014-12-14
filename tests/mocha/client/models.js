@@ -30,7 +30,7 @@ if (typeof MochaWeb !== 'undefined'){
 
         describe("Models", function() {
             it("should pass validation", function(done) {
-                var poll = new Poll({
+                var poll = Poll({
                      title: "test",
                      description: "description here",
                      type: "YesNo"
@@ -39,14 +39,12 @@ if (typeof MochaWeb !== 'undefined'){
                 done();
             });
             it("should not pass validation", function(done) {
-                var poll = new Poll({
-                    title: "YOU SHOULD NOT PASS!",
-                    description: "If Gandalf says so it must be true. But also because it lacks type."
+                var poll = Poll({
+                    title: "YOU SHALL NOT PASS!",
+                    description: "If Gandalf says so it must be true, but also since the type isn't allowed",
+                    type: "InvalidType"
                 });
-
-                // TODO: Broke when I switched lib/models.js to ES6, fix it.
-                // chai.assert(!Match.test(poll, Polls.simpleSchema()));
-
+                chai.assert(!Match.test(poll, Polls.simpleSchema()));
                 done();
             });
         });
