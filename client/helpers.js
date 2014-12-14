@@ -49,8 +49,8 @@ Template.registerHelper("fromNow", function(date) {
 });
 
 Template.registerHelper("points", function(id) {
-    var upVotes = Votes.find({"post": id, value: 1}).count();
-    var downVotes = Votes.find({"post": id, value: -1}).count();
+    var upVotes = Votes.find({"post": id, value: 1, type: "UpDown"}).count();
+    var downVotes = Votes.find({"post": id, value: -1, type: "UpDown"}).count();
     var points = upVotes - downVotes;
     return points.toString();
 });
