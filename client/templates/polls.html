@@ -1,7 +1,7 @@
 <template name="polls">
 <div class=container>
   <div class="row">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-8 col-md-offset-2">
       <button id="newPollBtn" class="btn">
         {{#if session "showNewPoll"}}
         <span class="glyphicon glyphicon-remove"></span> Cancel
@@ -17,9 +17,7 @@
       {{/if}}
       {{/momentum}}
       <hr>
-    </div>
 
-    <div class="col-md-8 col-md-offset-2">
       {{#each polls}}
       <div class="row">
         {{> poll}}

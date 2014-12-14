@@ -1,11 +1,11 @@
 <template name="statement">
-{{> card . details="statementDetails"}}
+{{> card .}}
 </template>
 
 <template name="singleStatement">
 <!-- TODO: Remove code duplication, also in singlePoll -->
 <div class="container">
-  {{> statement}}
+  {{> statement .}}
 </div>
 </template>
 

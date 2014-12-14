@@ -13,7 +13,7 @@ Template.card.created = function() {
 Template.card.helpers({
     error: "",
     showDetails: function() {
-        return this.showDetails.get();
+        return this.singleCard ? true : this.showDetails.get();
     },
     detailsTemplate: function() {
         return Template[this.cardType + "Details"];

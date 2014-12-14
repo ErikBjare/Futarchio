@@ -1,20 +1,24 @@
 .votebuttons {
+    margin-left: 0.4em;
+    padding-right: 0.5em;
     margin-right: 0.5em;
-    width: 1em;
     text-align: center;
+
+    border: 1px #CCC solid;
+    border-width: 0 1px 0 0;
 
     div {
         padding: 0;
     }
 
     .button {
-        font-size: 0.75em;
-        line-height: 0.5;
+        font-size: 0.9em;
+        line-height: 0.8;
     }
 
     #points {
         font-size: 0.9em;
-        line-height: 1.2em;
+        line-height: 1.0em;
     }
 
     #up, #down {

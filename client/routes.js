@@ -25,7 +25,9 @@ Router.route('/poll/:_id', function () {
     var id = params._id;
     this.render("singlePoll", {
         data: function() {
-            return Polls.findOne({"_id": id});
+            data = Polls.findOne({"_id": id});
+            data.singleCard = true;
+            return data;
         }
     });
 });
@@ -40,7 +42,9 @@ Router.route('/statement/:_id', function () {
     var id = params._id;
     this.render("singleStatement", {
         data: function() {
-            return Statements.findOne({"_id": id});
+            data = Statements.findOne({"_id": id});
+            data.singleCard = true;
+            return data;
         }
     });
 });
