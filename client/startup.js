@@ -1,5 +1,8 @@
 Meteor.startup(function() {
-    console.info("Started...");
+    Meteor.subscribe('polls');
+    Meteor.subscribe('votes');
+    Meteor.subscribe('statements');
+    Meteor.subscribe('posts');
 
     toastr.options = {
         "closeButton": true,

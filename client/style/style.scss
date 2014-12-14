@@ -3,8 +3,8 @@
 @import 'card';
 @import 'votebuttons';
 @import 'slider';
-
-$footer_height: 140px;
+@import 'footer';
+@import 'about';
 
 html {
   position: relative;
@@ -13,7 +13,6 @@ html {
 }
 
 body {
-  margin-bottom: $footer_height+20;
 }
 
 .dark {
@@ -45,17 +44,6 @@ body {
 .col-center {
   margin: 0 auto;
   float: none;
-}
-
-.footer {
-  @extend .dark-topshadow;
-  position: absolute;
-  padding-top: 20px;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: $footer_height;
-  border-top-width: 2px;
 }
 
 .profile-thumbnail {

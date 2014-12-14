@@ -11,6 +11,9 @@ Router.configure({
 Router.route('/', function() {
     this.render("home");
 });
+Router.route('/about', function() {
+    this.render("about");
+});
 
 // Votes and Polls
 Router.route('/vote', function() {

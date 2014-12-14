@@ -8,8 +8,7 @@
           <img class=image width="100%" alt="profile picture" src="{{gravatarUrl profile.email}}?s=300">
         {{else}}
           <!-- {{! TODO: Fix placeholder image}} -->
-          <img class=image width="100%" alt="missing profile picture" src="/favicon.png">
-          No profile picture
+          <i class="image fa fa-user" width="100%" style="text-align: center; font-size: 18em;"></i>
         {{/if}}
       </div>
       <h2>{{profile.name}}</h2>

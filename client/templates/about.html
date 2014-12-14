@@ -1,0 +1,37 @@
+<template name="about">
+<div id="about" class="container">
+  Nothing here, yet.
+
+  <div id="team">
+    <h3>The Team</h3>
+
+    <div class=row>
+      <div class="col-sm-4">
+        {{> memberCard name="Test" username="tester" title="Lead Tester"}}
+      </div>
+
+      <div class="col-sm-4">
+        {{> memberCard name="Test" username="tester" title="Lead Tester"}}
+      </div>
+
+      <div class="col-sm-4">
+        {{> memberCard name="Test" username="tester" title="Lead Tester"}}
+      </div>
+    </div>
+
+  </div>
+
+  <h3>On a train</h3>
+  Rise and shine, Mr. Freeman, rise and... shine.
+</div>
+</template>
+
+<template name="memberCard">
+<div class="member well">
+  {{name}}
+  <br>
+  @{{username}}
+  <br>
+  <b>{{title}}</b>
+</div>
+</template>

@@ -1,0 +1,34 @@
+.footer {
+    hr {
+        margin: 3em 0 1em 0;
+    }
+
+    .left {
+        float: left;
+    }
+
+    .right {
+        float: right;
+        font-size: 2em;
+
+        a {
+            opacity: 0.8;
+            text-decoration: none;
+
+            .fa-facebook-square {
+                color: rgb(58, 87, 149);
+            }
+
+            .fa-twitter-square {
+                color: #08F;
+            }
+
+            .fa-google-plus-square {
+                color: #F00;
+            }
+        }
+        a:hover {
+            opacity: 1;
+        }
+    }
+}
