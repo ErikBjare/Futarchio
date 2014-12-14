@@ -14,6 +14,10 @@ Template.registerHelper('length', function(l) {
     return l.length;
 });
 
+Template.registerHelper("userId", function() {
+    return Meteor.userId();
+});
+
 Template.registerHelper("usernameOf", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
