@@ -2,7 +2,7 @@ Meteor.startup(function() {
     Meteor.subscribe('polls');
     Meteor.subscribe('votes');
     Meteor.subscribe('statements');
-    Meteor.subscribe('posts');
+    Meteor.subscribe('predictions');
 
     toastr.options = {
         "closeButton": true,

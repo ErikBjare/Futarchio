@@ -9,11 +9,9 @@ Template.statementDetails.helpers({
 
 Template.statementDetails.events({
     "submit": function(event, template) {
-        console.log(this);
-        console.log(this.post);
-        var pred = new Prediction({
+        var pred = Prediction({
             "credence": event.target.credence.value,
-            "statement": this._id
+            "statement": template.data._id
         });
         Predictions.insert(pred);
 
@@ -37,7 +35,7 @@ Template.statements.events({
 
 Template.newstatement.events({
     "submit": function(event) {
-        var stmt = new Statement({
+        var stmt = Statement({
             title: event.target.title.value,
              description: event.target.description.value
         });
