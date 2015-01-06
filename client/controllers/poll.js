@@ -64,6 +64,16 @@ Template.newpoll.events({
     "submit": function(event) {
         event.preventDefault();
 
+        // Empty variable field handling
+        if (!event.target.title.value){
+            Session.set("formerror", "You cannot create a question without a title");
+            return false;
+        }
+        else if (!event.target.description.value){
+            Session.set("formerror", "You cannot create a question without a description");
+            return false;
+        }
+
         var poll = new Poll({
             title: event.target.title.value,
             description: event.target.description.value,
