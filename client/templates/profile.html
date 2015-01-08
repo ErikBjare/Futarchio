@@ -1,6 +1,7 @@
 <template name="profile">
 <div class=container>
   <div class="panel panel-body">
+  {{#if profile}}
     <div class="row profile">
       <div class="col-xs-3">
         <div>
@@ -38,6 +39,9 @@
         Sidebar here
       </div>
     </div>
+  {{else}}
+    <h2>Could not find user</h2>
+  {{/if}}
   </div>
 </div>
 </template>

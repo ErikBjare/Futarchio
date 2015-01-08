@@ -22,11 +22,11 @@ Template.registerHelper("usernameOf", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
         console.error("User " + userid + " not found");
-        return "[ERROR: USER NOT FOUND]";
+        return "Unknown";
     }
     if(user.username === undefined) {
         console.error("User " + userid + " has no username");
-        return "?";
+        return "Unnamed";
     }
     return user.username;
 });
