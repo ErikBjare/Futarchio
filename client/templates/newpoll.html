@@ -1,11 +1,16 @@
 <template name="newpoll">
     <form>
+        {{#momentum plugin='slide-height'}}
+            {{#if session "formerror"}}
+                <p id="form-error-notification" style="color: #f00; padding-left: 5px;">{{session "formerror"}}</p>
+            {{/if}}
+        {{/momentum}}
         <div class="col-md-8 col-md-offset-2">
             <input id="title" class="form-control input-md"
-                   style="border-bottom-left-radius: 0; border-bottom-right-radius:0 ;" type=text
+                   style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;" type=text
                    placeholder="What is the question?">
             <textarea id="description" class="form-control input"
-                      style="border-top-left-radius: 0; border-top-right-radius: 0;"
+                      style="border-top-left-radius: 0; border-top-right-radius: 0; resize: vertical;"
                       placeholder="Write a clear and concise description here"></textarea>
             <br>
 

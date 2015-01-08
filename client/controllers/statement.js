@@ -35,6 +35,17 @@ Template.statements.events({
 
 Template.newstatement.events({
     "submit": function(event) {
+
+        // Empty variable field handling
+        if (!event.target.title.value){
+            Session.set("formerror", "You cannot create a statement without a title");
+            return false;
+        }
+        else if (!event.target.description.value){
+            Session.set("formerror", "You cannot create a statement without a description");
+            return false;
+        }
+
         var stmt = Statement({
             title: event.target.title.value,
              description: event.target.description.value

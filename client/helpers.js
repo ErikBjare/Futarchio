@@ -1,3 +1,6 @@
+// Makes it possible for the client to find all users
+Meteor.subscribe('allUsers');
+
 Template.registerHelper("session", function(str) {
     console.warn("Deprecated");
     return Session.get(str);
@@ -19,15 +22,24 @@ Template.registerHelper("userId", function() {
     return Meteor.userId();
 });
 
+Template.registerHelper("loggedin", function() {
+    if (Meteor.user()){
+        return true;
+    }
+    else {
+        return false;
+    }
+})
+
 Template.registerHelper("usernameOf", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
         console.error("User " + userid + " not found");
-        return "[ERROR: USER NOT FOUND]";
+        return "Unknown";
     }
     if(user.username === undefined) {
         console.error("User " + userid + " has no username");
-        return "?";
+        return "Unnamed";
     }
     return user.username;
 });

@@ -27,25 +27,29 @@
                     </div>
 
                     <div class="pull-right">
-                        <button id="newPollBtn" class="btn btn-sm btn-primary">
-                            {{#if tvar "showNewPoll"}}
-                                <span class="glyphicon glyphicon-remove"></span> Cancel
-                            {{else}}
-                                <span class="glyphicon glyphicon-plus"></span> New Poll
-                            {{/if}}
-                        </button>
+                        {{#if currentUser}}
+                            <button id="newPollBtn" class="btn btn-sm btn-primary">
+                                {{#if tvar "showNewPoll"}}
+                                    <span class="glyphicon glyphicon-remove"></span> Cancel
+                                {{else}}
+                                    <span class="glyphicon glyphicon-plus"></span> New Poll
+                                {{/if}}
+                            </button>
+                        {{/if}}
                     </div>
                 </div>
             </div>
-            {{#momentum plugin='slide-height'}}
-                {{#if tvar "showNewPoll"}}
-                    <div class="panel-body">
+            {{#if currentUser}}
+                {{#momentum plugin='slide-height'}}
+                    {{#if tvar "showNewPoll"}}
                         <div class="panel-body">
-                            {{> newpoll}}
+                            <div class="panel-body">
+                                {{> newpoll}}
+                            </div>
                         </div>
-                    </div>
-                {{/if}}
-            {{/momentum}}
+                    {{/if}}
+                {{/momentum}}
+            {{/if}}
         </div>
 
 

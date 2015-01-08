@@ -1,12 +1,14 @@
 <template name="newstatement">
     <form>
-      {{#if error}}
-          <div>{{error}}</div>
-      {{/if}}
+        {{#momentum plugin='slide-height'}}
+            {{#if session "formerror"}}
+                <p id="form-error-notification" style="color: #f00; padding-left: 5px;">{{session "formerror"}}</p>
+            {{/if}}
+        {{/momentum}}
         <input id="title" type="text" placeholder="Statement to make predictions on" class="form-control"
                style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
         <textarea id="description" placeholder="Description of statement" class="form-control"
-                  style="border-top-left-radius: 0; border-top-right-radius: 0;"></textarea>
+                  style="border-top-left-radius: 0; border-top-right-radius: 0; resize: vertical;"></textarea>
         <br>
         <button class="btn btn-success center-block">Create new statement</button>
     </form>

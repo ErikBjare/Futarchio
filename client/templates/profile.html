@@ -1,43 +1,47 @@
 <template name="profile">
     <div class=container>
         <div class="panel panel-body">
-            <div class="row profile">
-                <div class="col-xs-3">
-                    <div>
-                        <!-- TODO: Gravatar hash -->
-                      {{#if profile.email}}
-                          <img class=image width="100%" alt="profile picture" src="{{gravatarUrl profile.email}}?s=300">
-                      {{else}}
-                          <!-- {{! TODO: Fix placeholder image}} -->
-                          <i class="image fa fa-user" width="100%" style="text-align: center; font-size: 18em;"></i>
-                      {{/if}}
+            {{#if profile}}
+                <div class="row profile">
+                    <div class="col-xs-3">
+                        <div>
+                            <!-- TODO: Gravatar hash -->
+                            {{#if profile.email}}
+                                <img class=image width="100%" alt="profile picture" src="{{gravatarUrl profile.email}}?s=300">
+                            {{else}}
+                                <!-- {{! TODO: Fix placeholder image}} -->
+                                <i class="image fa fa-user" width="100%" style="text-align: center; font-size: 18em;"></i>
+                            {{/if}}
+                        </div>
+                        <h2>{{profile.name}}</h2>
+                        <h4>@{{username}}</h4>
+
+                        Username: {{username}}<br>
+
+                        {{#if profile.name}}
+                            Name: {{profile.name}}<br>
+                        {{/if}}
+
+                        {{#if profile.email}}
+                            Email: {{profile.email}}
+                        {{/if}}
+
+                        <hr>
+
+                        Stats will go here!
                     </div>
-                    <h2>{{profile.name}}</h2>
-                    <h4>@{{username}}</h4>
 
-                    Username: {{username}}<br>
+                    <div class="col-xs-6">
+                        User feed will go here!
+                    </div>
 
-                  {{#if profile.name}}
-                      Name: {{profile.name}}<br>
-                  {{/if}}
-
-                  {{#if profile.email}}
-                      Email: {{profile.email}}
-                  {{/if}}
-
-                    <hr>
-
-                    Stats will go here!
+                    <div class="col-xs-3">
+                        Sidebar here
+                    </div>
                 </div>
-
-                <div class="col-xs-6">
-                    User feed will go here!
-                </div>
-
-                <div class="col-xs-3">
-                    Sidebar here
-                </div>
-            </div>
+            {{else}}
+                <h2>Could not find user</h2>
+            {{/if}}
         </div>
     </div>
 </template>
