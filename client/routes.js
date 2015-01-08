@@ -26,7 +26,11 @@ Router.route('/poll/:_id', function () {
     this.render("singlePoll", {
         data: function() {
             data = Polls.findOne({"_id": id});
+            if(data === undefined) {
+                return data;
+            }
             data.singleCard = true;
+            data.cardType = "poll";
             return data;
         }
     });
@@ -43,7 +47,11 @@ Router.route('/statement/:_id', function () {
     this.render("singleStatement", {
         data: function() {
             data = Statements.findOne({"_id": id});
+            if(data === undefined) {
+                return data;
+            }
             data.singleCard = true;
+            data.cardType = "statement";
             return data;
         }
     });

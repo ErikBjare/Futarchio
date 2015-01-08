@@ -13,7 +13,7 @@ indent_size = 4
 
 # 2 spaces for Ruby, HTML and CSS/SASS
 [*.{rb,html}]
-indent_size = 2
+indent_size = 4
 
 # 4 spaces for CSS/SCSS/SASS
 [*.{css,scss,sass}]

@@ -1,14 +1,38 @@
 // Polls
 
+var defaultOrder = "date";
+
+
+Template.polls.created = function() {
+    TemplateVar.set(this, "order", defaultOrder);
+};
+
 Template.polls.helpers({
-    polls: function() {
-        return Polls.find({}, {sort: {createdAt: -1}});
+    polls: function(order) {
+        // TODO: Sort by points & activity by publishing and subscribing to aggregations server-side
+        // https://stackoverflow.com/questions/18520567/average-aggregation-queries-in-meteor
+        // Votes.aggregate([{$match: {type: "UpDown"}}, {$group: {_id: "$post", score: {$sum: "$value"}}}]);
+
+        var orderToSort = {
+            "date": {createdAt: -1},
+            "points": {points: -1},
+            "activity": {createdAt: -1}
+        };
+        return Polls.find({}, {sort: orderToSort[order]});
+    },
+    order: function() {
+        return TemplateVar.get("order");
     }
 });
 
 Template.polls.events({
-    "click #newPollBtn": function() {
-        Session.set("showNewPoll", !Session.get("showNewPoll"));
+    "click #orderMenu": function(e, template) {
+        if(e.target.id) {
+            TemplateVar.set(template, "order", e.target.id);
+        }
+    },
+    "click #newPollBtn": function(e, template) {
+        TemplateVar.set(template, "showNewPoll", !TemplateVar.get(template, "showNewPoll"));
     }
 });
 
@@ -16,8 +40,7 @@ Template.polls.events({
 // Poll details
 
 Template.pollDetails.created = function() {
-    this.data.showResults = new ReactiveVar();
-    this.data.showResults.set(false);
+    TemplateVar.set(this, "showResults", false);
 };
 
 Template.pollDetails.helpers({
@@ -38,8 +61,7 @@ Template.pollDetails.helpers({
         return Votes.find({post: this._id, type: this.type});
     },
     showResults: function() {
-        console.log(this);
-        return this.showResults.get();
+        return TemplateVar.get("showResults");
     }
 });
 
@@ -54,7 +76,7 @@ Template.pollDetails.events({
         Votes.insert(vote);
     },
     "click button#showResults": function(e, template) {
-        this.showResults.set(!this.showResults.get());
+        TemplateVar.set(template, "showResults", !TemplateVar.get(template, "showResults"));
     }
 });
 

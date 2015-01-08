@@ -1,27 +1,28 @@
 Template.card.created = function() {
-    this.data.showDetails = new ReactiveVar();
-    this.data.showDetails.set(false);
-
     // TODO: Ugly hack, make it beautiful and safe
-    var cardType = this.view.parentView.parentView.name.split(".")[1];
+    var cardType = this.view.parentView.name.split(".")[1];
     if(Template[cardType + "Details"] === undefined) {
         console.error("Card details template '" + cardType + "Details', doesn't exist");
+    } else {
+        TemplateVar.set(this, "cardType", cardType);
     }
-    this.data.cardType = cardType;
 };
 
 Template.card.helpers({
     error: "",
     showDetails: function() {
-        return this.singleCard ? true : this.showDetails.get();
+        return this.singleCard ? true : TemplateVar.get("showDetails");
     },
     detailsTemplate: function() {
-        return Template[this.cardType + "Details"];
+        return Template[TemplateVar.get("cardType") + "Details"];
+    },
+    cardType: function() {
+        return TemplateVar.get("cardType");
     }
 });
 
 Template.card.events({
     "click #showDetails": function(e, template) {
-        template.data.showDetails.set(!(template.data.showDetails.get()));
+        TemplateVar.set(template, "showDetails", !TemplateVar.get("showDetails"));
     }
 });

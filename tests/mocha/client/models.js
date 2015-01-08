@@ -38,6 +38,7 @@ if (typeof MochaWeb !== 'undefined'){
                 chai.assert(Match.test(poll, Polls.simpleSchema()));
                 done();
             });
+
             it("should not pass validation", function(done) {
                 var poll = Poll({
                     title: "YOU SHALL NOT PASS!",

@@ -1,28 +1,22 @@
 <template name="statements">
-<div class="container">
-  <div class=row>
-    <div class="col-md-8 col-md-offset-2">
-      <button id="addbtn" class="btn">
-        {{#if session "showNewStmt"}}
-          <span class="glyphicon glyphicon-remove"></span> Cancel
-        {{else}}
-          <span class="glyphicon glyphicon-plus"></span> New Statement
-        {{/if}}
-      </button>
+    <div class="container">
+        <button id="addbtn" class="btn">
+          {{#if session "showNewStmt"}}
+              <span class="glyphicon glyphicon-remove"></span> Cancel
+          {{else}}
+              <span class="glyphicon glyphicon-plus"></span> New Statement
+          {{/if}}
+        </button>
       {{#momentum plugin='slide-height'}}
         {{#if session "showNewStmt"}}
-          <br>
+            <br>
           {{> newstatement}}
         {{/if}}
       {{/momentum}}
-      <hr>
+        <hr>
 
       {{#each statements}}
-      <div class=row>
         {{> statement}}
-      </div>
-        {{/each}}
+      {{/each}}
     </div>
-  </div>
-</div>
 </template>

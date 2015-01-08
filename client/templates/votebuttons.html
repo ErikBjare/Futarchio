@@ -1,15 +1,15 @@
 <template name="votebuttons">
-<div class="votebuttons">
-  <div class=button>
-    <span id="up" class="glyphicon glyphicon-chevron-up" style="{{votedStyle 'up'}}"></span>
-  </div>
+    <div class="votebuttons">
+        <div class=button>
+            <span id="up" class="glyphicon glyphicon-chevron-up" style="{{votedStyle 'up'}}"></span>
+        </div>
 
-  <div id="points">
-    {{points _id}}
-  </div>
+        <div id="points">
+          {{points .}}
+        </div>
 
-  <div class=button>
-    <span id="down" class="glyphicon glyphicon-chevron-down" style="{{votedStyle 'down'}}"></span>
-  </div>
-</div>
+        <div class=button>
+            <span id="down" class="glyphicon glyphicon-chevron-down" style="{{votedStyle 'down'}}"></span>
+        </div>
+    </div>
 </template>

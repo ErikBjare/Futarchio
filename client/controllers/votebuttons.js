@@ -1,16 +1,20 @@
 Template.votebuttons.helpers({
     "votedStyle": function(upOrDown) {
-        vote = Votes.findOne({post: this._id, createdBy: Meteor.userId(), type: "UpDown"});
-        if(vote === undefined) {
+        if(!Meteor.userId()) {
             return "";
         }
 
-        if(vote.value === 1) {
+        var rating = this.ratings[Meteor.userId()];
+        if(!rating) {
+            return "";
+        }
+
+        if(rating.score === 1) {
             return upOrDown === "up" ? "color: #3F3;" : "";
-        } else if (vote.value === -1) {
+        } else if (rating.score === -1) {
             return upOrDown === "down" ? "color: #F33;" : "";
         } else {
-            console.error("Invalid vote.value: " + vote.value);
+            console.error("Invalid score: " + rating.score);
             return "";
         }
     }
@@ -23,12 +27,16 @@ Template.votebuttons.events({
             return;
         }
 
-        var vote = new Vote({
-            type: "UpDown",
-            value: event.target.id === "up" ? 1 : -1,
-            post: template.data._id
-        });
-        Votes.insert(vote);
+        var collectionName = template.data.cardType[0].toUpperCase() + template.data.cardType.slice(1) + "s";
+        var collection = getCollection(collectionName);
+
+        var score = event.target.id === "up" ? 1 : -1;
+        var insert = {$set: {}};
+        insert.$set["ratings."+Meteor.userId()] = new Rating(score);
+        var n = collection.update(template.data._id, insert);
+        if(n != 1) {
+            console.warn("Updated " + n + " " + collectionName);
+        }
     }
 });
 

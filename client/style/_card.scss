@@ -1,4 +1,12 @@
 .card {
+    font-size: 125%;
+
+    .panel {
+        border-radius: 0;
+        margin: -1px 0 0 0;
+
+    }
+
     .panel-heading {
         background-color: white;
         color: gray;

@@ -1,50 +1,65 @@
 <template name="card">
-<div class="row">
-  <div class="card panel panel-default">
-    <div class="panel-heading" style="height: 3em; padding: 0.1em;">
-      <div class="pull-left">
-        {{> votebuttons}}
-      </div>
+    <div class="card">
+        {{#momentum plugin="slide-height"}}
+            {{#if showDetails}}
+                <div style="margin-top: 1em;"></div>
+            {{/if}}
+        {{/momentum}}
 
-      <div class="pull-left">
-        <span class="title">
-          <a href="/{{cardType}}/{{_id}}">
-            {{title}}
-          </a>
-        </span>
-        <div class="metadata">
-          Points: {{points _id}} | Created by {{> userlink userid=createdBy}} <time title="{{createdAt}}">{{fromNow createdAt}}</time>
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 3em; padding: 0.1em;">
+                <div class="pull-left">
+                    {{> votebuttons}}
+                </div>
+
+                <div class="pull-left">
+                <span class="title">
+                  <a href="/{{cardType}}/{{_id}}">
+                      {{title}}
+                  </a>
+                </span>
+
+                    <div class="metadata">
+                        Points: {{points this}} | Created by {{> userlink userid=createdBy}}
+                        <time title="{{createdAt}}">{{fromNow createdAt}}</time>
+                    </div>
+                </div>
+
+                {{#unless singleCard}}
+                    <div id="showDetails" style="cursor: pointer; font-size: 1.5em; margin: 0.25em;" class="pull-right">
+                        {{#if showDetails}}
+                            <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
+                        {{else}}
+                            <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
+                        {{/if}}
+                    </div>
+                {{/unless}}
+            </div>
         </div>
-      </div>
 
-      {{#unless singleCard}}
-      <div id="showDetails" style="cursor: pointer; font-size: 1.5em; margin: 0.25em;" class="pull-right">
-        {{#if showDetails}}
-        <span class="glyphicon glyphicon-minus" style="opacity: 0.7;"></span>
-        {{else}}
-        <span class="glyphicon glyphicon-plus" style="opacity: 0.7;"></span>
-        {{/if}}
-      </div>
-      {{/unless}}
 
-    </div>
+        {{#momentum plugin="slide-height"}}
+            {{#if showDetails}}
+                <div class="panel" style="margin-left: 2em;">
+                    <div class="row panel-body">
+                        <p class="description col-md-12">{{description}}</p>
+
+                        <div class="col-md-12">
+                            <hr>
+                            {{> detailsTemplate}}
+                        </div>
+
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+        {{/momentum}}
 
     {{#momentum plugin="slide-height"}}
-    {{#if showDetails}}
-    <div class="row panel-body">
-      <p class="description col-md-12">{{description}}</p>
-
-      <div class="col-md-12">
-        <hr>
-        {{> detailsTemplate}}
-      </div>
-
-      <div class="col-md-12">
-      </div>
-    </div>
-    {{/if}}
+        {{#if showDetails}}
+            <div style="margin-top: 1em;"></div>
+        {{/if}}
     {{/momentum}}
-
-  </div>
-</div>
+    </div>
 </template>

@@ -1,45 +1,50 @@
 <template name="statement">
-{{> card .}}
+  {{> card}}
 </template>
 
 <template name="singleStatement">
-<!-- TODO: Remove code duplication, also in singlePoll -->
-<div class="container">
-  {{> statement .}}
-</div>
+    <!-- TODO: Remove code duplication, also in singlePoll -->
+    {{#if .}}
+        <div class="container">
+            {{> statement}}
+        </div>
+    {{/if}}
 </template>
 
 <template name="statementDetails">
-<div class="row">
-  <div class="col-md-9">
-    {{predictionsCount}} Predictions:
-    <ul>
-      {{#each predictions}}
-      <li>
-        {{credence}}% by {{> userlink userid=createdBy}}<br>
-        <small>at {{fromNow createdAt}}</small>
-      </li>
-      {{else}}
-      <b>No predictions made on this statement yet, be the first!</b>
-      {{/each}}
-    </ul>
-  </div>
+    <div class="row">
+        <div class="col-md-9">
+          {{predictionsCount}} Predictions:
+            <ul>
+              {{#each predictions}}
+                  <li>
+                    {{credence}}% by {{> userlink userid=createdBy}}<br>
+                      <small>at {{fromNow createdAt}}</small>
+                  </li>
+              {{else}}
+                  <b>No predictions made on this statement yet, be the first!</b>
+              {{/each}}
+            </ul>
+        </div>
 
-  <div class="col-md-3">
-    <form id="predict">
-      <b>Make a new prediction</b>
-      <br>
-      <i>I believe with...</i>
-      <div class="input-group">
-        <input id="credence" type=number min=0 max=100 style="text-align: right;" class="form-control input-sm">
-        <div class="input-group-addon input-sm">%</div>
-      </div>
-      <i>...certainty that this statement holds true.</i>
-      <br>
+        <div class="col-md-3">
+            <form id="predict">
+                <b>Make a new prediction</b>
+                <br>
+                <i>I believe with...</i>
 
-      <br>
-      <button class="btn btn-success center-block">Predict</button>
-    </form>
-  </div>
-</div>
+                <div class="input-group">
+                    <input id="credence" type=number min=0 max=100 style="text-align: right;"
+                           class="form-control input-sm">
+
+                    <div class="input-group-addon input-sm">%</div>
+                </div>
+                <i>...certainty that this statement holds true.</i>
+                <br>
+
+                <br>
+                <button class="btn btn-success center-block">Predict</button>
+            </form>
+        </div>
+    </div>
 </template>
