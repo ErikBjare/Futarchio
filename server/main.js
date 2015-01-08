@@ -6,6 +6,17 @@ Meteor.startup(function() {
     Meteor.publish('predictions', function() { return Predictions.find(); });
 });
 
+// Allows people to see user information about others than themselves
+Meteor.publish("allUsers", function () {
+    return Meteor.users.find({}, {
+        fields: {
+            '_id': 1,
+            'profile': 1,
+            'emails': 1,
+            'username': 1
+    }});
+});
+
 Votes.deny({
     "insert": function(userId, doc) {
         // TODO: This method for deleting existing votes is nasty,

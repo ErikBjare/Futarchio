@@ -2,6 +2,7 @@
 <div class=container>
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
+      {{#if loggedin}}
       <button id="newPollBtn" class="btn">
         {{#if session "showNewPoll"}}
         <span class="glyphicon glyphicon-remove"></span> Cancel
@@ -17,6 +18,7 @@
       {{/if}}
       {{/momentum}}
       <hr>
+      {{/if}}
 
       {{#each polls}}
       <div class="row">

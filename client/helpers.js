@@ -1,3 +1,6 @@
+// Makes it possible for the client to find all users
+Meteor.subscribe('allUsers');
+
 Template.registerHelper("session", function(str) {
     return Session.get(str);
 });
@@ -17,6 +20,15 @@ Template.registerHelper('length', function(l) {
 Template.registerHelper("userId", function() {
     return Meteor.userId();
 });
+
+Template.registerHelper("loggedin", function() {
+    if (Meteor.user()){
+        return true;
+    }
+    else {
+        return false;
+    }
+})
 
 Template.registerHelper("usernameOf", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
