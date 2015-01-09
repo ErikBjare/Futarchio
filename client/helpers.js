@@ -22,15 +22,6 @@ Template.registerHelper("userId", function() {
     return Meteor.userId();
 });
 
-Template.registerHelper("loggedin", function() {
-    if (Meteor.user()){
-        return true;
-    }
-    else {
-        return false;
-    }
-})
-
 Template.registerHelper("usernameOf", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
