@@ -23,7 +23,11 @@ Template.statementDetails.events({
 
 Template.statements.helpers({
     statements: function() {
-        return Statements.find({}, {sort: {"createdAt": -1}});
+        statements = Statements.find({}, {sort: {"createdAt": -1}}).fetch();
+        statements = _.map(statements, function(obj) {
+            return _.extend(obj, {"cardType": "statement"});
+        });
+        return statements;
     }
 });
 

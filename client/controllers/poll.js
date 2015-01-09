@@ -18,7 +18,11 @@ Template.polls.helpers({
             "points": {points: -1},
             "activity": {createdAt: -1}
         };
-        return Polls.find({}, {sort: orderToSort[order]});
+        polls = Polls.find({}, {sort: orderToSort[order]}).fetch();
+        polls = _.map(polls, function(obj) {
+            return _.extend(obj, {"cardType": "poll"});
+        });
+        return polls;
     },
     order: function() {
         return TemplateVar.get("order");

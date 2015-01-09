@@ -31,8 +31,17 @@ Template.votebuttons.events({
         var collection = getCollection(collectionName);
 
         var score = event.target.id === "up" ? 1 : -1;
-        var insert = {$set: {}};
-        insert.$set["ratings."+Meteor.userId()] = new Rating(score);
+
+        var insert;
+        if(template.data.ratings[Meteor.userId()] !== undefined &&
+            template.data.ratings[Meteor.userId()].score === score) {
+            insert = {$unset: {}};
+            insert.$unset["ratings."+Meteor.userId()] = "";
+        } else {
+            insert = {$set: {}};
+            insert.$set["ratings."+Meteor.userId()] = new Rating(score);
+        }
+
         var n = collection.update(template.data._id, insert);
         if(n != 1) {
             console.warn("Updated " + n + " " + collectionName);
