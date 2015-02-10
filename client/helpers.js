@@ -22,7 +22,7 @@ Template.registerHelper("userId", function() {
     return Meteor.userId();
 });
 
-Template.registerHelper("usernameOf", function(userid) {
+Template.registerHelper("usernameById", function(userid) {
     var user = Meteor.users.findOne({"_id": userid});
     if(user === undefined) {
         console.error("User " + userid + " not found");

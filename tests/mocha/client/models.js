@@ -30,22 +30,26 @@ if (typeof MochaWeb !== 'undefined'){
 
         describe("Models", function() {
             it("should pass validation", function(done) {
-                var poll = Poll({
+                var stmt = Statement({
                      title: "test",
-                     description: "description here",
-                     type: "YesNo"
+                     description: "description here"
                 });
-                chai.assert(Match.test(poll, Polls.simpleSchema()));
+                chai.assert(Match.test(stmt, Statements.simpleSchema()));
                 done();
+
             });
 
             it("should not pass validation", function(done) {
-                var poll = Poll({
-                    title: "YOU SHALL NOT PASS!",
-                    description: "If Gandalf says so it must be true, but also since the type isn't allowed",
-                    type: "InvalidType"
+                var stmt = Statement({
+                    description: "This won't pass validation because it misses a title"
                 });
-                chai.assert(!Match.test(poll, Polls.simpleSchema()));
+                chai.assert(!Match.test(stmt, Statements.simpleSchema()));
+
+                stmt = Statement({
+                    title: "This won't pass validation because it misses a description"
+                });
+                chai.assert(!Match.test(stmt, Statements.simpleSchema()));
+
                 done();
             });
         });

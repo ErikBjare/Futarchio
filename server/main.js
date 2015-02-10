@@ -1,7 +1,5 @@
 Meteor.startup(function() {
     // code to run on server at startup
-    Meteor.publish('polls', function() { return Polls.find(); });
-    Meteor.publish('votes', function() { return Votes.find(); });
     Meteor.publish('statements', function() { return Statements.find(); });
     Meteor.publish('predictions', function() { return Predictions.find(); });
 });
@@ -12,7 +10,6 @@ Meteor.publish("allUsers", function () {
         fields: {
             '_id': 1,
             'profile': 1,
-            'emails': 1,
             'username': 1
     }});
 });

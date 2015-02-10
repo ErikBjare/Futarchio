@@ -15,27 +15,6 @@ Router.route('/about', function() {
     this.render("about");
 });
 
-// Votes and Polls
-Router.route('/vote', function() {
-    this.render("polls");
-});
-
-Router.route('/poll/:_id', function () {
-    var params = this.params;
-    var id = params._id;
-    this.render("singlePoll", {
-        data: function() {
-            data = Polls.findOne({"_id": id});
-            if(data === undefined) {
-                return data;
-            }
-            data.singleCard = true;
-            data.cardType = "poll";
-            return data;
-        }
-    });
-});
-
 // Predictions and Statements
 Router.route('/predict', function() {
     this.render("statements");

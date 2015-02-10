@@ -1,23 +1,56 @@
 <template name="statements">
     <div class="container">
-        {{#if currentUser}}
-            <button id="addbtn" class="btn">
-                {{#if session "showNewStmt"}}
-                    <span class="glyphicon glyphicon-remove"></span> Cancel
-                {{else}}
-                    <span class="glyphicon glyphicon-plus"></span> New Statement
-                {{/if}}
-            </button>
+        <div class="panel" style="margin-top: -20px; border-radius: 0; border-top-width: 0;">
+            <div class="panel-header row" style="padding: 0.5em;">
+                <div class="col-md-12">
+                    <div class="pull-left">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                                Order by {{capitalize order}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul id="orderMenu" class="dropdown-menu" role="menu">
+                                <li><a id="activity" href="#">Activity</a></li>
+                                <li><a id="points" href="#">Points</a></li>
+                                <li><a id="date" href="#">Date</a></li>
+                            </ul>
+                        </div>
+                    </div>
 
-            {{#momentum plugin='slide-height'}}
-                {{#if session "showNewStmt"}}
-                    <br>
-                    {{> newstatement}}
-                {{/if}}
-            {{/momentum}}
+                    <div class="pull-left">
+                        <div class="input-group" style="margin-left: 0.5em; width: 15em;">
+                            <input class="form-control input-sm" placeholder="Search">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-sm btn-default">Search [TODO]</button>
+                            </span>
+                        </div>
+                    </div>
 
-            <hr>
-        {{/if}}
+                    <div class="pull-right">
+                        {{#if currentUser}}
+                            <button id="newbtn" class="btn btn-sm btn-primary">
+                                {{#if tvar "showNewStmt"}}
+                                    <span class="glyphicon glyphicon-remove"></span> Cancel
+                                {{else}}
+                                    <span class="glyphicon glyphicon-plus"></span> New Statement
+                                {{/if}}
+                            </button>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+            {{#if currentUser}}
+                {{#momentum plugin='slide-height'}}
+                    {{#if tvar "showNewStmt"}}
+                        <div class="panel-body">
+                            <div class="panel-body">
+                                {{> newstatement}}
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/momentum}}
+            {{/if}}
+        </div>
 
         {{#each statements}}
             {{> statement}}
