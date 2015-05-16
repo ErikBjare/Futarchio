@@ -3,6 +3,9 @@ Futarchio
 
 *Predicting a better future, for most of mankind.*
 
+**NOTE:** Development has seized because the awesome people at Augur are doing such an awesome job that I can't keep up.
+
+
 [![Codeship Status for ErikBjare/Futarchio](https://codeship.com/projects/99df3fa0-60ec-0132-382e-1288075d9375/status)](https://codeship.com/projects/51705)  
 
 [![Code Climate](https://codeclimate.com/github/ErikBjare/Futarchio/badges/gpa.svg)](https://codeclimate.com/github/ErikBjare/Futarchio)
