@@ -3,7 +3,7 @@ Futarchio
 
 *Predicting a better future, for most of mankind.*
 
-**NOTE:** Development has seized because the awesome people at Augur are doing such an awesome job that I can't keep up.
+**NOTE:** Development has seized because the awesome people at Gnosis and Augur were doing such an amazing job that I could not expect to keep up. Those aside, **I highly recommend [Metaculus](http://metaculus.com/) if you are interested in prediction markets and don't mind them being no-money markets.**
 
 
 [![Codeship Status for ErikBjare/Futarchio](https://codeship.com/projects/99df3fa0-60ec-0132-382e-1288075d9375/status)](https://codeship.com/projects/51705)  
